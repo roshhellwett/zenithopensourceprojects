@@ -1,5 +1,8 @@
 "use client";
 
+/* =========================================================================
+   1. IMPORTS
+   ========================================================================= */
 import React, { useState, useEffect } from "react";
 import {
   motion,
@@ -10,30 +13,17 @@ import {
 } from "framer-motion";
 
 import {
-  Github,
-  Twitter,
-  Instagram,
-  Mail,
-  Gitlab,
-  Terminal,
-  Code2,
-  Cpu,
-  Database,
-  Globe,
-  FolderGit2,
-  CheckCircle2,
-  User,
-  MapPin,
-  Link2,
-  Star,
-  GitFork,
-  Activity,
-  Clock,
-  FileText
+  Github, Twitter, Instagram, Mail, Gitlab, 
+  Terminal, Code2, Cpu, Database, Globe, 
+  FolderGit2, CheckCircle2, User, MapPin, 
+  Link2, Star, GitFork, Activity, Clock, 
+  FileText, Rocket, BookOpen, GitCommit
 } from "lucide-react";
 
-/* ---------------- TYPES ---------------- */
 
+/* =========================================================================
+   2. TYPES & INTERFACES
+   ========================================================================= */
 interface Repo {
   name: string;
   link: string;
@@ -48,6 +38,7 @@ interface Repo {
 interface PanelProps {
   children: React.ReactNode;
   className?: string;
+  delay?: number;
 }
 
 interface RepoCardProps {
@@ -55,8 +46,10 @@ interface RepoCardProps {
   index: number;
 }
 
-/* ---------------- INITIAL FALLBACK DATA ---------------- */
 
+/* =========================================================================
+   3. STATIC DATA CONFIGURATION
+   ========================================================================= */
 const TARGET_REPOS = [
   "AcademicTeleBot",
   "PayNix",
@@ -89,8 +82,16 @@ const SOCIALS = [
   { label: "Email", icon: <Mail size={18} />, link: "mailto:roshhellwett@icloud.com", color: "text-emerald-500" }
 ];
 
-/* ---------------- ANIMATION ---------------- */
+const COMMIT_PATTERN = [
+  "bg-slate-200", "bg-emerald-300", "bg-emerald-200", "bg-slate-200", "bg-emerald-400", "bg-emerald-500", "bg-emerald-200",
+  "bg-slate-200", "bg-slate-200", "bg-emerald-300", "bg-emerald-500", "bg-emerald-400", "bg-emerald-200", "bg-slate-200",
+  "bg-emerald-200", "bg-emerald-400", "bg-emerald-300", "bg-emerald-500", "bg-emerald-500", "bg-emerald-300", "bg-emerald-200"
+];
 
+
+/* =========================================================================
+   4. ANIMATION CONFIGURATION
+   ========================================================================= */
 const spring: Transition = {
   type: "spring",
   stiffness: 100,
@@ -104,13 +105,13 @@ const fadeUp: Variants = {
 
 const stagger: Variants = {
   hidden: { opacity: 0 },
-  show: { 
-    opacity: 1,
-    transition: { staggerChildren: 0.1 } 
-  }
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
-/* ---------------- COMPONENTS ---------------- */
+
+/* =========================================================================
+   5. REUSABLE COMPONENTS
+   ========================================================================= */
 
 function Background() {
   const reduce = useReducedMotion();
@@ -118,32 +119,31 @@ function Background() {
 
   return (
     <div className="fixed inset-0 -z-10 bg-[#F4F5F7] overflow-hidden">
-      {/* Neo-Apple Soft Glows */}
       <motion.div
         animate={{ x: [0, 60, 0], y: [0, -60, 0] }}
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] blur-[100px] rounded-full bg-gradient-to-br from-orange-200/40 to-amber-100/40"
+        className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] blur-[100px] rounded-full bg-gradient-to-br from-orange-200/40 to-amber-100/40 will-change-transform transform-gpu"
       />
       <motion.div
         animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
         transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] blur-[120px] rounded-full bg-gradient-to-tl from-emerald-200/30 to-teal-100/30"
+        className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] blur-[120px] rounded-full bg-gradient-to-tl from-emerald-200/30 to-teal-100/30 will-change-transform transform-gpu"
       />
       <motion.div
         animate={{ x: [0, 30, 0], y: [0, 30, 0] }}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[20%] right-[20%] w-[40vw] h-[40vw] blur-[90px] rounded-full bg-gradient-to-b from-blue-200/30 to-indigo-100/30"
+        className="absolute top-[20%] right-[20%] w-[40vw] h-[40vw] blur-[90px] rounded-full bg-gradient-to-b from-blue-200/30 to-indigo-100/30 will-change-transform transform-gpu"
       />
     </div>
   );
 }
 
-function Panel({ children, className = "" }: PanelProps) {
+function Panel({ children, className = "", delay = 0 }: PanelProps) {
   return (
     <motion.div
       variants={fadeUp}
-      transition={spring}
-      className={`bg-white/70 backdrop-blur-3xl border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] rounded-[2.5rem] overflow-hidden ${className}`}
+      transition={{ ...spring, delay }}
+      className={`bg-white/70 backdrop-blur-xl border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] rounded-[2.5rem] overflow-hidden ${className}`}
     >
       {children}
     </motion.div>
@@ -164,7 +164,6 @@ const TerminalTyping = ({ text, delay = 0 }: { text: string, delay?: number }) =
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     let currentIndex = 0;
-
     const startTyping = () => {
       timeout = setInterval(() => {
         if (currentIndex <= text.length) {
@@ -175,13 +174,8 @@ const TerminalTyping = ({ text, delay = 0 }: { text: string, delay?: number }) =
         }
       }, 30);
     };
-
     const initialDelay = setTimeout(startTyping, delay);
-
-    return () => {
-      clearTimeout(initialDelay);
-      clearInterval(timeout);
-    };
+    return () => { clearTimeout(initialDelay); clearInterval(timeout); };
   }, [text, delay]);
 
   return <span>{displayedText}</span>;
@@ -203,23 +197,19 @@ function RepoCard({ repo, index }: RepoCardProps) {
       onMouseLeave={() => setHover(false)}
       className="block cursor-pointer h-full outline-none"
     >
-      <div className="relative h-full bg-white/60 hover:bg-white/90 backdrop-blur-xl border border-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col overflow-hidden">
+      <div className="relative h-full bg-white/60 hover:bg-white/90 backdrop-blur-lg border border-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col overflow-hidden">
         
-        {/* Terminal Header */}
+        {/* Repo Header */}
         <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between z-20 relative">
           <SoftTrafficLights />
           <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">{repo.name}.sh</span>
           <div className="w-10" />
         </div>
 
-        {/* Content */}
+        {/* Repo Content */}
         <motion.div 
-          animate={{ 
-            opacity: hover ? 0 : 1,
-            filter: hover ? "blur(8px)" : "blur(0px)",
-            scale: hover ? 0.95 : 1
-          }}
-          transition={{ duration: 0.3 }}
+          animate={{ opacity: hover ? 0 : 1, scale: hover ? 0.95 : 1 }}
+          transition={{ duration: 0.2 }}
           className="p-6 flex-1 flex flex-col relative z-10"
         >
           <div className="flex gap-4 items-center mb-5">
@@ -237,7 +227,6 @@ function RepoCard({ repo, index }: RepoCardProps) {
             <span className="inline-block text-[11px] font-bold px-4 py-1.5 rounded-full bg-slate-100/80 text-slate-600 shadow-sm border border-white">
               {repo.lang}
             </span>
-            
             {(repo.stars !== undefined || repo.forks !== undefined) && (
               <div className="flex gap-3 text-slate-400 text-xs font-bold">
                 <span className="flex items-center gap-1"><Star size={14}/> {repo.stars}</span>
@@ -247,7 +236,7 @@ function RepoCard({ repo, index }: RepoCardProps) {
           </div>
         </motion.div>
 
-        {/* Hover Terminal Overlay */}
+        {/* Repo Hover State */}
         <AnimatePresence>
           {hover && (
             <motion.div
@@ -255,7 +244,7 @@ function RepoCard({ repo, index }: RepoCardProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="absolute inset-0 top-[52px] z-30 bg-white/85 backdrop-blur-2xl p-8 flex flex-col justify-center font-mono text-sm rounded-b-[2rem]"
+              className="absolute inset-0 top-[52px] z-30 bg-white/95 backdrop-blur-xl p-8 flex flex-col justify-center font-mono text-sm rounded-b-[2rem]"
             >
               <div className="space-y-4">
                 <div className="text-slate-800 font-semibold text-base flex items-center h-6">
@@ -267,9 +256,7 @@ function RepoCard({ repo, index }: RepoCardProps) {
                   <TerminalTyping text="resolving dependencies..." delay={600} />
                 </div>
                 <motion.div 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  transition={{ delay: 1.4 }} 
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }} 
                   className="text-emerald-600 font-bold flex items-center gap-2 text-base mt-2"
                 >
                   <CheckCircle2 size={18} /> build success
@@ -285,18 +272,19 @@ function RepoCard({ repo, index }: RepoCardProps) {
   );
 }
 
-/* ---------------- PAGE ---------------- */
+
+/* =========================================================================
+   6. MAIN PAGE LAYOUT
+   ========================================================================= */
 
 export default function Page() {
   const [repos, setRepos] = useState<Repo[]>(FALLBACK_REPOS);
   const [time, setTime] = useState<string>("");
 
-  // Handle Hydration safe Local Time
   useEffect(() => {
-    setTime(new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }));
-    const interval = setInterval(() => {
-      setTime(new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }));
-    }, 1000);
+    const updateTime = () => setTime(new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }));
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -305,65 +293,66 @@ export default function Page() {
       try {
         const response = await fetch("https://api.github.com/users/roshhellwett/repos?per_page=100");
         if (!response.ok) throw new Error("GitHub API rate limit or error");
-        
         const data = await response.json();
         
         const liveRepos = TARGET_REPOS.map(targetName => {
           const liveData = data.find((r: any) => r.name === targetName);
           const fallbackData = FALLBACK_REPOS.find(r => r.name === targetName)!;
-          
           if (liveData) {
             return {
+              ...fallbackData,
               name: liveData.name,
               link: liveData.html_url,
               desc: liveData.description || fallbackData.desc,
               lang: liveData.language || fallbackData.lang,
               stars: liveData.stargazers_count,
               forks: liveData.forks_count,
-              gradient: fallbackData.gradient,
-              iconColor: fallbackData.iconColor
             };
           }
           return fallbackData; 
         });
-
         setRepos(liveRepos);
       } catch (error) {
         console.error("Using fallback repo data:", error);
       }
     };
-
     fetchGithubData();
   }, []);
 
   return (
-    <div className="min-h-screen font-sans text-slate-800 pb-24 selection:bg-indigo-100 selection:text-indigo-900 relative">
+    <div className="min-h-screen font-sans text-slate-800 pb-16 selection:bg-indigo-100 selection:text-indigo-900 relative flex flex-col">
       <Background />
 
-      {/* Header */}
+      {/* --- SITE HEADER --- */}
       <header className="sticky top-0 z-50 backdrop-blur-2xl bg-white/40 border-b border-white shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
           <div className="font-bold text-slate-700 tracking-wide bg-white shadow-sm border border-slate-100 px-4 py-1.5 rounded-xl">
-            Syntax
+            Radix
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 pt-12 relative z-10">
+      {/* --- MAIN LAYOUT GRID --- */}
+      <main className="max-w-7xl mx-auto px-6 pt-12 relative z-10 flex-grow w-full">
         <motion.div 
           variants={stagger} 
           initial="hidden" 
           animate="show"
-          className="grid lg:grid-cols-[340px_1fr] gap-10"
+          className="grid lg:grid-cols-[340px_1fr] gap-10 items-stretch"
         >
 
-          {/* SIDEBAR WRAPPER */}
-          <div className="flex flex-col space-y-10 self-start">
+          {/* ==============================================================
+              COLUMN 1: SIDEBAR (Widgets)
+              FIX: Removed self-start so it naturally flows and handles height
+              ============================================================== */}
+          <div className="flex flex-col space-y-8 h-full">
             
-            {/* MAIN PROFILE PANEL */}
+            {/* WIDGET 1: Main Profile Panel */}
             <Panel className="p-8 space-y-8">
               <div className="text-center md:text-left">
-                <h1 className="text-4xl font-black tracking-tight text-slate-800 mb-2">Roshan Kr Singh</h1>
+                <h1 className="text-3xl font-black tracking-tight text-slate-800 mb-2 whitespace-nowrap">
+                  ROSHAN ✭ 
+                </h1>
                 <p className="text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-lg inline-block">
                   @roshhellwett
                 </p>
@@ -377,20 +366,20 @@ export default function Page() {
               <div className="space-y-4 text-sm font-semibold text-slate-600">
                 <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
                   <div className="p-2 bg-indigo-50 text-indigo-500 rounded-lg"><User size={16}/></div> 
-                  Independent Developer
+                  INDEPENDENT DEVELOPER
                 </div>
                 <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
                   <div className="p-2 bg-rose-50 text-rose-500 rounded-lg"><MapPin size={16}/></div> 
-                  Kolkata, IN
+                  KOLKATA, IN
                 </div>
                 <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
                   <div className="p-2 bg-amber-50 text-amber-500 rounded-lg"><Link2 size={16}/></div> 
-                  <a href="#" className="hover:text-indigo-600 transition-colors">roshhellwett.dev</a>
+                  <a href="https://g.dev/roshhellwett" target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors">DEVLOPER PROGRAM MEMBER</a>
                 </div>
               </div>
 
               <div className="pt-6 border-t border-slate-200/50 space-y-2">
-                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">Social Nodes</h3>
+                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">SOCIAL NODES</h3>
                 {SOCIALS.map((s, i) => (
                   <a key={i} href={s.link} target="_blank" rel="noreferrer" aria-label={`Visit my ${s.label} profile`} className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white shadow-sm transition-all group">
                     <span className={`p-2 bg-slate-50 border border-slate-100 rounded-lg group-hover:bg-white transition-colors ${s.color}`}>
@@ -404,53 +393,97 @@ export default function Page() {
               </div>
             </Panel>
 
-            {/* SYSTEM STATUS & RESUME PANEL */}
-            <Panel className="p-8">
-              <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-2 flex items-center gap-2">
-                <Activity size={14} /> System Status
+            {/* WIDGET 2: System Status */}
+            <Panel className="p-8" delay={0.1}>
+              <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2 px-2">
+                <Activity size={14} /> SYSTEM STATUS
               </h3>
               
               <div className="space-y-4">
-                {/* Status Indicator */}
-                <div className="flex items-center justify-between p-4 bg-white/60 border border-white rounded-2xl shadow-sm">
-                  <span className="text-sm font-bold text-slate-600">Network</span>
+                <div className="flex items-center justify-between p-4 bg-white/60 border border-white rounded-2xl shadow-sm hover:shadow-md transition-all">
+                  <span className="text-sm font-bold text-slate-600">NETWORK</span>
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2.5 w-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                     </span>
-                    <span className="text-xs font-bold text-emerald-600">Online</span>
+                    <span className="text-xs font-bold text-emerald-600">ACTIVE</span>
                   </div>
                 </div>
 
-                {/* Local Time */}
-                <div className="flex items-center justify-between p-4 bg-white/60 border border-white rounded-2xl shadow-sm">
-                  <span className="text-sm font-bold text-slate-600">Local Time</span>
+                <div className="flex items-center justify-between p-4 bg-white/60 border border-white rounded-2xl shadow-sm hover:shadow-md transition-all">
+                  <span className="text-sm font-bold text-slate-600">LOCAL TIME</span>
                   <div className="flex items-center gap-2 text-indigo-600 font-mono text-xs font-bold">
                     <Clock size={14} />
                     <span>{time || "Loading..."}</span>
                   </div>
                 </div>
 
-                {/* Resume CTA */}
                 <a 
-                  href="/resume.pdf" 
+                  href="https://www.linkedin.com/in/roshhellwett" 
                   target="_blank"
                   rel="noreferrer"
                   className="mt-4 w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white font-bold rounded-xl shadow-[0_4px_14px_rgba(99,102,241,0.4)] transition-all active:scale-95"
                 >
                   <FileText size={16} />
-                  View Resume
+                  LINKEDIN
                 </a>
+              </div>
+            </Panel>
+
+            {/* WIDGET 3: Logic Synthesizer */}
+            <Panel className="p-8" delay={0.2}>
+              <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2 px-2">
+                <Cpu size={14} /> LOGIC SYNTHESIZER
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3.5 bg-white/60 border border-white rounded-xl shadow-sm hover:shadow-md transition-all">
+                  <span className="text-xs font-bold text-slate-700">GATE SIMULATION</span>
+                  <span className="text-[10px] font-bold px-2 py-1 bg-amber-100 border border-amber-200 text-amber-600 rounded-md shadow-sm">XOR / NAND</span>
+                </div>
+                <div className="flex items-center justify-between p-3.5 bg-white/60 border border-white rounded-xl shadow-sm hover:shadow-md transition-all">
+                  <span className="text-xs font-bold text-slate-700">K-MAP OPTIMIZATIONS</span>
+                  <span className="text-[10px] font-bold px-2 py-1 bg-emerald-100 border border-emerald-200 text-emerald-600 rounded-md shadow-sm">Active</span>
+                </div>
+                <div className="flex items-center justify-between p-3.5 bg-white/60 border border-white rounded-xl shadow-sm hover:shadow-md transition-all">
+                  <span className="text-xs font-bold text-slate-700">GRAPH ALGORITHMS</span>
+                  <span className="text-[10px] font-bold px-2 py-1 bg-indigo-100 border border-indigo-200 text-indigo-600 rounded-md shadow-sm">O(V+E)</span>
+                </div>
+              </div>
+            </Panel>
+
+            {/* WIDGET 4: Activity Matrix */}
+            <Panel className="p-8" delay={0.3}>
+              <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2 px-2">
+                <GitCommit size={14} /> Activity Matrix
+              </h3>
+              <div className="bg-white/60 border border-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center">
+                 <div className="flex items-center justify-between w-full mb-3">
+                   <span className="text-xs font-bold text-slate-800">Recent Commits</span>
+                   <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">Active</span>
+                 </div>
+                 {/* 7x3 Grid of Commit Squares */}
+                 <div className="grid grid-cols-7 gap-1.5 w-full">
+                    {COMMIT_PATTERN.map((color, i) => (
+                      <div key={i} className={`aspect-square rounded-[4px] ${color} shadow-inner hover:scale-110 transition-transform cursor-pointer`}></div>
+                    ))}
+                 </div>
+                 <div className="flex justify-between w-full mt-3 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                   <span>Less</span>
+                   <span>More</span>
+                 </div>
               </div>
             </Panel>
 
           </div>
 
-          {/* MAIN CONTENT AREA */}
-          <div className="space-y-10">
+
+          {/* ==============================================================
+              COLUMN 2: MAIN CONTENT AREA (Repos & Terminals)
+              ============================================================== */}
+          <div className="flex flex-col space-y-10 h-full">
             
-            {/* REPOSITORIES */}
+            {/* SECTION: Pinned Repositories */}
             <section>
               <h2 className="text-2xl font-black mb-6 flex gap-3 items-center text-slate-800 tracking-tight px-2">
                 <div className="p-2 bg-white text-indigo-500 rounded-xl border border-white shadow-sm">
@@ -466,36 +499,42 @@ export default function Page() {
               </motion.div>
             </section>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+            {/* SECTION: Twin Terminals 
+                FIX: flex-1 allows this container to push all the way to the bottom
+            */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch flex-1">
               
-              {/* STACK */}
+              {/* TERMINAL 1: Tech Stack */}
               <Panel className="flex flex-col h-full !p-0">
                 <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between">
                   <SoftTrafficLights />
                   <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">stack.sh</span>
                   <div className="w-10" />
                 </div>
-                <div className="p-8 font-mono text-sm text-slate-700 flex-1">
-                  <div className="mb-8 font-medium text-slate-500">
-                    <span className="text-indigo-500 font-black mr-2">{">"}</span> ./init_systems.sh
-                  </div>
-                  
-                  <div className="space-y-6">
-                    {STACK.map((group, i) => (
-                      <div key={i} className={`bg-white/60 p-5 rounded-2xl border border-white shadow-sm`}>
-                        <h3 className={`font-bold mb-4 flex items-center gap-2 ${group.color}`}>
-                          <span className={`p-1.5 rounded-lg ${group.bg} ${group.border} border`}>{group.icon}</span> 
-                          {group.category}
-                        </h3>
-                        <div className="grid grid-cols-2 gap-3 pl-2">
-                          {group.items.map(item => (
-                            <div key={item} className="flex gap-2 items-center font-bold text-slate-700 text-sm">
-                              <CheckCircle2 size={16} className={`${group.color} opacity-80`}/> {item}
-                            </div>
-                          ))}
+                {/* justify-between forces the footer to the absolute bottom of the panel */}
+                <div className="p-8 font-mono text-sm text-slate-700 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="mb-8 font-medium text-slate-500">
+                      <span className="text-indigo-500 font-black mr-2">{">"}</span> ./init_systems.sh
+                    </div>
+                    
+                    <div className="space-y-6">
+                      {STACK.map((group, i) => (
+                        <div key={i} className={`bg-white/60 p-5 rounded-2xl border border-white shadow-sm`}>
+                          <h3 className={`font-bold mb-4 flex items-center gap-2 ${group.color}`}>
+                            <span className={`p-1.5 rounded-lg ${group.bg} ${group.border} border`}>{group.icon}</span> 
+                            {group.category}
+                          </h3>
+                          <div className="grid grid-cols-2 gap-3 pl-2">
+                            {group.items.map(item => (
+                              <div key={item} className="flex gap-2 items-center font-bold text-slate-700 text-sm">
+                                <CheckCircle2 size={16} className={`${group.color} opacity-80`}/> {item}
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
 
                   <div className="mt-8 pt-6 border-t border-slate-200/50 flex items-center gap-2 font-bold text-emerald-600">
@@ -504,7 +543,7 @@ export default function Page() {
                 </div>
               </Panel>
 
-              {/* CONTACT TERMINAL */}
+              {/* TERMINAL 2: Contact Info */}
               <Panel className="flex flex-col h-full !p-0">
                 <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between">
                   <SoftTrafficLights />
@@ -512,40 +551,42 @@ export default function Page() {
                   <div className="w-10" />
                 </div>
                 
-                <div className="p-8 font-mono text-sm text-slate-700 flex-1">
-                  <div className="mb-8 font-medium text-slate-500">
-                    <span className="text-indigo-500 font-black mr-2">{">"}</span> contact --init
-                  </div>
-
-                  <div className="bg-white/60 border border-white rounded-[2rem] p-6 md:p-8 space-y-6 shadow-sm overflow-hidden">
-                    
-                    {/* Name Row */}
-                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
-                      <div className="flex items-center shrink-0">
-                        <span className="text-rose-500 font-bold w-16 md:w-24">Name</span>
-                        <span className="text-slate-400 mr-2 md:mr-4">:</span>
-                      </div>
-                      <span className="text-slate-800 font-bold text-xs sm:text-sm md:text-base truncate">Roshan Kr Singh</span>
+                {/* justify-between forces the footer to the absolute bottom of the panel */}
+                <div className="p-8 font-mono text-sm text-slate-700 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="mb-8 font-medium text-slate-500">
+                      <span className="text-indigo-500 font-black mr-2">{">"}</span> contact --init
                     </div>
 
-                    {/* Alias Row */}
-                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
-                      <div className="flex items-center shrink-0">
-                        <span className="text-amber-500 font-bold w-16 md:w-24">Alias</span>
-                        <span className="text-slate-400 mr-2 md:mr-4">:</span>
+                    <div className="bg-white/60 border border-white rounded-[2rem] p-6 md:p-8 space-y-6 shadow-sm overflow-hidden">
+                      {/* Name Row */}
+                      <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
+                        <div className="flex items-center shrink-0">
+                          <span className="text-rose-500 font-bold w-16 md:w-24">NAME</span>
+                          <span className="text-slate-400 mr-2 md:mr-4">:</span>
+                        </div>
+                        <span className="text-slate-800 font-bold text-xs sm:text-sm md:text-base truncate">ROSHAN ✭</span>
                       </div>
-                      <span className="text-slate-800 font-bold text-xs sm:text-sm md:text-base truncate">@roshhellwett</span>
-                    </div>
 
-                    {/* Email Row */}
-                    <div className="flex items-center justify-between pt-2 whitespace-nowrap overflow-hidden">
-                      <div className="flex items-center shrink-0">
-                        <span className="text-emerald-500 font-bold w-16 md:w-24">Email</span>
-                        <span className="text-slate-400 mr-2 md:mr-4">:</span>
+                      {/* Alias Row */}
+                      <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
+                        <div className="flex items-center shrink-0">
+                          <span className="text-amber-500 font-bold w-16 md:w-24">ALIAS</span>
+                          <span className="text-slate-400 mr-2 md:mr-4">:</span>
+                        </div>
+                        <span className="text-slate-800 font-bold text-xs sm:text-sm md:text-base truncate">@roshhellwett</span>
                       </div>
-                      <a href="mailto:roshhellwett@icloud.com" className="text-indigo-600 hover:text-indigo-500 font-bold text-[11px] sm:text-sm md:text-base hover:underline underline-offset-4 transition-all truncate">
-                        roshhellwett@icloud.com
-                      </a>
+
+                      {/* Email Row */}
+                      <div className="flex items-center justify-between pt-2 whitespace-nowrap overflow-hidden">
+                        <div className="flex items-center shrink-0">
+                          <span className="text-emerald-500 font-bold w-16 md:w-24">EMAIL</span>
+                          <span className="text-slate-400 mr-2 md:mr-4">:</span>
+                        </div>
+                        <a href="mailto:roshhellwett@icloud.com" className="text-indigo-600 hover:text-indigo-500 font-bold text-[11px] sm:text-sm md:text-base hover:underline underline-offset-4 transition-all truncate">
+                          @roshhellwett
+                        </a>
+                      </div>
                     </div>
                   </div>
 
@@ -558,8 +599,22 @@ export default function Page() {
 
             </div>
           </div>
+
         </motion.div>
       </main>
+
+      {/* --- SITE FOOTER --- */}
+      <footer className="max-w-7xl mx-auto px-6 py-8 mt-12 w-full text-center relative z-10">
+        <div className="pt-8 border-t border-slate-300/40">
+          <p className="text-xs font-bold text-slate-500">
+            © {new Date().getFullYear()} Roshhellwett. All rights reserved.
+          </p>
+          <p className="text-[10px] font-medium text-slate-400 mt-2">
+            Built with Next.js, Tailwind CSS, Framer Motion & Design By Roshhellwett.
+          </p>
+        </div>
+      </footer>
+      
     </div>
   );
 }
