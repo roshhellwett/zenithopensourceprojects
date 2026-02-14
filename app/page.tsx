@@ -26,7 +26,10 @@ import {
   MapPin,
   Link2,
   Star,
-  GitFork
+  GitFork,
+  Activity,
+  Clock,
+  FileText
 } from "lucide-react";
 
 /* ---------------- TYPES ---------------- */
@@ -244,7 +247,7 @@ function RepoCard({ repo, index }: RepoCardProps) {
           </div>
         </motion.div>
 
-        {/* Hover Terminal Overlay - Matching the provided image */}
+        {/* Hover Terminal Overlay */}
         <AnimatePresence>
           {hover && (
             <motion.div
@@ -286,6 +289,16 @@ function RepoCard({ repo, index }: RepoCardProps) {
 
 export default function Page() {
   const [repos, setRepos] = useState<Repo[]>(FALLBACK_REPOS);
+  const [time, setTime] = useState<string>("");
+
+  // Handle Hydration safe Local Time
+  useEffect(() => {
+    setTime(new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }));
+    const interval = setInterval(() => {
+      setTime(new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchGithubData = async () => {
@@ -344,50 +357,95 @@ export default function Page() {
           className="grid lg:grid-cols-[340px_1fr] gap-10"
         >
 
-          {/* SIDEBAR */}
-          <Panel className="p-8 space-y-8 self-start">
+          {/* SIDEBAR WRAPPER */}
+          <div className="flex flex-col space-y-10 self-start">
             
-            <div className="text-center md:text-left">
-              <h1 className="text-4xl font-black tracking-tight text-slate-800 mb-2">Roshan Kr Singh</h1>
-              <p className="text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-lg inline-block">
-                @roshhellwett
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-5 border border-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] mb-8 font-mono text-sm">
-              <span className="text-indigo-500 font-bold">const</span> <span className="text-rose-500 font-semibold">focus</span> = <br/>
-              <span className="text-emerald-600 font-medium">"Building systems that think."</span>;
-            </div>
-
-            <div className="space-y-4 text-sm font-semibold text-slate-600">
-              <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
-                <div className="p-2 bg-indigo-50 text-indigo-500 rounded-lg"><User size={16}/></div> 
-                Independent Developer
+            {/* MAIN PROFILE PANEL */}
+            <Panel className="p-8 space-y-8">
+              <div className="text-center md:text-left">
+                <h1 className="text-4xl font-black tracking-tight text-slate-800 mb-2">Roshan Kr Singh</h1>
+                <p className="text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-lg inline-block">
+                  @roshhellwett
+                </p>
               </div>
-              <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
-                <div className="p-2 bg-rose-50 text-rose-500 rounded-lg"><MapPin size={16}/></div> 
-                Kolkata, IN
-              </div>
-              <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
-                <div className="p-2 bg-amber-50 text-amber-500 rounded-lg"><Link2 size={16}/></div> 
-                <a href="#" className="hover:text-indigo-600 transition-colors">roshhellwett.dev</a>
-              </div>
-            </div>
 
-            <div className="pt-6 border-t border-slate-200/50 space-y-2">
-              <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">Social Nodes</h3>
-              {SOCIALS.map((s, i) => (
-                <a key={i} href={s.link} target="_blank" rel="noreferrer" aria-label={`Visit my ${s.label} profile`} className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white shadow-sm transition-all group">
-                  <span className={`p-2 bg-slate-50 border border-slate-100 rounded-lg group-hover:bg-white transition-colors ${s.color}`}>
-                    {s.icon}
-                  </span>
-                  <span className="font-bold text-sm text-slate-600 group-hover:text-slate-900 transition-colors">
-                    {s.label}
-                  </span>
+              <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-5 border border-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] mb-8 font-mono text-sm">
+                <span className="text-indigo-500 font-bold">const</span> <span className="text-rose-500 font-semibold">focus</span> = <br/>
+                <span className="text-emerald-600 font-medium">"Building systems that think."</span>;
+              </div>
+
+              <div className="space-y-4 text-sm font-semibold text-slate-600">
+                <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
+                  <div className="p-2 bg-indigo-50 text-indigo-500 rounded-lg"><User size={16}/></div> 
+                  Independent Developer
+                </div>
+                <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
+                  <div className="p-2 bg-rose-50 text-rose-500 rounded-lg"><MapPin size={16}/></div> 
+                  Kolkata, IN
+                </div>
+                <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
+                  <div className="p-2 bg-amber-50 text-amber-500 rounded-lg"><Link2 size={16}/></div> 
+                  <a href="#" className="hover:text-indigo-600 transition-colors">roshhellwett.dev</a>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-slate-200/50 space-y-2">
+                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">Social Nodes</h3>
+                {SOCIALS.map((s, i) => (
+                  <a key={i} href={s.link} target="_blank" rel="noreferrer" aria-label={`Visit my ${s.label} profile`} className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white shadow-sm transition-all group">
+                    <span className={`p-2 bg-slate-50 border border-slate-100 rounded-lg group-hover:bg-white transition-colors ${s.color}`}>
+                      {s.icon}
+                    </span>
+                    <span className="font-bold text-sm text-slate-600 group-hover:text-slate-900 transition-colors">
+                      {s.label}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </Panel>
+
+            {/* SYSTEM STATUS & RESUME PANEL */}
+            <Panel className="p-8">
+              <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-2 flex items-center gap-2">
+                <Activity size={14} /> System Status
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Status Indicator */}
+                <div className="flex items-center justify-between p-4 bg-white/60 border border-white rounded-2xl shadow-sm">
+                  <span className="text-sm font-bold text-slate-600">Network</span>
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span className="text-xs font-bold text-emerald-600">Online</span>
+                  </div>
+                </div>
+
+                {/* Local Time */}
+                <div className="flex items-center justify-between p-4 bg-white/60 border border-white rounded-2xl shadow-sm">
+                  <span className="text-sm font-bold text-slate-600">Local Time</span>
+                  <div className="flex items-center gap-2 text-indigo-600 font-mono text-xs font-bold">
+                    <Clock size={14} />
+                    <span>{time || "Loading..."}</span>
+                  </div>
+                </div>
+
+                {/* Resume CTA */}
+                <a 
+                  href="/resume.pdf" 
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white font-bold rounded-xl shadow-[0_4px_14px_rgba(99,102,241,0.4)] transition-all active:scale-95"
+                >
+                  <FileText size={16} />
+                  View Resume
                 </a>
-              ))}
-            </div>
-          </Panel>
+              </div>
+            </Panel>
+
+          </div>
 
           {/* MAIN CONTENT AREA */}
           <div className="space-y-10">
@@ -446,7 +504,7 @@ export default function Page() {
                 </div>
               </Panel>
 
-              {/* CONTACT TERMINAL (Strict Layout Maintained) */}
+              {/* CONTACT TERMINAL */}
               <Panel className="flex flex-col h-full !p-0">
                 <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between">
                   <SoftTrafficLights />
