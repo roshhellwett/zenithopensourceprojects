@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-title: "Radix",
-  description: "Building systems that think. Beginner in Python, C++, and modern web architectures.",
+title: "Zenith",
+  description: "We Focus On Open Source Projects",
   themeColor: "#4A7FA7",
 };
 

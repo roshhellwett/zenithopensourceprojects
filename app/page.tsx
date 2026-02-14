@@ -60,7 +60,7 @@ const TARGET_REPOS = [
 ];
 
 const FALLBACK_REPOS: Repo[] = [
-  { name: "AcademicTeleBot", link: "https://github.com/roshhellwett/AcademicTeleBot", desc: "Automated university notification engine.", lang: "Python", stars: 0, forks: 0, gradient: "from-indigo-100 to-blue-50", iconColor: "text-indigo-500" },
+  { name: "ZenithSupremeEdition", link: "https://github.com/roshhellwett/ZenithSupremeEdition.git", desc: "Open Source Telegram Bots", lang: "Python", stars: 0, forks: 0, gradient: "from-indigo-100 to-blue-50", iconColor: "text-indigo-500" },
   { name: "PayNix", link: "https://github.com/roshhellwett/PayNix", desc: "Secure transaction processing module.", lang: "JavaScript", stars: 0, forks: 0, gradient: "from-orange-100 to-amber-50", iconColor: "text-orange-500" },
   { name: "Egnima", link: "https://github.com/roshhellwett/Egnima", desc: "Advanced encryption/decryption algorithm.", lang: "C++", stars: 0, forks: 0, gradient: "from-emerald-100 to-teal-50", iconColor: "text-emerald-500" },
   { name: "Logichands", link: "https://github.com/roshhellwett/Logichands", desc: "Digital logic gate simulation kernel.", lang: "C", stars: 0, forks: 0, gradient: "from-rose-100 to-pink-50", iconColor: "text-rose-500" },
@@ -327,7 +327,7 @@ export default function Page() {
       <header className="sticky top-0 z-50 backdrop-blur-2xl bg-white/40 border-b border-white shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
           <div className="font-bold text-slate-700 tracking-wide bg-white shadow-sm border border-slate-100 px-4 py-1.5 rounded-xl">
-            Radix
+            Zenith
           </div>
         </div>
       </header>
@@ -370,7 +370,7 @@ export default function Page() {
                 </div>
                 <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
                   <div className="p-2 bg-rose-50 text-rose-500 rounded-lg"><MapPin size={16}/></div> 
-                  KOLKATA, IN
+                  ASIA/INDIA
                 </div>
                 <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
                   <div className="p-2 bg-amber-50 text-amber-500 rounded-lg"><Link2 size={16}/></div> 
@@ -607,10 +607,10 @@ export default function Page() {
       <footer className="max-w-7xl mx-auto px-6 py-8 mt-12 w-full text-center relative z-10">
         <div className="pt-8 border-t border-slate-300/40">
           <p className="text-xs font-bold text-slate-500">
-            © {new Date().getFullYear()} Roshhellwett. All rights reserved.
+            © {new Date().getFullYear()} Zenith . All rights reserved.
           </p>
           <p className="text-[10px] font-medium text-slate-400 mt-2">
-            Built with Next.js, Tailwind CSS, Framer Motion & Design By Roshhellwett.
+            Built with Next.js, Tailwind CSS, Framer Motion & Design By Claude & Gemini.
           </p>
         </div>
       </footer>
