@@ -495,7 +495,7 @@ export default function Page() {
                 <div className="p-2 bg-white text-indigo-500 rounded-xl border border-white shadow-sm">
                   <Terminal size={20}/>
                 </div>
-                Pinned Repositories
+                Open Source Projects
               </h2>
 
               <motion.div variants={stagger} className="grid md:grid-cols-2 gap-6 items-stretch">
