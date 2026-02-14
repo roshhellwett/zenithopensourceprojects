@@ -50,8 +50,9 @@ interface RepoCardProps {
 /* =========================================================================
    3. STATIC DATA CONFIGURATION
    ========================================================================= */
+// FIX: Updated TARGET_REPOS to exactly match the names in FALLBACK_REPOS
 const TARGET_REPOS = [
-  "AcademicTeleBot",
+  "ZenithSupremeEdition",
   "PayNix",
   "Egnima",
   "Logichands",
@@ -184,9 +185,12 @@ const TerminalTyping = ({ text, delay = 0 }: { text: string, delay?: number }) =
 function RepoCard({ repo, index }: RepoCardProps) {
   const [hover, setHover] = useState(false);
 
+  // Safety check to prevent crashes if a repo is undefined
+  if (!repo) return null;
+
   return (
     <motion.a
-      href={repo.link}
+      href={repo.link || "#"}
       target="_blank"
       rel="noreferrer"
       variants={fadeUp}
@@ -202,7 +206,7 @@ function RepoCard({ repo, index }: RepoCardProps) {
         {/* Repo Header */}
         <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between z-20 relative">
           <SoftTrafficLights />
-          <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">{repo.name}.sh</span>
+          <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">{repo.name || "repo"}.sh</span>
           <div className="w-10" />
         </div>
 
@@ -213,24 +217,24 @@ function RepoCard({ repo, index }: RepoCardProps) {
           className="p-6 flex-1 flex flex-col relative z-10"
         >
           <div className="flex gap-4 items-center mb-5">
-            <div className={`p-3.5 rounded-2xl bg-gradient-to-br ${repo.gradient} ${repo.iconColor} shadow-sm border border-white`}>
+            <div className={`p-3.5 rounded-2xl bg-gradient-to-br ${repo.gradient || "from-slate-100 to-slate-50"} ${repo.iconColor || "text-slate-500"} shadow-sm border border-white`}>
               <FolderGit2 size={24} />
             </div>
-            <h3 className="text-xl font-bold tracking-tight text-slate-800">{repo.name}</h3>
+            <h3 className="text-xl font-bold tracking-tight text-slate-800">{repo.name || "Unknown"}</h3>
           </div>
 
           <p className="text-slate-500 mb-6 flex-1 font-medium leading-relaxed">
-            {repo.desc}
+            {repo.desc || "No description provided."}
           </p>
 
           <div className="flex items-center justify-between mt-auto">
             <span className="inline-block text-[11px] font-bold px-4 py-1.5 rounded-full bg-slate-100/80 text-slate-600 shadow-sm border border-white">
-              {repo.lang}
+              {repo.lang || "Code"}
             </span>
             {(repo.stars !== undefined || repo.forks !== undefined) && (
               <div className="flex gap-3 text-slate-400 text-xs font-bold">
-                <span className="flex items-center gap-1"><Star size={14}/> {repo.stars}</span>
-                <span className="flex items-center gap-1"><GitFork size={14}/> {repo.forks}</span>
+                <span className="flex items-center gap-1"><Star size={14}/> {repo.stars || 0}</span>
+                <span className="flex items-center gap-1"><GitFork size={14}/> {repo.forks || 0}</span>
               </div>
             )}
           </div>
@@ -297,21 +301,25 @@ export default function Page() {
         
         const liveRepos = TARGET_REPOS.map(targetName => {
           const liveData = data.find((r: any) => r.name === targetName);
-          const fallbackData = FALLBACK_REPOS.find(r => r.name === targetName)!;
+          const fallbackData = FALLBACK_REPOS.find(r => r.name === targetName);
+          
+          const safeFallback = fallbackData || { name: targetName, link: "#", desc: "", lang: "Code", gradient: "from-slate-100 to-slate-50", iconColor: "text-slate-500" };
+
           if (liveData) {
             return {
-              ...fallbackData,
+              ...safeFallback,
               name: liveData.name,
               link: liveData.html_url,
-              desc: liveData.description || fallbackData.desc,
-              lang: liveData.language || fallbackData.lang,
+              desc: liveData.description || safeFallback.desc,
+              lang: liveData.language || safeFallback.lang,
               stars: liveData.stargazers_count,
               forks: liveData.forks_count,
             };
           }
-          return fallbackData; 
-        });
-        setRepos(liveRepos);
+          return safeFallback as Repo; 
+        }).filter(Boolean);
+
+        setRepos(liveRepos as Repo[]);
       } catch (error) {
         console.error("Using fallback repo data:", error);
       }
@@ -338,19 +346,18 @@ export default function Page() {
           variants={stagger} 
           initial="hidden" 
           animate="show"
-          className="grid lg:grid-cols-[340px_1fr] gap-10 items-stretch"
+          className="grid lg:grid-cols-[340px_1fr] gap-10 items-stretch h-full"
         >
 
           {/* ==============================================================
               COLUMN 1: SIDEBAR (Widgets)
-              FIX: Removed self-start so it naturally flows and handles height
               ============================================================== */}
           <div className="flex flex-col space-y-8 h-full">
             
             {/* WIDGET 1: Main Profile Panel */}
             <Panel className="p-8 space-y-8">
               <div className="text-center md:text-left">
-                <h1 className="text-3xl font-black tracking-tight text-slate-800 mb-2 whitespace-nowrap">
+                <h1 className="text-3xl xl:text-[32px] font-black tracking-tight text-slate-800 mb-2 whitespace-nowrap shrink-0">
                   ROSHAN ✭ 
                 </h1>
                 <p className="text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-lg inline-block">
@@ -453,7 +460,7 @@ export default function Page() {
             </Panel>
 
             {/* WIDGET 4: Activity Matrix */}
-            <Panel className="p-8" delay={0.3}>
+            <Panel className="p-8 flex-1 flex flex-col justify-center" delay={0.3}>
               <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2 px-2">
                 <GitCommit size={14} /> Activity Matrix
               </h3>
@@ -462,7 +469,6 @@ export default function Page() {
                    <span className="text-xs font-bold text-slate-800">Recent Commits</span>
                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">Active</span>
                  </div>
-                 {/* 7x3 Grid of Commit Squares */}
                  <div className="grid grid-cols-7 gap-1.5 w-full">
                     {COMMIT_PATTERN.map((color, i) => (
                       <div key={i} className={`aspect-square rounded-[4px] ${color} shadow-inner hover:scale-110 transition-transform cursor-pointer`}></div>
@@ -499,9 +505,7 @@ export default function Page() {
               </motion.div>
             </section>
 
-            {/* SECTION: Twin Terminals 
-                FIX: flex-1 allows this container to push all the way to the bottom
-            */}
+            {/* SECTION: Twin Terminals */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch flex-1">
               
               {/* TERMINAL 1: Tech Stack */}
@@ -511,7 +515,6 @@ export default function Page() {
                   <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">stack.sh</span>
                   <div className="w-10" />
                 </div>
-                {/* justify-between forces the footer to the absolute bottom of the panel */}
                 <div className="p-8 font-mono text-sm text-slate-700 flex-1 flex flex-col justify-between">
                   <div>
                     <div className="mb-8 font-medium text-slate-500">
@@ -551,7 +554,6 @@ export default function Page() {
                   <div className="w-10" />
                 </div>
                 
-                {/* justify-between forces the footer to the absolute bottom of the panel */}
                 <div className="p-8 font-mono text-sm text-slate-700 flex-1 flex flex-col justify-between">
                   <div>
                     <div className="mb-8 font-medium text-slate-500">
@@ -559,7 +561,6 @@ export default function Page() {
                     </div>
 
                     <div className="bg-white/60 border border-white rounded-[2rem] p-6 md:p-8 space-y-6 shadow-sm overflow-hidden">
-                      {/* Name Row */}
                       <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
                         <div className="flex items-center shrink-0">
                           <span className="text-rose-500 font-bold w-16 md:w-24">NAME</span>
@@ -568,7 +569,6 @@ export default function Page() {
                         <span className="text-slate-800 font-bold text-xs sm:text-sm md:text-base truncate">ROSHAN ✭</span>
                       </div>
 
-                      {/* Alias Row */}
                       <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
                         <div className="flex items-center shrink-0">
                           <span className="text-amber-500 font-bold w-16 md:w-24">ALIAS</span>
@@ -577,7 +577,6 @@ export default function Page() {
                         <span className="text-slate-800 font-bold text-xs sm:text-sm md:text-base truncate">@roshhellwett</span>
                       </div>
 
-                      {/* Email Row */}
                       <div className="flex items-center justify-between pt-2 whitespace-nowrap overflow-hidden">
                         <div className="flex items-center shrink-0">
                           <span className="text-emerald-500 font-bold w-16 md:w-24">EMAIL</span>
