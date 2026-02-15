@@ -50,23 +50,23 @@ interface RepoCardProps {
 /* =========================================================================
    3. STATIC DATA CONFIGURATION
    ========================================================================= */
-// FIX: Updated TARGET_REPOS to exactly match the names in FALLBACK_REPOS
+// Updated with your new real repositories
 const TARGET_REPOS = [
   "ZenithSupremeEdition",
-  "PayNix",
-  "Egnima",
-  "Logichands",
+  "WinActivation",
+  "Grub",
+  "MovieFix",
   "Numsuko",
   "easyeffects-pulsewire-presets"
 ];
 
 const FALLBACK_REPOS: Repo[] = [
   { name: "ZenithSupremeEdition", link: "https://github.com/roshhellwett/ZenithSupremeEdition.git", desc: "Open Source Telegram Bots", lang: "Python", stars: 0, forks: 0, gradient: "from-indigo-100 to-blue-50", iconColor: "text-indigo-500" },
-  { name: "PayNix", link: "https://github.com/roshhellwett/PayNix", desc: "Secure transaction processing module.", lang: "JavaScript", stars: 0, forks: 0, gradient: "from-orange-100 to-amber-50", iconColor: "text-orange-500" },
-  { name: "Egnima", link: "https://github.com/roshhellwett/Egnima", desc: "Advanced encryption/decryption algorithm.", lang: "C++", stars: 0, forks: 0, gradient: "from-emerald-100 to-teal-50", iconColor: "text-emerald-500" },
-  { name: "Logichands", link: "https://github.com/roshhellwett/Logichands", desc: "Digital logic gate simulation kernel.", lang: "C", stars: 0, forks: 0, gradient: "from-rose-100 to-pink-50", iconColor: "text-rose-500" },
+  { name: "WinActivation", link: "https://github.com/roshhellwett/WinActivation.git", desc: "Windows OS Activation utility scripts.", lang: "Batchfile", stars: 0, forks: 0, gradient: "from-sky-100 to-blue-50", iconColor: "text-sky-500" },
+  { name: "Grub", link: "https://github.com/roshhellwett/Grub.git", desc: "Custom GRUB bootloader themes and configs.", lang: "Shell", stars: 0, forks: 0, gradient: "from-purple-100 to-pink-50", iconColor: "text-purple-500" },
+  { name: "MovieFix", link: "https://github.com/roshhellwett/MovieFix.git", desc: "Movie metadata matching and renaming tool.", lang: "Python", stars: 0, forks: 0, gradient: "from-rose-100 to-orange-50", iconColor: "text-rose-500" },
   { name: "Numsuko", link: "https://github.com/roshhellwett/Numsuko", desc: "High-performance numerical analysis toolkit.", lang: "Java", stars: 0, forks: 0, gradient: "from-cyan-100 to-sky-50", iconColor: "text-cyan-600" },
-  { name: "easyeffects-pulsewire-presets", link: "https://github.com/roshhellwett/easyeffects-pulsewire-presets", desc: "Audio processing signal chains.", lang: "Shell", stars: 0, forks: 0, gradient: "from-purple-100 to-fuchsia-50", iconColor: "text-purple-500" }
+  { name: "easyeffects-pulsewire-presets", link: "https://github.com/roshhellwett/easyeffects-pulsewire-presets", desc: "Audio processing signal chains.", lang: "Shell", stars: 0, forks: 0, gradient: "from-emerald-100 to-teal-50", iconColor: "text-emerald-500" }
 ];
 
 const STACK = [
