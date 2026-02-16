@@ -13,9 +13,11 @@ import {
 } from "framer-motion";
 
 import {
-  Github, Twitter, Instagram, Mail, Gitlab, 
-  Terminal, FolderGit2, CheckCircle2, 
-  Link2, Star, GitFork
+  Github, Twitter, Gitlab, Terminal, 
+  FolderGit2, CheckCircle2, ArrowRight, 
+  GraduationCap, Globe, ExternalLink,
+  Linkedin, Layers, Box, Cpu, Database,
+  LayoutTemplate, Code2
 } from "lucide-react";
 
 
@@ -23,12 +25,11 @@ import {
    2. TYPES & INTERFACES
    ========================================================================= */
 interface Repo {
-  name: string;
+  name: string;        
+  displayName: string; 
   link: string;
   desc: string;
   lang: string;
-  stars?: number;
-  forks?: number;
   gradient: string;
   iconColor: string;
 }
@@ -50,28 +51,56 @@ interface RepoCardProps {
    ========================================================================= */
 const TARGET_REPOS = [
   "ZenithSupremeEdition",
+  "PayNix",
   "WinActivation",
   "Grub",
-  "MovieFix",
-  "Numsuko",
-  "easyeffects-pulsewire-presets"
+  "easyeffects-pulsewire-presets",
+  "Logichands"
 ];
 
 const FALLBACK_REPOS: Repo[] = [
-  { name: "ZenithSupremeEdition", link: "https://github.com/roshhellwett/ZenithSupremeEdition.git", desc: "Open Source Telegram Bots", lang: "Python", stars: 0, forks: 0, gradient: "from-indigo-100 to-blue-50", iconColor: "text-indigo-500" },
-  { name: "WinActivation", link: "https://github.com/roshhellwett/WinActivation.git", desc: "Windows OS Activation utility scripts.", lang: "Batchfile", stars: 0, forks: 0, gradient: "from-sky-100 to-blue-50", iconColor: "text-sky-500" },
-  { name: "Grub", link: "https://github.com/roshhellwett/Grub.git", desc: "Custom GRUB bootloader themes and configs.", lang: "Shell", stars: 0, forks: 0, gradient: "from-purple-100 to-pink-50", iconColor: "text-purple-500" },
-  { name: "MovieFix", link: "https://github.com/roshhellwett/MovieFix.git", desc: "Movie metadata matching and renaming tool.", lang: "Python", stars: 0, forks: 0, gradient: "from-rose-100 to-orange-50", iconColor: "text-rose-500" },
-  { name: "Numsuko", link: "https://github.com/roshhellwett/Numsuko", desc: "High-performance numerical analysis toolkit.", lang: "Java", stars: 0, forks: 0, gradient: "from-cyan-100 to-sky-50", iconColor: "text-cyan-600" },
-  { name: "easyeffects-pulsewire-presets", link: "https://github.com/roshhellwett/easyeffects-pulsewire-presets", desc: "Audio processing signal chains.", lang: "Shell", stars: 0, forks: 0, gradient: "from-emerald-100 to-teal-50", iconColor: "text-emerald-500" }
+  { name: "ZenithSupremeEdition", displayName: "Zenith Supreme Edition", link: "https://github.com/roshhellwett/ZenithSupremeEdition", desc: "Open Source Telegram Bots", lang: "Python", gradient: "from-indigo-100 to-blue-50", iconColor: "text-indigo-500" },
+  { name: "PayNix", displayName: "Pay Nix", link: "https://github.com/roshhellwett/PayNix", desc: "Secure transaction processing module.", lang: "JavaScript", gradient: "from-orange-100 to-amber-50", iconColor: "text-orange-500" },
+  { name: "WinActivation", displayName: "Win Activation", link: "https://github.com/roshhellwett/WinActivation", desc: "Windows OS Activation utility scripts.", lang: "Batchfile", gradient: "from-sky-100 to-blue-50", iconColor: "text-sky-500" },
+  { name: "Grub", displayName: "Grub", link: "https://github.com/roshhellwett/Grub", desc: "Custom GRUB bootloader themes and configs.", lang: "Shell", gradient: "from-purple-100 to-pink-50", iconColor: "text-purple-500" },
+  { name: "easyeffects-pulsewire-presets", displayName: "Pulsewire Presets", link: "https://github.com/roshhellwett/easyeffects-pulsewire-presets", desc: "Audio processing signal chains.", lang: "Shell", gradient: "from-emerald-100 to-teal-50", iconColor: "text-emerald-500" },
+  { name: "Logichands", displayName: "Logic Hands", link: "https://github.com/roshhellwett/Logichands", desc: "Digital logic gate simulation kernel.", lang: "C", gradient: "from-rose-100 to-orange-50", iconColor: "text-rose-500" }
+];
+
+const STACK = [
+  { 
+    category: "Systems & Logic Core", 
+    icon: <Cpu size={16} />,
+    color: "text-indigo-600",
+    bgColor: "bg-indigo-50 border-indigo-100",
+    concept: "Low-level memory management, OOP principles, and algorithmic thinking across paradigms.",
+    items: ["C", "C++", "Python", "Java"] 
+  },
+  { 
+    category: "Web & Interface Ecosystem", 
+    icon: <LayoutTemplate size={16} />,
+    color: "text-sky-600",
+    bgColor: "bg-sky-50 border-sky-100",
+    concept: "Component-based architecture, asynchronous state management, and responsive design patterns.",
+    items: ["HTML5", "CSS3", "JavaScript", "React"] 
+  },
+  { 
+    category: "Data Infrastructure & Ops", 
+    icon: <Database size={16} />,
+    color: "text-emerald-600",
+    bgColor: "bg-emerald-50 border-emerald-100",
+    concept: "Relational vs NoSQL modeling, distributed version control flows, and system administration.",
+    items: ["MySQL", "MongoDB", "Linux", "Git"] 
+  }
 ];
 
 const SOCIALS = [
-  { label: "GitHub", icon: <Github size={18} />, link: "https://github.com/roshhellwett", color: "text-slate-700" },
-  { label: "Twitter", icon: <Twitter size={18} />, link: "https://twitter.com/roshhellwett", color: "text-sky-500" },
-  { label: "Instagram", icon: <Instagram size={18} />, link: "https://instagram.com/roshhellwett", color: "text-pink-500" },
+  { label: "LinkedIn", icon: <Linkedin size={18} />, link: "https://www.linkedin.com/in/roshhellwett", color: "text-blue-600" },
+  { label: "ORCID", icon: <GraduationCap size={18} />, link: "https://orcid.org/0009-0008-7213-6376", color: "text-lime-600" },
+  { label: "Stack Overflow", icon: <Layers size={18} />, link: "https://stackoverflow.com/users/17301307/roshhellwett", color: "text-amber-500" },
+  { label: "SourceForge", icon: <Box size={18} />, link: "https://sourceforge.net/u/roshhellwett/profile", color: "text-orange-600" },
   { label: "GitLab", icon: <Gitlab size={18} />, link: "https://gitlab.com/roshhellwett", color: "text-orange-500" },
-  { label: "Email", icon: <Mail size={18} />, link: "mailto:roshhellwett@icloud.com", color: "text-emerald-500" }
+  { label: "Twitter", icon: <Twitter size={18} />, link: "https://twitter.com/roshhellwett", color: "text-sky-500" }
 ];
 
 
@@ -117,7 +146,7 @@ function Panel({ children, className = "", delay = 0 }: PanelProps) {
     <motion.div
       variants={fadeUp}
       transition={{ ...spring, delay }}
-      className={`bg-white/70 backdrop-blur-xl border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] rounded-[2.5rem] overflow-hidden ${className}`}
+      className={`bg-white/70 backdrop-blur-xl border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden ${className}`}
     >
       {children}
     </motion.div>
@@ -171,48 +200,42 @@ function RepoCard({ repo, index }: RepoCardProps) {
       whileTap={{ scale: 0.98 }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="block cursor-pointer h-full outline-none"
+      className="block cursor-pointer h-full outline-none group"
     >
       <div className="relative h-full bg-white/60 hover:bg-white/90 backdrop-blur-lg border border-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col overflow-hidden">
         
-        {/* Repo Header */}
         <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between z-20 relative">
           <SoftTrafficLights />
-          <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">{repo.name || "repo"}.sh</span>
-          <div className="w-10" />
+          <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase truncate ml-3">{repo.name || "repo"}.sh</span>
+          <div className="w-10 shrink-0" />
         </div>
 
-        {/* Repo Content */}
         <motion.div 
           animate={{ opacity: hover ? 0 : 1, scale: hover ? 0.95 : 1 }}
           transition={{ duration: 0.2 }}
-          className="p-6 flex-1 flex flex-col relative z-10"
+          className="p-5 md:p-6 flex-1 flex flex-col relative z-10"
         >
           <div className="flex gap-4 items-center mb-5">
-            <div className={`p-3.5 rounded-2xl bg-gradient-to-br ${repo.gradient || "from-slate-100 to-slate-50"} ${repo.iconColor || "text-slate-500"} shadow-sm border border-white`}>
-              <FolderGit2 size={24} />
+            <div className={`p-3 md:p-3.5 rounded-2xl bg-gradient-to-br ${repo.gradient || "from-slate-100 to-slate-50"} ${repo.iconColor || "text-slate-500"} shadow-sm border border-white shrink-0`}>
+              <FolderGit2 size={22} className="md:w-6 md:h-6" />
             </div>
-            <h3 className="text-xl font-bold tracking-tight text-slate-800">{repo.name || "Unknown"}</h3>
+            <h3 className="text-lg md:text-xl font-bold tracking-tight text-slate-800 leading-tight">{repo.displayName || "Unknown"}</h3>
           </div>
 
-          <p className="text-slate-500 mb-6 flex-1 font-medium leading-relaxed">
+          <p className="text-slate-500 mb-6 flex-1 font-medium leading-relaxed text-sm md:text-base">
             {repo.desc || "No description provided."}
           </p>
 
           <div className="flex items-center justify-between mt-auto">
-            <span className="inline-block text-[11px] font-bold px-4 py-1.5 rounded-full bg-slate-100/80 text-slate-600 shadow-sm border border-white">
+            <span className="inline-block text-[10px] md:text-[11px] font-bold px-3 py-1.5 md:px-4 rounded-full bg-slate-100/80 text-slate-600 shadow-sm border border-white">
               {repo.lang || "Code"}
             </span>
-            {(repo.stars !== undefined || repo.forks !== undefined) && (
-              <div className="flex gap-3 text-slate-400 text-xs font-bold">
-                <span className="flex items-center gap-1"><Star size={14}/> {repo.stars || 0}</span>
-                <span className="flex items-center gap-1"><GitFork size={14}/> {repo.forks || 0}</span>
-              </div>
-            )}
+            <div className="text-slate-400 group-hover:text-indigo-500 transition-colors">
+              <ExternalLink size={16} strokeWidth={2.5} />
+            </div>
           </div>
         </motion.div>
 
-        {/* Repo Hover State */}
         <AnimatePresence>
           {hover && (
             <motion.div
@@ -220,24 +243,24 @@ function RepoCard({ repo, index }: RepoCardProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="absolute inset-0 top-[52px] z-30 bg-white/95 backdrop-blur-xl p-8 flex flex-col justify-center font-mono text-sm rounded-b-[2rem]"
+              className="absolute inset-0 top-[52px] z-30 bg-white/95 backdrop-blur-xl p-6 md:p-8 flex flex-col justify-center font-mono text-xs md:text-sm rounded-b-[2rem]"
             >
               <div className="space-y-4">
-                <div className="text-slate-800 font-semibold text-base flex items-center h-6">
-                  <span className="text-indigo-600 font-black mr-3">{">"}</span> 
-                  <TerminalTyping text={`git clone ${repo.name}`} delay={0} />
+                <div className="text-slate-800 font-semibold flex items-center h-6 overflow-hidden">
+                  <span className="text-indigo-600 font-black mr-2 md:mr-3 shrink-0">{">"}</span> 
+                  <span className="truncate"><TerminalTyping text={`git clone ${repo.link}.git`} delay={0} /></span>
                 </div>
                 <div className="text-slate-400 font-medium h-6">
-                  <span className="text-indigo-600 font-black mr-3">{">"}</span> 
+                  <span className="text-indigo-600 font-black mr-2 md:mr-3">{">"}</span> 
                   <TerminalTyping text="resolving dependencies..." delay={600} />
                 </div>
                 <motion.div 
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }} 
-                  className="text-emerald-600 font-bold flex items-center gap-2 text-base mt-2"
+                  className="text-emerald-600 font-bold flex items-center gap-2 mt-2"
                 >
-                  <CheckCircle2 size={18} /> build success
+                  <CheckCircle2 size={16} className="md:w-[18px] md:h-[18px]" /> build success
                 </motion.div>
-                <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-3 h-5 bg-indigo-500 mt-2 rounded-sm" />
+                <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-2.5 md:w-3 h-4 md:h-5 bg-indigo-500 mt-2 rounded-sm" />
               </div>
             </motion.div>
           )}
@@ -263,25 +286,19 @@ export default function Page() {
         if (!response.ok) throw new Error("GitHub API rate limit or error");
         const data = await response.json();
         
-        const liveRepos = TARGET_REPOS.map(targetName => {
-          const liveData = data.find((r: any) => r.name === targetName);
-          const fallbackData = FALLBACK_REPOS.find(r => r.name === targetName);
+        const liveRepos = FALLBACK_REPOS.map(fallbackData => {
+          const liveData = data.find((r: any) => r.name === fallbackData.name);
           
-          const safeFallback = fallbackData || { name: targetName, link: "#", desc: "", lang: "Code", gradient: "from-slate-100 to-slate-50", iconColor: "text-slate-500" };
-
           if (liveData) {
             return {
-              ...safeFallback,
-              name: liveData.name,
+              ...fallbackData,
               link: liveData.html_url,
-              desc: liveData.description || safeFallback.desc,
-              lang: liveData.language || safeFallback.lang,
-              stars: liveData.stargazers_count,
-              forks: liveData.forks_count,
+              desc: liveData.description || fallbackData.desc,
+              lang: liveData.language || fallbackData.lang,
             };
           }
-          return safeFallback as Repo; 
-        }).filter(Boolean);
+          return fallbackData; 
+        });
 
         setRepos(liveRepos as Repo[]);
       } catch (error) {
@@ -297,58 +314,57 @@ export default function Page() {
 
       {/* --- SITE HEADER --- */}
       <header className="sticky top-0 z-50 backdrop-blur-2xl bg-white/40 border-b border-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
-          <div className="font-bold text-slate-700 tracking-wide bg-white shadow-sm border border-slate-100 px-4 py-1.5 rounded-xl">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center">
+          <div className="font-bold text-slate-700 tracking-wide bg-white shadow-sm border border-slate-100 px-4 py-1.5 rounded-xl text-sm md:text-base">
             Zenith Projects
           </div>
         </div>
       </header>
 
       {/* --- MAIN LAYOUT GRID --- */}
-      <main className="max-w-7xl mx-auto px-6 pt-12 relative z-10 flex-grow w-full">
+      <main className="max-w-7xl mx-auto px-4 md:px-6 pt-8 md:pt-12 relative z-10 flex-grow w-full">
         <motion.div 
           variants={stagger} 
           initial="hidden" 
           animate="show"
-          // "items-start" prevents stretching and allows the sticky sidebar to work perfectly
-          className="grid lg:grid-cols-[340px_1fr] gap-10 items-start relative"
+          className="grid lg:grid-cols-[340px_1fr] gap-6 lg:gap-10 items-start relative"
         >
 
           {/* ==============================================================
-              COLUMN 1: SIDEBAR (Widgets)
-              PROFESSIONAL TOUCH: Made sticky so it scrolls smoothly with the page!
+              COLUMN 1: SIDEBAR
               ============================================================== */}
-          <div className="flex flex-col space-y-8 lg:sticky lg:top-28">
+          <div className="flex flex-col space-y-6 lg:space-y-8 lg:sticky lg:top-28 h-fit">
             
             {/* WIDGET 1: Professional Profile Panel */}
-            <Panel className="p-8 space-y-8">
+            <Panel className="p-6 lg:p-8 space-y-6 lg:space-y-8">
               <div className="text-center md:text-left">
-                {/* PROFESSIONAL HEADER TEXT */}
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 lg:mb-4 block">
                   Developer Details
                 </span>
-                <h1 className="text-3xl xl:text-[32px] font-black tracking-tight text-slate-800 mb-2 whitespace-nowrap shrink-0">
-                  ROSHAN ✭ 
-                </h1>
-                <p className="text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-lg inline-block">
-                  @roshhellwett
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-5 border border-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] mb-8 font-mono text-sm">
-                <span className="text-indigo-500 font-bold">const</span> <span className="text-rose-500 font-semibold">focus</span> = <br/>
-                <span className="text-emerald-600 font-medium">"Building systems that think."</span>;
-              </div>
-
-              <div className="space-y-4 text-sm font-semibold text-slate-600">
-                <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
-                  <div className="p-2 bg-amber-50 text-amber-500 rounded-lg"><Link2 size={16}/></div> 
-                  <a href="https://g.dev/roshhellwett" target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors">DEVELOPER PROGRAM MEMBER</a>
+                
+                {/* Tagline */}
+                <div className="bg-slate-50/80 rounded-2xl p-4 lg:p-5 border border-slate-100 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] mb-6 lg:mb-8">
+                  <p className="text-slate-600 font-semibold text-sm leading-relaxed italic text-center md:text-left">
+                    "Open Source is The First Step of Development."
+                  </p>
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-slate-200/50 space-y-2">
-                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">SOCIAL NODES</h3>
+              {/* Developer Links */}
+              <div className="space-y-3 lg:space-y-4 text-sm font-semibold text-slate-600">
+                <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
+                  <div className="p-2 bg-blue-50 text-blue-500 rounded-lg"><Globe size={16}/></div> 
+                  <a href="https://g.dev/roshhellwett" target="_blank" rel="noreferrer" className="hover:text-blue-600 transition-colors">Google Dev Member</a>
+                </div>
+                <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
+                  <div className="p-2 bg-slate-100 text-slate-700 rounded-lg"><Github size={16}/></div> 
+                  <a href="https://github.com/roshhellwett" target="_blank" rel="noreferrer" className="hover:text-slate-900 transition-colors">Github Dev Member</a>
+                </div>
+              </div>
+
+              {/* Vertices (Social Links) */}
+              <div className="pt-5 lg:pt-6 border-t border-slate-200/50 space-y-1 lg:space-y-2">
+                <h3 className="text-[10px] lg:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 lg:mb-4 px-2 text-center md:text-left">VERTICES</h3>
                 {SOCIALS.map((s, i) => (
                   <a key={i} href={s.link} target="_blank" rel="noreferrer" aria-label={`Visit my ${s.label} profile`} className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white shadow-sm transition-all group">
                     <span className={`p-2 bg-slate-50 border border-slate-100 rounded-lg group-hover:bg-white transition-colors ${s.color}`}>
@@ -362,50 +378,31 @@ export default function Page() {
               </div>
             </Panel>
 
-            {/* WIDGET 2: Contact Terminal (Clean and precise) */}
+            {/* WIDGET 2: Contact Terminal (FIXED: Cleaned up the details array) */}
             <Panel className="flex flex-col !p-0" delay={0.1}>
-              <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between">
+              <div className="px-4 lg:px-5 py-3 lg:py-4 bg-white/40 border-b border-white flex items-center justify-between">
                 <SoftTrafficLights />
                 <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">contact.exe</span>
                 <div className="w-10" />
               </div>
               
-              <div className="p-8 font-mono text-sm text-slate-700">
-                <div className="mb-8 font-medium text-slate-500">
+              <div className="p-6 lg:p-8 font-mono text-xs lg:text-sm text-slate-700">
+                <div className="mb-6 lg:mb-8 font-medium text-slate-500">
                   <span className="text-indigo-500 font-black mr-2">{">"}</span> contact --init
                 </div>
 
-                <div className="bg-white/60 border border-white rounded-[2rem] p-6 space-y-6 shadow-sm overflow-hidden">
-                  <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
-                    <div className="flex items-center shrink-0">
-                      <span className="text-rose-500 font-bold w-16 md:w-20">NAME</span>
-                      <span className="text-slate-400 mr-2 md:mr-4">:</span>
-                    </div>
-                    <span className="text-slate-800 font-bold text-xs sm:text-sm truncate">ROSHAN ✭</span>
-                  </div>
-
-                  <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
-                    <div className="flex items-center shrink-0">
-                      <span className="text-amber-500 font-bold w-16 md:w-20">ALIAS</span>
-                      <span className="text-slate-400 mr-2 md:mr-4">:</span>
-                    </div>
-                    <span className="text-slate-800 font-bold text-xs sm:text-sm truncate">@roshhellwett</span>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 whitespace-nowrap overflow-hidden">
-                    <div className="flex items-center shrink-0">
-                      <span className="text-emerald-500 font-bold w-16 md:w-20">EMAIL</span>
-                      <span className="text-slate-400 mr-2 md:mr-4">:</span>
-                    </div>
-                    <a href="mailto:roshhellwett@icloud.com" className="text-indigo-600 hover:text-indigo-500 font-bold text-[11px] sm:text-sm hover:underline underline-offset-4 transition-all truncate">
-                      @roshhellwett
-                    </a>
-                  </div>
+                {/* Clean, vertically stacked data without rigid labels */}
+                <div className="bg-white/60 border border-white rounded-2xl lg:rounded-[2rem] p-5 lg:p-6 space-y-3 shadow-sm flex flex-col items-start">
+                  <span className="text-rose-500 font-bold text-base md:text-lg tracking-tight">Roshan Kr Singh</span>
+                  <span className="text-amber-500 font-bold text-sm md:text-base">@roshhellwett</span>
+                  <a href="mailto:roshhellwett@icloud.com" className="text-emerald-500 hover:text-emerald-600 font-bold text-sm md:text-base hover:underline underline-offset-4 transition-all break-all pt-1">
+                    roshhellwett@icloud.com
+                  </a>
                 </div>
 
-                <div className="mt-10 flex items-center gap-2 font-bold text-slate-500 bg-white/40 p-4 rounded-xl border border-white">
-                  <span className="text-indigo-500">roshhellwett@local</span><span className="text-slate-400">:~$</span>
-                  <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-2.5 h-5 bg-indigo-500 rounded-sm" />
+                <div className="mt-8 lg:mt-10 flex items-center gap-2 font-bold text-slate-500 bg-white/40 p-3 lg:p-4 rounded-xl border border-white overflow-hidden">
+                  <span className="text-indigo-500 truncate">roshhellwett@local</span><span className="text-slate-400 shrink-0">:~$</span>
+                  <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-2 lg:w-2.5 h-4 lg:h-5 bg-indigo-500 rounded-sm shrink-0" />
                 </div>
               </div>
             </Panel>
@@ -414,14 +411,14 @@ export default function Page() {
 
 
           {/* ==============================================================
-              COLUMN 2: MAIN CONTENT AREA (Repositories)
+              COLUMN 2: MAIN CONTENT AREA (Repositories & Tech Stash)
               ============================================================== */}
           <div className="flex flex-col h-full">
             
             <section className="flex-1">
-              <h2 className="text-2xl font-black mb-6 flex gap-3 items-center text-slate-800 tracking-tight px-2">
+              <h2 className="text-xl lg:text-2xl font-black mb-6 flex gap-3 items-center text-slate-800 tracking-tight px-2">
                 <div className="p-2 bg-white text-indigo-500 rounded-xl border border-white shadow-sm">
-                  <Terminal size={20}/>
+                  <Terminal size={18} className="lg:w-5 lg:h-5" />
                 </div>
                 Open Source Projects
               </h2>
@@ -431,7 +428,61 @@ export default function Page() {
                   <RepoCard repo={repo} index={i} key={i}/>
                 ))}
               </motion.div>
+
+              {/* View More Projects Button */}
+              <motion.div variants={fadeUp} className="mt-8 mb-10 flex justify-center md:justify-end">
+                <a 
+                  href="https://github.com/roshhellwett?tab=repositories" 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="flex items-center justify-center w-full md:w-auto gap-2 px-6 py-3.5 bg-white/60 hover:bg-white text-slate-700 hover:text-indigo-600 font-bold text-sm rounded-2xl border border-white shadow-sm hover:shadow-md transition-all group"
+                >
+                  View more projects
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </a>
+              </motion.div>
             </section>
+
+            {/* HORIZONTAL TECH STASH WIDGET (Conceptual & Professional) */}
+            <Panel className="p-6 md:p-8 w-full mt-auto" delay={0.4}>
+              <h3 className="text-[10px] lg:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <Code2 size={14} /> TECHNOLOGY SPECTRUM & CONCEPTUAL UNDERSTANDING
+              </h3>
+              
+              <div className="flex flex-col gap-4 lg:gap-6">
+                {STACK.map((group, i) => (
+                  <div key={i} className={`flex flex-col md:flex-row gap-4 p-4 lg:p-5 rounded-2xl border ${group.bgColor}`}>
+                    
+                    {/* Category Header & Icon */}
+                    <div className="flex items-center gap-3 md:w-48 shrink-0">
+                      <div className={`p-2 rounded-xl bg-white border border-white shadow-sm ${group.color}`}>
+                        {group.icon}
+                      </div>
+                      <span className={`text-xs font-black tracking-wide uppercase ${group.color}`}>
+                        {group.category}
+                      </span>
+                    </div>
+
+                    {/* Conceptual Description & Pills */}
+                    <div className="flex flex-col gap-3 flex-1">
+                      <p className="text-xs lg:text-sm font-medium text-slate-600 leading-relaxed">
+                        {group.concept}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {group.items.map(item => (
+                          <span 
+                            key={item} 
+                            className="px-2.5 py-1 bg-white/60 border border-white rounded-lg text-[10px] lg:text-[11px] font-bold text-slate-700 shadow-sm"
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Panel>
 
           </div>
 
@@ -439,12 +490,12 @@ export default function Page() {
       </main>
 
       {/* --- SITE FOOTER --- */}
-      <footer className="max-w-7xl mx-auto px-6 py-8 mt-12 w-full text-center relative z-10">
+      <footer className="max-w-7xl mx-auto px-4 md:px-6 py-8 mt-8 lg:mt-12 w-full text-center relative z-10">
         <div className="pt-8 border-t border-slate-300/40">
-          <p className="text-xs font-bold text-slate-500">
+          <p className="text-[10px] lg:text-xs font-bold text-slate-500">
             © {new Date().getFullYear()} Zenith Open Source Projects. All rights reserved.
           </p>
-          <p className="text-[10px] font-medium text-slate-400 mt-2">
+          <p className="text-[9px] lg:text-[10px] font-medium text-slate-400 mt-2">
             Built with Next.js, Tailwind CSS, Framer Motion & Design By Claude & Gemini.
           </p>
         </div>
