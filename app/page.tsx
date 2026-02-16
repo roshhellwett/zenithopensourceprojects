@@ -335,7 +335,7 @@ export default function Page() {
       <header className="sticky top-0 z-50 backdrop-blur-2xl bg-white/40 border-b border-white shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
           <div className="font-bold text-slate-700 tracking-wide bg-white shadow-sm border border-slate-100 px-4 py-1.5 rounded-xl">
-            Zenith
+            Zenith Open Source Projects
           </div>
         </div>
       </header>
