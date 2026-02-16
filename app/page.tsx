@@ -14,10 +14,9 @@ import {
 
 import {
   Github, Twitter, Instagram, Mail, Gitlab, 
-  Terminal, Code2, Cpu, Database, Globe, 
-  FolderGit2, CheckCircle2, User, MapPin, 
-  Link2, Star, GitFork, Activity, Clock, 
-  FileText, Rocket, BookOpen, GitCommit
+  Terminal, Cpu, FolderGit2, CheckCircle2, 
+  User, MapPin, Link2, Star, GitFork, 
+  Activity, Clock, FileText
 } from "lucide-react";
 
 
@@ -50,35 +49,22 @@ interface RepoCardProps {
 /* =========================================================================
    3. STATIC DATA CONFIGURATION
    ========================================================================= */
-// Now contains ALL 9 repositories
 const TARGET_REPOS = [
   "ZenithSupremeEdition",
-  "PayNix",
-  "Egnima",
-  "Logichands",
-  "Numsuko",
-  "easyeffects-pulsewire-presets",
   "WinActivation",
   "Grub",
-  "MovieFix"
+  "MovieFix",
+  "Numsuko",
+  "easyeffects-pulsewire-presets"
 ];
 
 const FALLBACK_REPOS: Repo[] = [
   { name: "ZenithSupremeEdition", link: "https://github.com/roshhellwett/ZenithSupremeEdition.git", desc: "Open Source Telegram Bots", lang: "Python", stars: 0, forks: 0, gradient: "from-indigo-100 to-blue-50", iconColor: "text-indigo-500" },
-  { name: "PayNix", link: "https://github.com/roshhellwett/PayNix", desc: "Secure transaction processing module.", lang: "JavaScript", stars: 0, forks: 0, gradient: "from-orange-100 to-amber-50", iconColor: "text-orange-500" },
-  { name: "Egnima", link: "https://github.com/roshhellwett/Egnima", desc: "Advanced encryption/decryption algorithm.", lang: "C++", stars: 0, forks: 0, gradient: "from-emerald-100 to-teal-50", iconColor: "text-emerald-500" },
-  { name: "Logichands", link: "https://github.com/roshhellwett/Logichands", desc: "Digital logic gate simulation kernel.", lang: "C", stars: 0, forks: 0, gradient: "from-rose-100 to-pink-50", iconColor: "text-rose-500" },
-  { name: "Numsuko", link: "https://github.com/roshhellwett/Numsuko", desc: "High-performance numerical analysis toolkit.", lang: "Java", stars: 0, forks: 0, gradient: "from-cyan-100 to-sky-50", iconColor: "text-cyan-600" },
-  { name: "easyeffects-pulsewire-presets", link: "https://github.com/roshhellwett/easyeffects-pulsewire-presets", desc: "Audio processing signal chains.", lang: "Shell", stars: 0, forks: 0, gradient: "from-purple-100 to-fuchsia-50", iconColor: "text-purple-500" },
   { name: "WinActivation", link: "https://github.com/roshhellwett/WinActivation.git", desc: "Windows OS Activation utility scripts.", lang: "Batchfile", stars: 0, forks: 0, gradient: "from-sky-100 to-blue-50", iconColor: "text-sky-500" },
-  { name: "Grub", link: "https://github.com/roshhellwett/Grub.git", desc: "Custom GRUB bootloader themes and configs.", lang: "Shell", stars: 0, forks: 0, gradient: "from-fuchsia-100 to-pink-50", iconColor: "text-fuchsia-500" },
-  { name: "MovieFix", link: "https://github.com/roshhellwett/MovieFix.git", desc: "Movie metadata matching and renaming tool.", lang: "Python", stars: 0, forks: 0, gradient: "from-rose-100 to-orange-50", iconColor: "text-rose-500" }
-];
-
-const STACK = [
-  { category: "Core Systems", icon: <Cpu size={18} />, items: ["C", "C++", "Python", "Java"], color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-100" },
-  { category: "Web", icon: <Globe size={18} />, items: ["HTML5", "CSS3", "JavaScript", "React"], color: "text-emerald-500", bg: "bg-emerald-50", border: "border-emerald-100" },
-  { category: "Data & Tools", icon: <Database size={18} />, items: ["MySQL", "MongoDB", "Linux", "Git"], color: "text-indigo-500", bg: "bg-indigo-50", border: "border-indigo-100" }
+  { name: "Grub", link: "https://github.com/roshhellwett/Grub.git", desc: "Custom GRUB bootloader themes and configs.", lang: "Shell", stars: 0, forks: 0, gradient: "from-purple-100 to-pink-50", iconColor: "text-purple-500" },
+  { name: "MovieFix", link: "https://github.com/roshhellwett/MovieFix.git", desc: "Movie metadata matching and renaming tool.", lang: "Python", stars: 0, forks: 0, gradient: "from-rose-100 to-orange-50", iconColor: "text-rose-500" },
+  { name: "Numsuko", link: "https://github.com/roshhellwett/Numsuko", desc: "High-performance numerical analysis toolkit.", lang: "Java", stars: 0, forks: 0, gradient: "from-cyan-100 to-sky-50", iconColor: "text-cyan-600" },
+  { name: "easyeffects-pulsewire-presets", link: "https://github.com/roshhellwett/easyeffects-pulsewire-presets", desc: "Audio processing signal chains.", lang: "Shell", stars: 0, forks: 0, gradient: "from-emerald-100 to-teal-50", iconColor: "text-emerald-500" }
 ];
 
 const SOCIALS = [
@@ -87,12 +73,6 @@ const SOCIALS = [
   { label: "Instagram", icon: <Instagram size={18} />, link: "https://instagram.com/roshhellwett", color: "text-pink-500" },
   { label: "GitLab", icon: <Gitlab size={18} />, link: "https://gitlab.com/roshhellwett", color: "text-orange-500" },
   { label: "Email", icon: <Mail size={18} />, link: "mailto:roshhellwett@icloud.com", color: "text-emerald-500" }
-];
-
-const COMMIT_PATTERN = [
-  "bg-slate-200", "bg-emerald-300", "bg-emerald-200", "bg-slate-200", "bg-emerald-400", "bg-emerald-500", "bg-emerald-200",
-  "bg-slate-200", "bg-slate-200", "bg-emerald-300", "bg-emerald-500", "bg-emerald-400", "bg-emerald-200", "bg-slate-200",
-  "bg-emerald-200", "bg-emerald-400", "bg-emerald-300", "bg-emerald-500", "bg-emerald-500", "bg-emerald-300", "bg-emerald-200"
 ];
 
 
@@ -465,25 +445,54 @@ export default function Page() {
               </div>
             </Panel>
 
-            {/* WIDGET 4: Activity Matrix */}
-            <Panel className="p-8 flex-1 flex flex-col justify-center" delay={0.3}>
-              <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2 px-2">
-                <GitCommit size={14} /> Activity Matrix
-              </h3>
-              <div className="bg-white/60 border border-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center">
-                 <div className="flex items-center justify-between w-full mb-3">
-                   <span className="text-xs font-bold text-slate-800">Recent Commits</span>
-                   <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">Active</span>
-                 </div>
-                 <div className="grid grid-cols-7 gap-1.5 w-full">
-                    {COMMIT_PATTERN.map((color, i) => (
-                      <div key={i} className={`aspect-square rounded-[4px] ${color} shadow-inner hover:scale-110 transition-transform cursor-pointer`}></div>
-                    ))}
-                 </div>
-                 <div className="flex justify-between w-full mt-3 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                   <span>Less</span>
-                   <span>More</span>
-                 </div>
+            {/* WIDGET 4: Contact Terminal (Moved from right side to replace Activity Matrix) */}
+            {/* flex-1 causes this terminal to naturally stretch down and fill any empty space! */}
+            <Panel className="flex flex-col h-full !p-0 flex-1" delay={0.3}>
+              <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between">
+                <SoftTrafficLights />
+                <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">contact.exe</span>
+                <div className="w-10" />
+              </div>
+              
+              <div className="p-8 font-mono text-sm text-slate-700 flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="mb-8 font-medium text-slate-500">
+                    <span className="text-indigo-500 font-black mr-2">{">"}</span> contact --init
+                  </div>
+
+                  <div className="bg-white/60 border border-white rounded-[2rem] p-6 space-y-6 shadow-sm overflow-hidden">
+                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
+                      <div className="flex items-center shrink-0">
+                        <span className="text-rose-500 font-bold w-16 md:w-20">NAME</span>
+                        <span className="text-slate-400 mr-2 md:mr-4">:</span>
+                      </div>
+                      <span className="text-slate-800 font-bold text-xs sm:text-sm truncate">ROSHAN ✭</span>
+                    </div>
+
+                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
+                      <div className="flex items-center shrink-0">
+                        <span className="text-amber-500 font-bold w-16 md:w-20">ALIAS</span>
+                        <span className="text-slate-400 mr-2 md:mr-4">:</span>
+                      </div>
+                      <span className="text-slate-800 font-bold text-xs sm:text-sm truncate">@roshhellwett</span>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 whitespace-nowrap overflow-hidden">
+                      <div className="flex items-center shrink-0">
+                        <span className="text-emerald-500 font-bold w-16 md:w-20">EMAIL</span>
+                        <span className="text-slate-400 mr-2 md:mr-4">:</span>
+                      </div>
+                      <a href="mailto:roshhellwett@icloud.com" className="text-indigo-600 hover:text-indigo-500 font-bold text-[11px] sm:text-sm hover:underline underline-offset-4 transition-all truncate">
+                        @roshhellwett
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-10 flex items-center gap-2 font-bold text-slate-500 bg-white/40 p-4 rounded-xl border border-white">
+                  <span className="text-indigo-500">roshhellwett@local</span><span className="text-slate-400">:~$</span>
+                  <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-2.5 h-5 bg-indigo-500 rounded-sm" />
+                </div>
               </div>
             </Panel>
 
@@ -491,12 +500,12 @@ export default function Page() {
 
 
           {/* ==============================================================
-              COLUMN 2: MAIN CONTENT AREA (Repos & Terminals)
+              COLUMN 2: MAIN CONTENT AREA (Repositories)
               ============================================================== */}
           <div className="flex flex-col space-y-10 h-full">
             
             {/* SECTION: Pinned Repositories */}
-            <section>
+            <section className="flex-1">
               <h2 className="text-2xl font-black mb-6 flex gap-3 items-center text-slate-800 tracking-tight px-2">
                 <div className="p-2 bg-white text-indigo-500 rounded-xl border border-white shadow-sm">
                   <Terminal size={20}/>
@@ -511,98 +520,6 @@ export default function Page() {
               </motion.div>
             </section>
 
-            {/* SECTION: Twin Terminals */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch flex-1">
-              
-              {/* TERMINAL 1: Tech Stack */}
-              <Panel className="flex flex-col h-full !p-0">
-                <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between">
-                  <SoftTrafficLights />
-                  <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">stack.sh</span>
-                  <div className="w-10" />
-                </div>
-                <div className="p-8 font-mono text-sm text-slate-700 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="mb-8 font-medium text-slate-500">
-                      <span className="text-indigo-500 font-black mr-2">{">"}</span> ./init_systems.sh
-                    </div>
-                    
-                    <div className="space-y-6">
-                      {STACK.map((group, i) => (
-                        <div key={i} className={`bg-white/60 p-5 rounded-2xl border border-white shadow-sm`}>
-                          <h3 className={`font-bold mb-4 flex items-center gap-2 ${group.color}`}>
-                            <span className={`p-1.5 rounded-lg ${group.bg} ${group.border} border`}>{group.icon}</span> 
-                            {group.category}
-                          </h3>
-                          <div className="grid grid-cols-2 gap-3 pl-2">
-                            {group.items.map(item => (
-                              <div key={item} className="flex gap-2 items-center font-bold text-slate-700 text-sm">
-                                <CheckCircle2 size={16} className={`${group.color} opacity-80`}/> {item}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-8 pt-6 border-t border-slate-200/50 flex items-center gap-2 font-bold text-emerald-600">
-                    <span className="text-indigo-500 font-black">{">"}</span> systems active.
-                  </div>
-                </div>
-              </Panel>
-
-              {/* TERMINAL 2: Contact Info */}
-              <Panel className="flex flex-col h-full !p-0">
-                <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between">
-                  <SoftTrafficLights />
-                  <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">contact.exe</span>
-                  <div className="w-10" />
-                </div>
-                
-                <div className="p-8 font-mono text-sm text-slate-700 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="mb-8 font-medium text-slate-500">
-                      <span className="text-indigo-500 font-black mr-2">{">"}</span> contact --init
-                    </div>
-
-                    <div className="bg-white/60 border border-white rounded-[2rem] p-6 md:p-8 space-y-6 shadow-sm overflow-hidden">
-                      <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
-                        <div className="flex items-center shrink-0">
-                          <span className="text-rose-500 font-bold w-16 md:w-24">NAME</span>
-                          <span className="text-slate-400 mr-2 md:mr-4">:</span>
-                        </div>
-                        <span className="text-slate-800 font-bold text-xs sm:text-sm md:text-base truncate">ROSHAN ✭</span>
-                      </div>
-
-                      <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
-                        <div className="flex items-center shrink-0">
-                          <span className="text-amber-500 font-bold w-16 md:w-24">ALIAS</span>
-                          <span className="text-slate-400 mr-2 md:mr-4">:</span>
-                        </div>
-                        <span className="text-slate-800 font-bold text-xs sm:text-sm md:text-base truncate">@roshhellwett</span>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2 whitespace-nowrap overflow-hidden">
-                        <div className="flex items-center shrink-0">
-                          <span className="text-emerald-500 font-bold w-16 md:w-24">EMAIL</span>
-                          <span className="text-slate-400 mr-2 md:mr-4">:</span>
-                        </div>
-                        <a href="mailto:roshhellwett@icloud.com" className="text-indigo-600 hover:text-indigo-500 font-bold text-[11px] sm:text-sm md:text-base hover:underline underline-offset-4 transition-all truncate">
-                          @roshhellwett
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-10 flex items-center gap-2 font-bold text-slate-500 bg-white/40 p-4 rounded-xl border border-white">
-                    <span className="text-indigo-500">roshhellwett@local</span><span className="text-slate-400">:~$</span>
-                    <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-2.5 h-5 bg-indigo-500 rounded-sm" />
-                  </div>
-                </div>
-              </Panel>
-
-            </div>
           </div>
 
         </motion.div>
