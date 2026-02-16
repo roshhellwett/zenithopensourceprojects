@@ -14,9 +14,8 @@ import {
 
 import {
   Github, Twitter, Instagram, Mail, Gitlab, 
-  Terminal, Cpu, FolderGit2, CheckCircle2, 
-  User, MapPin, Link2, Star, GitFork, 
-  Activity, Clock, FileText
+  Terminal, FolderGit2, CheckCircle2, 
+  Link2, Star, GitFork
 } from "lucide-react";
 
 
@@ -79,21 +78,9 @@ const SOCIALS = [
 /* =========================================================================
    4. ANIMATION CONFIGURATION
    ========================================================================= */
-const spring: Transition = {
-  type: "spring",
-  stiffness: 100,
-  damping: 20
-};
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0 }
-};
-
-const stagger: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-};
+const spring: Transition = { type: "spring", stiffness: 100, damping: 20 };
+const fadeUp: Variants = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0 } };
+const stagger: Variants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
 
 
 /* =========================================================================
@@ -171,7 +158,6 @@ const TerminalTyping = ({ text, delay = 0 }: { text: string, delay?: number }) =
 function RepoCard({ repo, index }: RepoCardProps) {
   const [hover, setHover] = useState(false);
 
-  // Safety check to prevent crashes if a repo is undefined
   if (!repo) return null;
 
   return (
@@ -269,14 +255,6 @@ function RepoCard({ repo, index }: RepoCardProps) {
 
 export default function Page() {
   const [repos, setRepos] = useState<Repo[]>(FALLBACK_REPOS);
-  const [time, setTime] = useState<string>("");
-
-  useEffect(() => {
-    const updateTime = () => setTime(new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }));
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const fetchGithubData = async () => {
@@ -332,17 +310,23 @@ export default function Page() {
           variants={stagger} 
           initial="hidden" 
           animate="show"
-          className="grid lg:grid-cols-[340px_1fr] gap-10 items-stretch h-full"
+          // "items-start" prevents stretching and allows the sticky sidebar to work perfectly
+          className="grid lg:grid-cols-[340px_1fr] gap-10 items-start relative"
         >
 
           {/* ==============================================================
               COLUMN 1: SIDEBAR (Widgets)
+              PROFESSIONAL TOUCH: Made sticky so it scrolls smoothly with the page!
               ============================================================== */}
-          <div className="flex flex-col space-y-8 h-full">
+          <div className="flex flex-col space-y-8 lg:sticky lg:top-28">
             
-            {/* WIDGET 1: Main Profile Panel */}
+            {/* WIDGET 1: Professional Profile Panel */}
             <Panel className="p-8 space-y-8">
               <div className="text-center md:text-left">
+                {/* PROFESSIONAL HEADER TEXT */}
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block">
+                  Developer Details
+                </span>
                 <h1 className="text-3xl xl:text-[32px] font-black tracking-tight text-slate-800 mb-2 whitespace-nowrap shrink-0">
                   ROSHAN ✭ 
                 </h1>
@@ -358,16 +342,8 @@ export default function Page() {
 
               <div className="space-y-4 text-sm font-semibold text-slate-600">
                 <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
-                  <div className="p-2 bg-indigo-50 text-indigo-500 rounded-lg"><User size={16}/></div> 
-                  INDEPENDENT DEVELOPER
-                </div>
-                <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
-                  <div className="p-2 bg-rose-50 text-rose-500 rounded-lg"><MapPin size={16}/></div> 
-                  ASIA/INDIA
-                </div>
-                <div className="flex gap-3 items-center p-2 rounded-xl hover:bg-white border border-transparent hover:border-white hover:shadow-sm transition-all">
                   <div className="p-2 bg-amber-50 text-amber-500 rounded-lg"><Link2 size={16}/></div> 
-                  <a href="https://g.dev/roshhellwett" target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors">DEVLOPER PROGRAM MEMBER</a>
+                  <a href="https://g.dev/roshhellwett" target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors">DEVELOPER PROGRAM MEMBER</a>
                 </div>
               </div>
 
@@ -386,106 +362,44 @@ export default function Page() {
               </div>
             </Panel>
 
-            {/* WIDGET 2: System Status */}
-            <Panel className="p-8" delay={0.1}>
-              <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2 px-2">
-                <Activity size={14} /> SYSTEM STATUS
-              </h3>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-white/60 border border-white rounded-2xl shadow-sm hover:shadow-md transition-all">
-                  <span className="text-sm font-bold text-slate-600">NETWORK</span>
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                    </span>
-                    <span className="text-xs font-bold text-emerald-600">ACTIVE</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-white/60 border border-white rounded-2xl shadow-sm hover:shadow-md transition-all">
-                  <span className="text-sm font-bold text-slate-600">LOCAL TIME</span>
-                  <div className="flex items-center gap-2 text-indigo-600 font-mono text-xs font-bold">
-                    <Clock size={14} />
-                    <span>{time || "Loading..."}</span>
-                  </div>
-                </div>
-
-                <a 
-                  href="https://www.linkedin.com/in/roshhellwett" 
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-4 w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white font-bold rounded-xl shadow-[0_4px_14px_rgba(99,102,241,0.4)] transition-all active:scale-95"
-                >
-                  <FileText size={16} />
-                  LINKEDIN
-                </a>
-              </div>
-            </Panel>
-
-            {/* WIDGET 3: Logic Synthesizer */}
-            <Panel className="p-8" delay={0.2}>
-              <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2 px-2">
-                <Cpu size={14} /> LOGIC SYNTHESIZER
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3.5 bg-white/60 border border-white rounded-xl shadow-sm hover:shadow-md transition-all">
-                  <span className="text-xs font-bold text-slate-700">GATE SIMULATION</span>
-                  <span className="text-[10px] font-bold px-2 py-1 bg-amber-100 border border-amber-200 text-amber-600 rounded-md shadow-sm">XOR / NAND</span>
-                </div>
-                <div className="flex items-center justify-between p-3.5 bg-white/60 border border-white rounded-xl shadow-sm hover:shadow-md transition-all">
-                  <span className="text-xs font-bold text-slate-700">K-MAP OPTIMIZATIONS</span>
-                  <span className="text-[10px] font-bold px-2 py-1 bg-emerald-100 border border-emerald-200 text-emerald-600 rounded-md shadow-sm">Active</span>
-                </div>
-                <div className="flex items-center justify-between p-3.5 bg-white/60 border border-white rounded-xl shadow-sm hover:shadow-md transition-all">
-                  <span className="text-xs font-bold text-slate-700">GRAPH ALGORITHMS</span>
-                  <span className="text-[10px] font-bold px-2 py-1 bg-indigo-100 border border-indigo-200 text-indigo-600 rounded-md shadow-sm">O(V+E)</span>
-                </div>
-              </div>
-            </Panel>
-
-            {/* WIDGET 4: Contact Terminal (Moved from right side to replace Activity Matrix) */}
-            {/* flex-1 causes this terminal to naturally stretch down and fill any empty space! */}
-            <Panel className="flex flex-col h-full !p-0 flex-1" delay={0.3}>
+            {/* WIDGET 2: Contact Terminal (Clean and precise) */}
+            <Panel className="flex flex-col !p-0" delay={0.1}>
               <div className="px-5 py-4 bg-white/40 border-b border-white flex items-center justify-between">
                 <SoftTrafficLights />
                 <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">contact.exe</span>
                 <div className="w-10" />
               </div>
               
-              <div className="p-8 font-mono text-sm text-slate-700 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="mb-8 font-medium text-slate-500">
-                    <span className="text-indigo-500 font-black mr-2">{">"}</span> contact --init
+              <div className="p-8 font-mono text-sm text-slate-700">
+                <div className="mb-8 font-medium text-slate-500">
+                  <span className="text-indigo-500 font-black mr-2">{">"}</span> contact --init
+                </div>
+
+                <div className="bg-white/60 border border-white rounded-[2rem] p-6 space-y-6 shadow-sm overflow-hidden">
+                  <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
+                    <div className="flex items-center shrink-0">
+                      <span className="text-rose-500 font-bold w-16 md:w-20">NAME</span>
+                      <span className="text-slate-400 mr-2 md:mr-4">:</span>
+                    </div>
+                    <span className="text-slate-800 font-bold text-xs sm:text-sm truncate">ROSHAN ✭</span>
                   </div>
 
-                  <div className="bg-white/60 border border-white rounded-[2rem] p-6 space-y-6 shadow-sm overflow-hidden">
-                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
-                      <div className="flex items-center shrink-0">
-                        <span className="text-rose-500 font-bold w-16 md:w-20">NAME</span>
-                        <span className="text-slate-400 mr-2 md:mr-4">:</span>
-                      </div>
-                      <span className="text-slate-800 font-bold text-xs sm:text-sm truncate">ROSHAN ✭</span>
+                  <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
+                    <div className="flex items-center shrink-0">
+                      <span className="text-amber-500 font-bold w-16 md:w-20">ALIAS</span>
+                      <span className="text-slate-400 mr-2 md:mr-4">:</span>
                     </div>
+                    <span className="text-slate-800 font-bold text-xs sm:text-sm truncate">@roshhellwett</span>
+                  </div>
 
-                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 whitespace-nowrap overflow-hidden">
-                      <div className="flex items-center shrink-0">
-                        <span className="text-amber-500 font-bold w-16 md:w-20">ALIAS</span>
-                        <span className="text-slate-400 mr-2 md:mr-4">:</span>
-                      </div>
-                      <span className="text-slate-800 font-bold text-xs sm:text-sm truncate">@roshhellwett</span>
+                  <div className="flex items-center justify-between pt-2 whitespace-nowrap overflow-hidden">
+                    <div className="flex items-center shrink-0">
+                      <span className="text-emerald-500 font-bold w-16 md:w-20">EMAIL</span>
+                      <span className="text-slate-400 mr-2 md:mr-4">:</span>
                     </div>
-
-                    <div className="flex items-center justify-between pt-2 whitespace-nowrap overflow-hidden">
-                      <div className="flex items-center shrink-0">
-                        <span className="text-emerald-500 font-bold w-16 md:w-20">EMAIL</span>
-                        <span className="text-slate-400 mr-2 md:mr-4">:</span>
-                      </div>
-                      <a href="mailto:roshhellwett@icloud.com" className="text-indigo-600 hover:text-indigo-500 font-bold text-[11px] sm:text-sm hover:underline underline-offset-4 transition-all truncate">
-                        @roshhellwett
-                      </a>
-                    </div>
+                    <a href="mailto:roshhellwett@icloud.com" className="text-indigo-600 hover:text-indigo-500 font-bold text-[11px] sm:text-sm hover:underline underline-offset-4 transition-all truncate">
+                      @roshhellwett
+                    </a>
                   </div>
                 </div>
 
@@ -502,9 +416,8 @@ export default function Page() {
           {/* ==============================================================
               COLUMN 2: MAIN CONTENT AREA (Repositories)
               ============================================================== */}
-          <div className="flex flex-col space-y-10 h-full">
+          <div className="flex flex-col h-full">
             
-            {/* SECTION: Pinned Repositories */}
             <section className="flex-1">
               <h2 className="text-2xl font-black mb-6 flex gap-3 items-center text-slate-800 tracking-tight px-2">
                 <div className="p-2 bg-white text-indigo-500 rounded-xl border border-white shadow-sm">
@@ -529,7 +442,7 @@ export default function Page() {
       <footer className="max-w-7xl mx-auto px-6 py-8 mt-12 w-full text-center relative z-10">
         <div className="pt-8 border-t border-slate-300/40">
           <p className="text-xs font-bold text-slate-500">
-            © {new Date().getFullYear()} Zenith Open Source Projects . All rights reserved.
+            © {new Date().getFullYear()} Zenith Open Source Projects. All rights reserved.
           </p>
           <p className="text-[10px] font-medium text-slate-400 mt-2">
             Built with Next.js, Tailwind CSS, Framer Motion & Design By Claude & Gemini.
