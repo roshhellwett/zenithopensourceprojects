@@ -50,23 +50,29 @@ interface RepoCardProps {
 /* =========================================================================
    3. STATIC DATA CONFIGURATION
    ========================================================================= */
-// Updated with your new real repositories
+// Now contains ALL 9 repositories
 const TARGET_REPOS = [
   "ZenithSupremeEdition",
+  "PayNix",
+  "Egnima",
+  "Logichands",
+  "Numsuko",
+  "easyeffects-pulsewire-presets",
   "WinActivation",
   "Grub",
-  "MovieFix",
-  "Numsuko",
-  "easyeffects-pulsewire-presets"
+  "MovieFix"
 ];
 
 const FALLBACK_REPOS: Repo[] = [
   { name: "ZenithSupremeEdition", link: "https://github.com/roshhellwett/ZenithSupremeEdition.git", desc: "Open Source Telegram Bots", lang: "Python", stars: 0, forks: 0, gradient: "from-indigo-100 to-blue-50", iconColor: "text-indigo-500" },
-  { name: "WinActivation", link: "https://github.com/roshhellwett/WinActivation.git", desc: "Windows OS Activation utility scripts.", lang: "Batchfile", stars: 0, forks: 0, gradient: "from-sky-100 to-blue-50", iconColor: "text-sky-500" },
-  { name: "Grub", link: "https://github.com/roshhellwett/Grub.git", desc: "Custom GRUB bootloader themes and configs.", lang: "Shell", stars: 0, forks: 0, gradient: "from-purple-100 to-pink-50", iconColor: "text-purple-500" },
-  { name: "MovieFix", link: "https://github.com/roshhellwett/MovieFix.git", desc: "Movie metadata matching and renaming tool.", lang: "Python", stars: 0, forks: 0, gradient: "from-rose-100 to-orange-50", iconColor: "text-rose-500" },
+  { name: "PayNix", link: "https://github.com/roshhellwett/PayNix", desc: "Secure transaction processing module.", lang: "JavaScript", stars: 0, forks: 0, gradient: "from-orange-100 to-amber-50", iconColor: "text-orange-500" },
+  { name: "Egnima", link: "https://github.com/roshhellwett/Egnima", desc: "Advanced encryption/decryption algorithm.", lang: "C++", stars: 0, forks: 0, gradient: "from-emerald-100 to-teal-50", iconColor: "text-emerald-500" },
+  { name: "Logichands", link: "https://github.com/roshhellwett/Logichands", desc: "Digital logic gate simulation kernel.", lang: "C", stars: 0, forks: 0, gradient: "from-rose-100 to-pink-50", iconColor: "text-rose-500" },
   { name: "Numsuko", link: "https://github.com/roshhellwett/Numsuko", desc: "High-performance numerical analysis toolkit.", lang: "Java", stars: 0, forks: 0, gradient: "from-cyan-100 to-sky-50", iconColor: "text-cyan-600" },
-  { name: "easyeffects-pulsewire-presets", link: "https://github.com/roshhellwett/easyeffects-pulsewire-presets", desc: "Audio processing signal chains.", lang: "Shell", stars: 0, forks: 0, gradient: "from-emerald-100 to-teal-50", iconColor: "text-emerald-500" }
+  { name: "easyeffects-pulsewire-presets", link: "https://github.com/roshhellwett/easyeffects-pulsewire-presets", desc: "Audio processing signal chains.", lang: "Shell", stars: 0, forks: 0, gradient: "from-purple-100 to-fuchsia-50", iconColor: "text-purple-500" },
+  { name: "WinActivation", link: "https://github.com/roshhellwett/WinActivation.git", desc: "Windows OS Activation utility scripts.", lang: "Batchfile", stars: 0, forks: 0, gradient: "from-sky-100 to-blue-50", iconColor: "text-sky-500" },
+  { name: "Grub", link: "https://github.com/roshhellwett/Grub.git", desc: "Custom GRUB bootloader themes and configs.", lang: "Shell", stars: 0, forks: 0, gradient: "from-fuchsia-100 to-pink-50", iconColor: "text-fuchsia-500" },
+  { name: "MovieFix", link: "https://github.com/roshhellwett/MovieFix.git", desc: "Movie metadata matching and renaming tool.", lang: "Python", stars: 0, forks: 0, gradient: "from-rose-100 to-orange-50", iconColor: "text-rose-500" }
 ];
 
 const STACK = [
@@ -335,7 +341,7 @@ export default function Page() {
       <header className="sticky top-0 z-50 backdrop-blur-2xl bg-white/40 border-b border-white shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
           <div className="font-bold text-slate-700 tracking-wide bg-white shadow-sm border border-slate-100 px-4 py-1.5 rounded-xl">
-            Zenith Open Source Projects
+            Zenith Projects
           </div>
         </div>
       </header>
@@ -606,7 +612,7 @@ export default function Page() {
       <footer className="max-w-7xl mx-auto px-6 py-8 mt-12 w-full text-center relative z-10">
         <div className="pt-8 border-t border-slate-300/40">
           <p className="text-xs font-bold text-slate-500">
-            © {new Date().getFullYear()} Zenith . All rights reserved.
+            © {new Date().getFullYear()} Zenith Open Source Projects . All rights reserved.
           </p>
           <p className="text-[10px] font-medium text-slate-400 mt-2">
             Built with Next.js, Tailwind CSS, Framer Motion & Design By Claude & Gemini.
