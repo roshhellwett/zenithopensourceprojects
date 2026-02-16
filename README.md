@@ -1,37 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Zenith Open Source Projects ✭
 
-## Getting Started
+> *"Open Source is The First Step of Development."*
 
-First, run the development server:
+This repository contains the source code for my personal developer portfolio. It is designed with a minimalist, terminal-inspired aesthetic to showcase my open-source contributions, system architecture projects, and core technical stash.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ⚙️ Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Built with modern web technologies for maximum performance and fluid animations:
+* **Framework:** [Next.js](https://nextjs.org/) (App Router)
+* **Language:** TypeScript
+* **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+* **Animations:** [Framer Motion](https://www.framer.com/motion/)
+* **Icons:** [Lucide React](https://lucide.dev/)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Key Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* **Live GitHub Integration:** Dynamically fetches and displays real-time repository data (descriptions, languages, and links) directly from the GitHub API.
+* **Terminal-Themed UI:** Features custom glassmorphic panels and mock executable scripts (e.g., `contact.exe`) to reflect a raw, systems-level developer environment.
+* **Responsive Architecture:** Built with advanced CSS Grid and Flexbox math to ensure a flawless, unbroken layout across mobile, tablet, and ultra-wide desktop screens.
+* **Sticky Navigation:** Employs intelligent vertical scrolling constraints to keep vital developer details accessible while browsing projects.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
+© 2026 [Zenith Open Source Projects](https://zenithprojects.up.railway.app/). All Rights Reserved.  
+Zenith is a Open Source Project Idea's by @roshhellwett
