@@ -1,4 +1,4 @@
-# Zenith Open Source Projects ✭
+# Zenith Open Source Projects 
 
 > *"Open Source is The First Step of Development."*
 
@@ -20,5 +20,4 @@ Built with modern web technologies for maximum performance and fluid animations:
 * **Responsive Architecture:** Built with advanced CSS Grid and Flexbox math to ensure a flawless, unbroken layout across mobile, tablet, and ultra-wide desktop screens.
 * **Sticky Navigation:** Employs intelligent vertical scrolling constraints to keep vital developer details accessible while browsing projects.
 
-© 2026 [Zenith Open Source Projects](https://zenithopensourceprojects.vercel.app/). All Rights Reserved.  
-Zenith is a Open Source Project Idea's by @roshhellwett
+© 2026 [Zenith Open Source Projects](https://zenithopensourceprojects.vercel.app/). All Rights Reserved. Zenith is a Open Source Project Idea's by @roshhellwett
