@@ -30,7 +30,7 @@ import {
   Layers,
   Box,
   Cpu,
-  Database,
+  Server,
   LayoutTemplate,
   Code2,
   Sparkles,
@@ -50,25 +50,28 @@ import {
 } from "lucide-react";
 
 import Script from "next/script";
-import Image from "next/image";
-
 /* =========================================================================
-   BRAND MARK COMPONENT — uses /public/logo.png everywhere
+   BRAND MARK COMPONENT — flat inline SVG "Z" on slate-900
    ========================================================================= */
 function BrandMark({ size = 36, rounded = "rounded-2xl" }: { size?: number; rounded?: string }) {
+  const pad = Math.round(size * 0.22);
   return (
     <div
-      className={`relative ${rounded} bg-black flex items-center justify-center overflow-hidden shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/10`}
+      className={`relative ${rounded} bg-slate-900 flex items-center justify-center overflow-hidden shadow-[0_4px_16px_-8px_rgba(15,23,42,0.4)] ring-1 ring-slate-700/50`}
       style={{ width: size, height: size }}
     >
-      <Image
-        src="/logo.png"
-        alt="Zenith Open Source Projects logo"
-        width={size}
-        height={size}
-        priority
-        className="object-contain"
-      />
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="white"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ width: size - pad * 2, height: size - pad * 2 }}
+        aria-hidden="true"
+      >
+        <polyline points="4,4 20,4 4,20 20,20" />
+      </svg>
     </div>
   );
 }
@@ -246,7 +249,7 @@ const STACK = [
   },
   {
     category: "Data Infrastructure & Ops",
-    icon: <Database size={16} />,
+    icon: <Server size={16} />,
     accent: "emerald",
     concept:
       "Relational vs NoSQL modeling, distributed VCS, Linux administration.",
@@ -458,12 +461,12 @@ function DashField() {
               x2={d.x + dx}
               y2={d.y + dy}
               stroke={d.color}
-              strokeWidth={1.6}
+              strokeWidth={1.2}
               strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
               style={
                 reduce
-                  ? { opacity: 0.7 }
+                  ? { opacity: 0.5 }
                   : {
                       animation: `dashFade ${d.duration}s ease-in-out ${d.delay}s infinite`
                     }
@@ -507,8 +510,7 @@ function DashField() {
                   x2={d.x + dx}
                   y2={d.y + dy}
                   stroke={d.color}
-                  strokeWidth={2.8}
-                  strokeOpacity={1}
+                  strokeWidth={2}
                   strokeLinecap="round"
                   vectorEffect="non-scaling-stroke"
                 />
@@ -538,21 +540,21 @@ function Background() {
   const reduce = useReducedMotion();
 
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden bg-[#FAFAF7]">
+    <div className="fixed inset-0 -z-10 overflow-hidden" style={{ backgroundColor: "#FAFAF7" }}>
       {/* Soft top vignette */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.85),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.9),transparent_70%)]" />
 
       {!reduce && (
         <>
           <motion.div
             animate={{ x: [0, 60, 0], y: [0, -40, 0] }}
             transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-[-15%] left-[-10%] w-[55vw] h-[55vw] blur-[140px] rounded-full bg-gradient-to-br from-amber-200/25 to-orange-100/20"
+            className="absolute top-[-15%] left-[-10%] w-[55vw] h-[55vw] blur-[140px] rounded-full bg-gradient-to-br from-amber-200/20 to-orange-100/15"
           />
           <motion.div
             animate={{ x: [0, -50, 0], y: [0, 40, 0] }}
             transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-[-15%] right-[-10%] w-[60vw] h-[60vw] blur-[140px] rounded-full bg-gradient-to-tl from-emerald-200/25 to-teal-100/20"
+            className="absolute bottom-[-15%] right-[-10%] w-[60vw] h-[60vw] blur-[140px] rounded-full bg-gradient-to-tl from-emerald-200/20 to-teal-100/15"
           />
         </>
       )}
@@ -565,19 +567,19 @@ function Panel({ children, className = "", delay = 0 }: PanelProps) {
     <motion.div
       variants={fadeUp}
       transition={{ ...spring, delay }}
-      className={`grain relative bg-white/55 backdrop-blur-2xl backdrop-saturate-150 border border-white/60 ring-1 ring-slate-200/50 rounded-3xl overflow-hidden shadow-[0_20px_50px_-25px_rgba(15,23,42,0.12)] ${className}`}
+      className={`grain relative bg-white/60 backdrop-blur-xl backdrop-saturate-150 border border-white/70 ring-1 ring-slate-200/40 rounded-3xl overflow-hidden shadow-[0_8px_30px_-16px_rgba(15,23,42,0.12)] ${className}`}
     >
-      <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-white/60 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-white/70 to-transparent" />
       <div className="relative">{children}</div>
     </motion.div>
   );
 }
 
 const TrafficLights = () => (
-  <div className="flex gap-1.5">
-    <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
-    <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-    <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+  <div className="flex gap-1">
+    <div className="w-2 h-2 rounded-full bg-rose-400/80" />
+    <div className="w-2 h-2 rounded-full bg-amber-400/80" />
+    <div className="w-2 h-2 rounded-full bg-emerald-400/80" />
   </div>
 );
 
@@ -589,17 +591,17 @@ const Pill = ({
   className?: string;
 }) => (
   <span
-    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border border-slate-200 bg-white/80 text-slate-600 shadow-sm ${className}`}
+    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-[0.15em] uppercase border border-slate-200/60 bg-white/85 text-slate-500 shadow-[0_1px_3px_-2px_rgba(15,23,42,0.06)] ${className}`}
   >
     {children}
   </span>
 );
 
 const Divider = () => (
-  <div className="max-w-7xl mx-auto px-4 md:px-6">
+  <div className="max-w-7xl mx-auto px-6 md:px-6">
     <div className="relative h-px">
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-300/70 to-transparent" />
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-slate-300 ring-4 ring-[#FAFAF7]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-300/40 to-transparent" />
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-0.5 rounded-full bg-slate-300/50 ring-[6px] ring-[#fafaf7]" />
     </div>
   </div>
 );
@@ -615,22 +617,22 @@ const SectionHeading = ({
   subtitle?: string;
   icon?: React.ReactNode;
 }) => (
-  <div className="mb-10 md:mb-14">
-    <div className="flex items-center gap-2 mb-4">
+  <div className="mb-12 md:mb-16">
+    <div className="flex items-center gap-3 mb-4">
       {icon && (
-        <span className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 shadow-sm">
+        <span className="p-1.5 rounded-lg bg-white/80 border border-slate-200/60 text-slate-500 shadow-[0_1px_3px_-2px_rgba(15,23,42,0.06)]">
           {icon}
         </span>
       )}
-      <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-slate-500">
+      <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-slate-400">
         {eyebrow}
       </span>
     </div>
-    <h2 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 leading-[1.05]">
+    <h2 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 leading-[1.04]">
       {title}
     </h2>
     {subtitle && (
-      <p className="mt-4 text-sm md:text-base text-slate-600 max-w-2xl leading-relaxed">
+      <p className="mt-5 text-sm md:text-base text-slate-500 max-w-2xl leading-relaxed">
         {subtitle}
       </p>
     )}
@@ -653,22 +655,22 @@ function EcosystemDiagram({
   const cats = CATEGORIES.filter((c) => c.id !== "all");
 
   return (
-    <div className="grain relative rounded-3xl border border-white/60 ring-1 ring-slate-200/50 bg-white/55 backdrop-blur-2xl backdrop-saturate-150 p-6 md:p-10 overflow-hidden shadow-[0_15px_50px_-30px_rgba(15,23,42,0.18)]">
+    <div className="grain relative rounded-3xl border border-white/70 ring-1 ring-slate-200/40 bg-white/60 backdrop-blur-xl backdrop-saturate-150 p-6 md:p-10 overflow-hidden shadow-[0_8px_30px_-16px_rgba(15,23,42,0.12)]">
       {/* Soft ambient blobs */}
-      <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-amber-100/50 blur-[80px]" />
-      <div className="pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-emerald-100/50 blur-[80px]" />
+      <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-amber-100/40 blur-[80px]" />
+      <div className="pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-emerald-100/40 blur-[80px]" />
 
       {/* Header */}
       <div className="relative flex flex-wrap items-center justify-between gap-3 mb-6 md:mb-10">
         <div className="flex items-center gap-2">
-          <span className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 shadow-sm">
+          <span className="p-1.5 rounded-lg bg-white/80 border border-slate-200/60 text-slate-500 shadow-[0_1px_3px_-2px_rgba(15,23,42,0.06)]">
             <Workflow size={14} />
           </span>
-          <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-slate-500">
+          <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-slate-400">
             Ecosystem Map
           </span>
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-slate-400">
+        <div className="flex items-center gap-2 text-[10px] font-bold tracking-[0.25em] uppercase text-slate-400">
           <span className="relative flex h-1.5 w-1.5">
             <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-70 animate-ping" />
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
@@ -778,22 +780,22 @@ function EcosystemDiagram({
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06, ...spring }}
-                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all ${
+                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all duration-200 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 ${
                   isActive
-                    ? `bg-${c.accent}-50 border-${c.accent}-300 shadow-sm`
-                    : "bg-white border-slate-200 hover:bg-slate-50"
+                    ? `bg-${c.accent}-50/80 border-${c.accent}-300/60 shadow-[0_2px_6px_-3px_rgba(15,23,42,0.08)]`
+                    : "bg-white/80 border-slate-200/60 hover:bg-slate-50/80"
                 }`}
               >
                 <span
-                  className={`p-1.5 rounded-lg border bg-${c.accent}-50 border-${c.accent}-200 text-${c.accent}-600`}
+                  className={`p-1.5 rounded-lg border bg-${c.accent}-50/80 border-${c.accent}-200/60 text-${c.accent}-600`}
                 >
                   {c.icon}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[11px] font-black tracking-wide text-slate-800 truncate">
+                  <div className="text-[11px] font-bold tracking-wide text-slate-700 truncate">
                     {c.label}
                   </div>
-                  <div className="text-[9px] font-bold tracking-widest uppercase text-slate-400">
+                  <div className="text-[9px] font-bold tracking-[0.15em] uppercase text-slate-400">
                     {countsByCategory[c.id] || 0} repos
                   </div>
                 </div>
@@ -833,7 +835,7 @@ function EcosystemDiagram({
             )}
             <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-3xl bg-black flex flex-col items-center justify-center text-white shadow-[0_20px_50px_-15px_rgba(15,23,42,0.45)]">
               <BrandMark size={64} rounded="rounded-2xl" />
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-[9px] font-black tracking-widest uppercase text-slate-700 shadow-sm whitespace-nowrap">
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-white/90 border border-slate-200/60 text-[9px] font-bold tracking-[0.15em] uppercase text-slate-500 shadow-[0_1px_3px_-2px_rgba(15,23,42,0.06)] whitespace-nowrap">
                 Zenith Core
               </div>
             </div>
@@ -870,18 +872,18 @@ function EcosystemDiagram({
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 + i * 0.08, ...spring }}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-200/60 bg-white/80 shadow-[0_1px_4px_-2px_rgba(15,23,42,0.06)] hover:shadow-[0_4px_12px_-6px_rgba(15,23,42,0.1)] hover:bg-white transition-all duration-200"
             >
               <span
-                className={`p-1.5 rounded-lg bg-${o.accent}-50 border border-${o.accent}-200 text-${o.accent}-600`}
+                className={`p-1.5 rounded-lg bg-${o.accent}-50/80 border border-${o.accent}-200/60 text-${o.accent}-600`}
               >
                 {o.icon}
               </span>
               <div className="flex-1 min-w-0">
-                <div className="text-[11px] font-black tracking-wide text-slate-800 truncate">
+                <div className="text-[11px] font-bold tracking-[0.15em] text-slate-800 truncate">
                   {o.label}
                 </div>
-                <div className="text-[9px] font-bold tracking-widest uppercase text-slate-400 truncate">
+                <div className="text-[9px] font-bold tracking-[0.2em] uppercase text-slate-400 truncate">
                   {o.value}
                 </div>
               </div>
@@ -891,9 +893,9 @@ function EcosystemDiagram({
       </div>
 
       {/* Bottom hint */}
-      <div className="relative mt-8 pt-6 border-t border-slate-200/60 flex flex-wrap items-center justify-between gap-2 text-[10px] font-bold tracking-widest uppercase text-slate-400">
+      <div className="relative mt-8 pt-6 border-t border-slate-200/40 flex flex-wrap items-center justify-between gap-2 text-[10px] font-bold tracking-[0.15em] uppercase text-slate-400">
         <span className="flex items-center gap-1.5">
-          <Filter size={11} /> Tap a category to filter the grid below
+          <Filter size={10} /> Tap a category to filter the grid below
         </span>
         <span>{active === "all" ? "Showing all projects" : `Filtering: ${CATEGORIES.find((c) => c.id === active)?.label}`}</span>
       </div>
@@ -1031,9 +1033,9 @@ function LifecycleLoop() {
             }}
           >
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-${s.accent}-200 text-${s.accent}-700 text-[10px] font-black tracking-widest uppercase shadow-sm whitespace-nowrap`}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 border border-${s.accent}-200/60 text-${s.accent}-700 text-[10px] font-bold tracking-[0.15em] uppercase shadow-[0_1px_3px_-2px_rgba(15,23,42,0.06)] whitespace-nowrap`}
             >
-              <span className={`w-1 h-1 rounded-full bg-${s.accent}-500`} />
+              <span className={`w-1 h-1 rounded-full bg-${s.accent}-500/80`} />
               {s.label}
             </span>
           </div>
@@ -1042,10 +1044,10 @@ function LifecycleLoop() {
 
       {/* Center label */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <div className="text-[9px] font-black tracking-[0.3em] uppercase text-slate-400">
+        <div className="text-[8px] font-bold tracking-[0.3em] uppercase text-slate-400">
           Open Source
         </div>
-        <div className="text-sm font-black tracking-tight text-slate-900">
+        <div className="text-sm font-bold tracking-tight text-slate-800">
           Lifecycle
         </div>
       </div>
@@ -1083,20 +1085,20 @@ function CommitHeatmap() {
   ];
 
   return (
-    <div className="grain rounded-2xl border border-white/60 ring-1 ring-slate-200/50 bg-white/55 backdrop-blur-xl backdrop-saturate-150 p-4">
+    <div className="grain relative overflow-hidden rounded-2xl border border-white/70 ring-1 ring-slate-200/40 bg-white/60 backdrop-blur-xl backdrop-saturate-150 p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="p-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600">
-            <Zap size={12} />
+          <span className="p-1.5 rounded-lg bg-emerald-50/80 border border-emerald-200/60 text-emerald-500">
+            <Zap size={11} />
           </span>
-          <span className="text-[10px] font-black tracking-widest uppercase text-slate-500">
+          <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-slate-500">
             Commit Cadence · Last 26 weeks
           </span>
         </div>
-        <span className="text-[9px] font-bold tracking-widest uppercase text-slate-400">
+        <span className="text-[9px] font-bold tracking-[0.1em] uppercase text-slate-400">
           Less <span className="inline-flex gap-0.5 mx-1.5 align-middle">
             {[0, 1, 2, 3, 4].map((l) => (
-              <span key={l} className={`w-2 h-2 rounded-sm ${levelClass[l]}`} />
+              <span key={l} className={`w-1.5 h-1.5 rounded-[2px] ${levelClass[l]}`} />
             ))}
           </span> More
         </span>
@@ -1134,45 +1136,45 @@ function CommitHeatmap() {
 function BharatWave() {
   const reduce = useReducedMotion();
   return (
-    <svg
-      className="pointer-events-none absolute inset-x-0 bottom-0 w-full h-32 md:h-40"
-      viewBox="0 0 200 60"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="saffronWave" x1="0" x2="1">
-          <stop offset="0%" stopColor="rgb(251,146,60)" stopOpacity="0" />
-          <stop offset="50%" stopColor="rgb(251,146,60)" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="rgb(251,146,60)" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="emeraldWave" x1="0" x2="1">
-          <stop offset="0%" stopColor="rgb(16,185,129)" stopOpacity="0" />
-          <stop offset="50%" stopColor="rgb(16,185,129)" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="rgb(16,185,129)" stopOpacity="0" />
-        </linearGradient>
-      </defs>
+      <svg
+        className="pointer-events-none absolute inset-x-0 bottom-0 w-full h-28 md:h-36"
+        viewBox="0 0 200 60"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="saffronWave" x1="0" x2="1">
+            <stop offset="0%" stopColor="rgb(251,146,60)" stopOpacity="0" />
+            <stop offset="50%" stopColor="rgb(251,146,60)" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="rgb(251,146,60)" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="emeraldWave" x1="0" x2="1">
+            <stop offset="0%" stopColor="rgb(16,185,129)" stopOpacity="0" />
+            <stop offset="50%" stopColor="rgb(16,185,129)" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="rgb(16,185,129)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
 
-      {/* Saffron wave */}
-      <motion.path
-        d="M -10 30 Q 25 10 50 30 T 110 30 T 170 30 T 230 30"
-        fill="none"
-        stroke="url(#saffronWave)"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-        animate={reduce ? {} : { x: [0, -60, 0] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
-      />
-      {/* Emerald wave */}
-      <motion.path
-        d="M -10 38 Q 25 58 50 38 T 110 38 T 170 38 T 230 38"
-        fill="none"
-        stroke="url(#emeraldWave)"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-        animate={reduce ? {} : { x: [0, 60, 0] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
-      />
+        {/* Saffron wave */}
+        <motion.path
+          d="M -10 30 Q 25 10 50 30 T 110 30 T 170 30 T 230 30"
+          fill="none"
+          stroke="url(#saffronWave)"
+          strokeWidth="1"
+          strokeLinecap="round"
+          animate={reduce ? {} : { x: [0, -60, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
+        />
+        {/* Emerald wave */}
+        <motion.path
+          d="M -10 38 Q 25 58 50 38 T 110 38 T 170 38 T 230 38"
+          fill="none"
+          stroke="url(#emeraldWave)"
+          strokeWidth="1"
+          strokeLinecap="round"
+          animate={reduce ? {} : { x: [0, 60, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
+        />
 
       {/* Floating code particles */}
       {!reduce &&
@@ -1203,6 +1205,15 @@ function BharatWave() {
    ========================================================================= */
 function RepoCard({ repo, index }: { repo: Repo; index: number }) {
   const [hover, setHover] = useState(false);
+  const categoryIcon: Record<string, React.ReactNode> = {
+    civic: <Flag size={18} />,
+    ai: <Sparkles size={18} />,
+    bots: <Bot size={18} />,
+    linux: <Terminal size={18} />,
+    systems: <Cpu size={18} />,
+    tools: <Workflow size={18} />
+  };
+  const icon = categoryIcon[repo.category] ?? <FolderGit2 size={18} />;
 
   return (
     <motion.a
@@ -1216,23 +1227,23 @@ function RepoCard({ repo, index }: { repo: Repo; index: number }) {
       onMouseLeave={() => setHover(false)}
       className="group block h-full"
     >
-      <div className="grain relative h-full bg-white/55 hover:bg-white/75 backdrop-blur-2xl backdrop-saturate-150 border border-white/60 ring-1 ring-slate-200/50 hover:ring-slate-300/70 rounded-3xl overflow-hidden transition-all duration-300 shadow-[0_10px_40px_-20px_rgba(15,23,42,0.12)] hover:shadow-[0_20px_55px_-20px_rgba(15,23,42,0.18)]">
+      <div className="grain relative h-full bg-white/60 hover:bg-white/80 backdrop-blur-xl backdrop-saturate-150 border border-white/70 ring-1 ring-slate-200/40 hover:ring-slate-300/60 rounded-3xl overflow-hidden transition-all duration-200 shadow-[0_4px_16px_-10px_rgba(15,23,42,0.1)] hover:shadow-[0_12px_32px_-16px_rgba(15,23,42,0.18)]">
         {/* Glow */}
         <div
-          className={`pointer-events-none absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-${repo.accent}-200/40 via-transparent to-transparent`}
+          className={`pointer-events-none absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-${repo.accent}-200/30 via-transparent to-transparent`}
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/60 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/70 to-transparent" />
 
         {/* Header strip */}
-        <div className="relative px-5 py-3.5 border-b border-slate-200/60 flex items-center justify-between">
+        <div className="relative px-5 py-3 border-b border-slate-200/50 flex items-center justify-between">
           <TrafficLights />
-          <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase truncate ml-3">
+          <span className="text-[9px] font-bold text-slate-400 tracking-[0.15em] uppercase truncate ml-3">
             {repo.name}.sh
           </span>
           <div className="flex items-center gap-1 text-[10px] text-slate-500 font-bold">
             {typeof repo.stars === "number" && (
               <>
-                <Star size={11} className="fill-amber-400 text-amber-400" />
+                <Star size={10} className="fill-amber-400/80 text-amber-400/80" />
                 {repo.stars}
               </>
             )}
@@ -1240,40 +1251,40 @@ function RepoCard({ repo, index }: { repo: Repo; index: number }) {
         </div>
 
         {/* Body */}
-        <div className="relative p-6 flex flex-col h-[calc(100%-49px)]">
-          <div className="flex items-start gap-4 mb-5">
+        <div className="relative p-5 flex flex-col h-[calc(100%-45px)]">
+          <div className="flex items-start gap-4 mb-4">
             <div
-              className={`shrink-0 p-3 rounded-2xl border border-${repo.accent}-200 bg-${repo.accent}-50 text-${repo.accent}-500 shadow-sm`}
+              className={`shrink-0 p-2.5 rounded-xl border border-${repo.accent}-200/60 bg-${repo.accent}-50/80 text-${repo.accent}-500 shadow-[0_1px_3px_-2px_rgba(15,23,42,0.06)] transition-transform duration-200 group-hover:scale-105`}
             >
-              <FolderGit2 size={20} />
+              {icon}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg md:text-xl font-black tracking-tight text-slate-900 leading-tight">
+              <h3 className="text-base md:text-lg font-black tracking-tight text-slate-900 leading-tight">
                 {repo.displayName}
               </h3>
-              <div className="mt-1 text-[10px] font-bold tracking-widest uppercase text-slate-400">
+              <div className="mt-0.5 text-[9px] font-bold tracking-[0.15em] uppercase text-slate-400">
                 Open Source · MIT
               </div>
             </div>
           </div>
 
-          <p className="text-sm leading-relaxed text-slate-600 mb-6 flex-1">
+          <p className="text-sm leading-relaxed text-slate-500 mb-5 flex-1">
             {repo.desc}
           </p>
 
-          <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-200/60">
+          <div className="flex items-center justify-between mt-auto pt-3.5 border-t border-slate-200/50">
             <span
-              className={`inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase text-${repo.accent}-500`}
+              className={`inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.15em] uppercase text-${repo.accent}-500`}
             >
-              <span className={`w-1.5 h-1.5 rounded-full bg-${repo.accent}-400`} />
+              <span className={`w-1 h-1 rounded-full bg-${repo.accent}-400`} />
               {repo.lang}
             </span>
             <motion.div
               animate={{ x: hover ? 4 : 0 }}
               transition={{ duration: 0.2 }}
-              className="flex items-center gap-1.5 text-xs font-bold text-slate-500 group-hover:text-slate-900"
+              className="flex items-center gap-1.5 text-xs font-bold text-slate-400 group-hover:text-slate-800 transition-colors duration-200"
             >
-              View repo <ArrowUpRight size={14} />
+              View repo <ArrowUpRight size={13} />
             </motion.div>
           </div>
         </div>
@@ -1288,32 +1299,32 @@ function RepoCard({ repo, index }: { repo: Repo; index: number }) {
 function FeaturedProject({ repo }: { repo: Repo }) {
   return (
     <motion.div variants={fadeUp} transition={spring} className="relative">
-      <div className="grain relative overflow-hidden rounded-[2rem] border border-white/60 ring-1 ring-slate-200/50 bg-gradient-to-br from-amber-50/80 via-white/60 to-emerald-50/80 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_30px_80px_-30px_rgba(15,23,42,0.18)]">
+      <div className="grain relative overflow-hidden rounded-[2rem] border border-white/70 ring-1 ring-slate-200/40 bg-gradient-to-br from-amber-50/80 via-white/60 to-emerald-50/80 backdrop-blur-xl backdrop-saturate-150 shadow-[0_12px_40px_-24px_rgba(15,23,42,0.15)]">
         {/* India accent strip */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-400 via-slate-300 to-emerald-500" />
-        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-amber-200/50 blur-[100px]" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-emerald-200/50 blur-[100px]" />
+        <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-orange-400/80 via-slate-300/60 to-emerald-500/80" />
+        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-amber-200/40 blur-[100px]" />
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-emerald-200/40 blur-[100px]" />
 
         <div className="relative grid md:grid-cols-[1.2fr_1fr] gap-8 p-8 md:p-12">
           {/* LEFT: Copy */}
           <div className="flex flex-col">
             <div className="flex flex-wrap items-center gap-2 mb-6">
-              <Pill className="!text-amber-700 !border-amber-300 !bg-amber-50">
-                <Sparkles size={11} /> Featured · Latest
+              <Pill>
+                <Sparkles size={10} /> Featured · Latest
               </Pill>
-              <Pill className="!text-emerald-700 !border-emerald-300 !bg-emerald-50">
-                <Flag size={11} /> Made for Bharat
+              <Pill>
+                <Flag size={10} /> Made for Bharat
               </Pill>
             </div>
 
             <h3 className="text-4xl md:text-6xl font-black tracking-tight text-slate-900 leading-[0.95]">
               {repo.displayName}
             </h3>
-            <div className="mt-3 text-sm font-bold tracking-widest uppercase text-slate-500">
+            <div className="mt-3 text-sm font-bold tracking-[0.15em] uppercase text-slate-400">
               AI · News Intelligence · {repo.lang}
             </div>
 
-            <p className="mt-6 text-base md:text-lg text-slate-700 leading-relaxed max-w-xl">
+            <p className="mt-6 text-base md:text-lg text-slate-500 leading-relaxed max-w-xl">
               {repo.desc}
             </p>
 
@@ -1323,12 +1334,12 @@ function FeaturedProject({ repo }: { repo: Repo }) {
                   href={repo.homepage}
                   target="_blank"
                   rel="noreferrer"
-                  className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20"
+                  className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all duration-200 shadow-lg shadow-slate-900/20 focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2"
                 >
                   <Eye size={16} /> Live Demo
                   <ArrowUpRight
                     size={16}
-                    className="group-hover:rotate-45 transition-transform"
+                    className="group-hover:rotate-45 transition-transform duration-200"
                   />
                 </a>
               )}
@@ -1336,7 +1347,7 @@ function FeaturedProject({ repo }: { repo: Repo }) {
                 href={repo.link}
                 target="_blank"
                 rel="noreferrer"
-                className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 font-bold text-sm hover:bg-slate-50 transition-all shadow-sm"
+                className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/90 border border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-white hover:border-slate-300/60 transition-all duration-200 shadow-[0_2px_8px_-4px_rgba(15,23,42,0.08)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2"
               >
                 <Github size={16} /> Source Code
                 <ChevronRight
@@ -1349,10 +1360,10 @@ function FeaturedProject({ repo }: { repo: Repo }) {
 
           {/* RIGHT: Terminal mock */}
           <div className="relative">
-            <div className="rounded-2xl border border-slate-900/90 bg-slate-950 overflow-hidden shadow-[0_30px_60px_-25px_rgba(15,23,42,0.5)]">
-              <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between bg-slate-900/60">
+            <div className="rounded-2xl border border-slate-900/80 bg-slate-950 overflow-hidden shadow-[0_16px_48px_-24px_rgba(15,23,42,0.4)]">
+              <div className="px-4 py-2.5 border-b border-white/[0.07] flex items-center justify-between bg-slate-900/60">
                 <TrafficLights />
-                <span className="text-[10px] font-bold tracking-widest uppercase text-white/50">
+                <span className="text-[9px] font-bold tracking-[0.15em] uppercase text-white/40">
                   sentinel ~ live
                 </span>
                 <div className="w-10" />
@@ -1377,7 +1388,7 @@ function FeaturedProject({ repo }: { repo: Repo }) {
                   {["AI", "TS", "Next", "Edge", "RSS", "NLP"].map((t) => (
                     <span
                       key={t}
-                      className="text-center px-2 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white/70 text-[10px] font-bold tracking-widest"
+                      className="text-center px-2 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white/70 text-[10px] font-bold tracking-[0.15em] hover:bg-white/[0.12] transition-colors duration-200"
                     >
                       {t}
                     </span>
@@ -1550,7 +1561,7 @@ export default function Page() {
       />
 
       {/* HEADER */}
-      <header className="sticky top-0 z-50 backdrop-blur-2xl backdrop-saturate-150 bg-white/55 border-b border-white/60 shadow-[0_1px_0_0_rgba(15,23,42,0.05)]">
+      <header className="sticky top-0 z-50 backdrop-blur-xl backdrop-saturate-150 bg-white/65 border-b border-slate-200/50 shadow-[0_0.5px_0_0_rgba(15,23,42,0.04)]">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3.5 flex items-center justify-between gap-4">
           <a href="#top" className="flex items-center gap-3 group">
             <BrandMark size={38} rounded="rounded-xl" />
@@ -1569,7 +1580,7 @@ export default function Page() {
               <a
                 key={l.href}
                 href={l.href}
-                className="px-3 py-1.5 text-xs font-bold tracking-wide text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
+                className="px-3 py-1.5 text-xs font-bold tracking-wide text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100/60 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2"
               >
                 {l.label}
               </a>
@@ -1580,7 +1591,7 @@ export default function Page() {
             href="https://github.com/roshhellwett?tab=repositories"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all shadow-sm"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all duration-200 shadow-[0_1px_3px_-2px_rgba(15,23,42,0.1)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2"
           >
             <Github size={14} />
             <span className="hidden sm:inline">All Repos</span>
@@ -1597,14 +1608,14 @@ export default function Page() {
         {/* =========================================================
             HERO
             ========================================================= */}
-        <section className="relative max-w-7xl mx-auto px-4 md:px-6 pt-16 md:pt-28 pb-16 md:pb-24">
+        <section className="relative max-w-7xl mx-auto px-6 md:px-6 pt-20 md:pt-32 pb-20 md:pb-28">
           <motion.div
             variants={stagger}
             initial="hidden"
             animate="show"
             className="relative text-center max-w-4xl mx-auto"
           >
-            <motion.div variants={fadeUp} className="flex flex-col items-center gap-5 mb-6">
+            <motion.div variants={fadeUp} className="flex flex-col items-center gap-5 mb-8">
               <Pill>
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75 animate-ping" />
@@ -1616,17 +1627,17 @@ export default function Page() {
 
             <motion.h1
               variants={fadeUp}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-[-0.04em] leading-[0.9] text-slate-900"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-[-0.03em] leading-[0.88] text-slate-900"
             >
               Zenith
-              <span className="block text-slate-500">
+              <span className="block text-slate-400/80 mt-1 font-black">
                 Open Source.
               </span>
             </motion.h1>
 
             <motion.p
               variants={fadeUp}
-              className="mt-6 md:mt-8 text-base md:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto"
+              className="mt-8 md:mt-10 text-base md:text-lg text-slate-500 leading-relaxed max-w-2xl mx-auto"
             >
               A collective of premium, transparent open source projects —
               Telegram bots, civic-tech, Linux audio, OS utilities, and AI
@@ -1640,25 +1651,25 @@ export default function Page() {
             >
               <a
                 href="#featured"
-                className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/15"
-              >
-                <Sparkles size={16} /> Featured Project
-                <ArrowRight
-                  size={14}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
-              </a>
-              <a
-                href="#projects"
-                className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 font-bold text-sm hover:bg-slate-50 transition-all shadow-sm"
-              >
-                <FolderGit2 size={16} /> Explore Projects
-              </a>
-              <a
-                href="https://github.com/roshhellwett?tab=repositories"
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 font-bold text-sm hover:bg-slate-50 transition-all shadow-sm"
+              className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all duration-200 shadow-[0_4px_12px_-4px_rgba(15,23,42,0.3)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2"
+            >
+              <Sparkles size={16} /> Featured Project
+              <ArrowRight
+                size={14}
+                className="group-hover:translate-x-1 transition-transform duration-200"
+              />
+            </a>
+            <a
+              href="#projects"
+              className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/90 border border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-white hover:border-slate-300/60 transition-all duration-200 shadow-[0_2px_8px_-4px_rgba(15,23,42,0.08)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2"
+            >
+              <FolderGit2 size={16} /> Explore Projects
+            </a>
+            <a
+              href="https://github.com/roshhellwett?tab=repositories"
+              target="_blank"
+              rel="noreferrer"
+              className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/90 border border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-white hover:border-slate-300/60 transition-all duration-200 shadow-[0_2px_8px_-4px_rgba(15,23,42,0.08)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2"
               >
                 <Github size={16} /> GitHub
                 <ArrowUpRight size={14} />
@@ -1679,13 +1690,13 @@ export default function Page() {
                 key={s.label}
                 variants={fadeUp}
                 transition={{ ...spring, delay: i * 0.05 }}
-                className="grain relative rounded-2xl bg-white/55 backdrop-blur-2xl backdrop-saturate-150 border border-white/60 ring-1 ring-slate-200/50 p-5 md:p-6 overflow-hidden shadow-[0_15px_40px_-25px_rgba(15,23,42,0.18)]"
+                className="grain relative rounded-2xl bg-white/60 backdrop-blur-xl backdrop-saturate-150 border border-white/70 ring-1 ring-slate-200/40 p-5 md:p-6 overflow-hidden shadow-[0_4px_16px_-8px_rgba(15,23,42,0.1)]"
               >
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/60 to-transparent" />
-                <div className="relative flex items-center gap-2 text-slate-500 text-[10px] font-bold tracking-widest uppercase">
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/70 to-transparent" />
+                <div className="relative flex items-center gap-2 text-slate-400 text-[10px] font-bold tracking-[0.15em] uppercase">
                   {s.icon} {s.label}
                 </div>
-                <div className="relative mt-2 text-3xl md:text-4xl font-black tracking-tight text-slate-900">
+                <div className="relative mt-2.5 text-3xl md:text-4xl font-black tracking-tight text-slate-900">
                   {s.value}
                   {typeof s.value === "number" && (
                     <span className="text-slate-400 text-xl ml-0.5">+</span>
@@ -1703,13 +1714,13 @@ export default function Page() {
             ========================================================= */}
         <section
           id="mission"
-          className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24"
+          className="max-w-7xl mx-auto px-6 md:px-6 py-20 md:py-28"
         >
           <SectionHeading
             eyebrow="Our Mission"
             title="Open source, by India — for the world."
             subtitle="Every project under Zenith is built with one rule: be useful, be transparent, be free. We focus on civic-tech, automation, and developer tooling that compounds in value the longer it stays open."
-            icon={<Flag size={14} />}
+            icon={<Globe size={14} />}
           />
 
           <motion.div
@@ -1722,20 +1733,20 @@ export default function Page() {
             {/* LEFT: Lifecycle Loop diagram */}
             <motion.div
               variants={fadeUp}
-              className="grain relative rounded-3xl border border-white/60 ring-1 ring-slate-200/50 bg-white/50 backdrop-blur-2xl backdrop-saturate-150 p-6 md:p-10 overflow-hidden shadow-[0_15px_50px_-30px_rgba(15,23,42,0.18)]"
+              className="grain relative rounded-3xl border border-white/70 ring-1 ring-slate-200/40 bg-white/60 backdrop-blur-xl backdrop-saturate-150 p-6 md:p-10 overflow-hidden shadow-[0_8px_30px_-16px_rgba(15,23,42,0.12)]"
             >
-              <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 rounded-full bg-amber-100/40 blur-[80px]" />
-              <div className="pointer-events-none absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-emerald-100/40 blur-[80px]" />
+              <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 rounded-full bg-amber-100/30 blur-[80px]" />
+              <div className="pointer-events-none absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-emerald-100/30 blur-[80px]" />
               <div className="relative flex items-center gap-2 mb-4">
-                <span className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 shadow-sm">
+                <span className="p-1.5 rounded-lg bg-white/80 border border-slate-200/60 text-slate-500 shadow-[0_1px_3px_-2px_rgba(15,23,42,0.06)]">
                   <Workflow size={14} />
                 </span>
-                <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-slate-500">
+                <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-slate-400">
                   How we operate
                 </span>
               </div>
               <LifecycleLoop />
-              <p className="relative mt-4 text-center text-[11px] font-bold tracking-widest uppercase text-slate-400">
+              <p className="relative mt-4 text-center text-[10px] font-bold tracking-[0.15em] uppercase text-slate-400">
                 Build · Ship · Open · Iterate — forever
               </p>
             </motion.div>
@@ -1744,7 +1755,7 @@ export default function Page() {
             <motion.div variants={fadeUp} className="grid sm:grid-cols-2 gap-4">
               {[
                 {
-                  icon: <Shield size={18} />,
+                  icon: <Eye size={18} />,
                   title: "Transparent by default",
                   desc: "MIT licensed, public history, public issues. No black boxes.",
                   accent: "emerald"
@@ -1770,18 +1781,18 @@ export default function Page() {
               ].map((c) => (
                 <div
                   key={c.title}
-                  className="grain relative rounded-2xl border border-white/60 ring-1 ring-slate-200/50 bg-white/55 backdrop-blur-2xl backdrop-saturate-150 p-5 overflow-hidden group hover:bg-white/75 transition-colors shadow-[0_10px_30px_-20px_rgba(15,23,42,0.15)]"
+                  className="grain relative rounded-2xl border border-white/70 ring-1 ring-slate-200/40 bg-white/60 backdrop-blur-xl backdrop-saturate-150 p-5 overflow-hidden group hover:bg-white/80 transition-all duration-200 shadow-[0_4px_12px_-8px_rgba(15,23,42,0.1)] hover:shadow-[0_8px_24px_-12px_rgba(15,23,42,0.15)]"
                 >
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/60 to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/70 to-transparent" />
                   <div
-                    className={`relative inline-flex p-2 rounded-xl bg-${c.accent}-50 text-${c.accent}-500 border border-${c.accent}-200 mb-4`}
+                    className={`relative inline-flex p-2 rounded-xl bg-${c.accent}-50/80 text-${c.accent}-500 border border-${c.accent}-200/60 mb-4 transition-transform duration-200 group-hover:scale-105`}
                   >
                     {c.icon}
                   </div>
                   <h4 className="relative text-base font-bold text-slate-900 tracking-tight">
                     {c.title}
                   </h4>
-                  <p className="relative mt-1.5 text-sm text-slate-600 leading-relaxed">
+                  <p className="relative mt-1.5 text-sm text-slate-500 leading-relaxed">
                     {c.desc}
                   </p>
                 </div>
@@ -1797,7 +1808,7 @@ export default function Page() {
             ========================================================= */}
         <section
           id="featured"
-          className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24"
+          className="max-w-7xl mx-auto px-6 md:px-6 py-20 md:py-28"
         >
           <SectionHeading
             eyebrow="Featured Initiative"
@@ -1822,7 +1833,7 @@ export default function Page() {
             ========================================================= */}
         <section
           id="projects"
-          className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24"
+          className="max-w-7xl mx-auto px-6 md:px-6 py-20 md:py-28"
         >
           <SectionHeading
             eyebrow="The Archive"
@@ -1854,10 +1865,10 @@ export default function Page() {
                   onClick={() => setActiveCategory(c.id)}
                   whileHover={{ y: -1 }}
                   whileTap={{ scale: 0.97 }}
-                  className={`group inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-bold tracking-wide border transition-all ${
+                  className={`group inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-bold tracking-wide border transition-all duration-200 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 ${
                     isActive
-                      ? `bg-slate-900 border-slate-900 text-white shadow-md`
-                      : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                      ? `bg-slate-900 border-slate-900 text-white shadow-[0_2px_8px_-4px_rgba(15,23,42,0.3)]`
+                      : "bg-white/80 border-slate-200/60 text-slate-500 hover:bg-slate-50/80"
                   }`}
                 >
                   <span className={isActive ? "text-white" : `text-${c.accent}-500`}>
@@ -1865,10 +1876,10 @@ export default function Page() {
                   </span>
                   <span>{c.label}</span>
                   <span
-                    className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-black ${
+                    className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
                       isActive
                         ? "bg-white/15 text-white"
-                        : "bg-slate-100 text-slate-500"
+                        : "bg-slate-100/80 text-slate-500"
                     }`}
                   >
                     {count}
@@ -1906,20 +1917,20 @@ export default function Page() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-16 px-6 rounded-3xl border border-dashed border-slate-300 bg-white/50"
+              className="text-center py-16 px-6 rounded-3xl border border-dashed border-slate-300/40 bg-white/60 backdrop-blur-sm"
             >
               <Boxes
-                size={28}
+                size={26}
                 className="mx-auto text-slate-400 mb-3"
                 strokeWidth={1.5}
               />
-              <p className="text-sm font-bold text-slate-700">
+              <p className="text-sm font-bold text-slate-500">
                 No projects in this category yet.
               </p>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-400">
                 More are shipping soon — switch back to{" "}
                 <button
-                  className="font-bold text-slate-900 underline underline-offset-4"
+                  className="font-bold text-slate-900 underline underline-offset-4 transition-colors duration-200 hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 rounded"
                   onClick={() => setActiveCategory("all")}
                 >
                   All projects
@@ -1939,19 +1950,19 @@ export default function Page() {
               href="https://github.com/roshhellwett?tab=repositories"
               target="_blank"
               rel="noreferrer"
-              className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/15"
+              className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all duration-200 shadow-[0_4px_12px_-4px_rgba(15,23,42,0.3)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2"
             >
               <Github size={16} /> View all on GitHub
               <ArrowUpRight
                 size={14}
-                className="group-hover:rotate-45 transition-transform"
+                className="group-hover:rotate-45 transition-transform duration-200"
               />
             </a>
             <a
               href="https://roshhellwett.github.io/zenithpages/"
               target="_blank"
               rel="noreferrer"
-              className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 font-bold text-sm hover:bg-slate-50 transition-all shadow-sm"
+              className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/90 border border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-white hover:border-slate-300/60 transition-all duration-200 shadow-[0_2px_8px_-4px_rgba(15,23,42,0.08)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2"
             >
               <Layers size={16} /> Zenith Tools Registry
               <ArrowUpRight size={14} />
@@ -1966,7 +1977,7 @@ export default function Page() {
             ========================================================= */}
         <section
           id="stack"
-          className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24"
+          className="max-w-7xl mx-auto px-6 md:px-6 py-20 md:py-28"
         >
           <SectionHeading
             eyebrow="Capability"
@@ -1987,29 +1998,29 @@ export default function Page() {
                 key={g.category}
                 variants={fadeUp}
                 transition={{ ...spring, delay: i * 0.05 }}
-                className="grain relative rounded-3xl border border-white/60 ring-1 ring-slate-200/50 bg-white/55 backdrop-blur-2xl backdrop-saturate-150 p-6 md:p-7 overflow-hidden shadow-[0_15px_45px_-25px_rgba(15,23,42,0.15)]"
+                className="grain relative rounded-3xl border border-white/70 ring-1 ring-slate-200/40 bg-white/60 backdrop-blur-xl backdrop-saturate-150 p-6 md:p-7 overflow-hidden shadow-[0_4px_16px_-10px_rgba(15,23,42,0.1)]"
               >
                 <div
-                  className={`pointer-events-none absolute -top-20 -right-20 w-48 h-48 rounded-full blur-[60px] bg-${g.accent}-200/60`}
+                  className={`pointer-events-none absolute -top-20 -right-20 w-48 h-48 rounded-full blur-[60px] bg-${g.accent}-200/50`}
                 />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/60 to-transparent" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/70 to-transparent" />
                 <div className="relative">
                   <div
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-${g.accent}-50 border border-${g.accent}-200 text-${g.accent}-600`}
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-${g.accent}-50/80 border border-${g.accent}-200/60 text-${g.accent}-600`}
                   >
                     {g.icon}
-                    <span className="text-[10px] font-black tracking-widest uppercase">
+                    <span className="text-[10px] font-bold tracking-[0.15em] uppercase">
                       {g.category}
                     </span>
                   </div>
-                  <p className="mt-5 text-sm text-slate-600 leading-relaxed">
+                  <p className="mt-5 text-sm text-slate-500 leading-relaxed">
                     {g.concept}
                   </p>
                   <div className="mt-6 flex flex-wrap gap-2">
                     {g.items.map((item) => (
                       <span
                         key={item}
-                        className="px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px] font-bold text-slate-700"
+                        className="px-2.5 py-1 rounded-lg bg-slate-50/70 border border-slate-200/50 text-[10px] font-bold text-slate-500"
                       >
                         {item}
                       </span>
@@ -2028,7 +2039,7 @@ export default function Page() {
             ========================================================= */}
         <section
           id="founder"
-          className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24"
+          className="max-w-7xl mx-auto px-6 md:px-6 py-20 md:py-28"
         >
           <SectionHeading
             eyebrow="Behind Zenith"
@@ -2050,24 +2061,24 @@ export default function Page() {
                 {/* Commit cadence heatmap — full width, top */}
                 <CommitHeatmap />
 
-                <div className="mt-8 grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-12 items-start">
+                <div className="mt-10 grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-12 items-start">
                   {/* LEFT: Identity + bio + quote */}
                   <div className="flex flex-col">
                     <h3 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
                       Roshan Kr Singh
                     </h3>
-                    <div className="mt-1 text-sm font-bold tracking-widest uppercase text-slate-500">
+                    <div className="mt-1 text-sm font-bold tracking-[0.2em] uppercase text-slate-500">
                       @roshhellwett · Founder
                     </div>
 
-                    <p className="mt-6 text-sm md:text-base text-slate-600 leading-relaxed">
+                    <p className="mt-6 text-sm md:text-base text-slate-500 leading-relaxed">
                       Independent developer, Google Dev member, and open source
                       maintainer based in India. I build systems I wish existed —
                       for students, for democracy, for the open web. Zenith is my
                       promise to keep them free.
                     </p>
 
-                    <blockquote className="mt-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 text-sm italic">
+                    <blockquote className="mt-6 p-4 rounded-2xl bg-slate-50/80 border border-slate-200/60 text-slate-500 text-sm italic leading-relaxed">
                       &ldquo;Open Source is the first step of development.&rdquo;
                     </blockquote>
                   </div>
@@ -2079,9 +2090,9 @@ export default function Page() {
                         href="https://g.dev/roshhellwett"
                         target="_blank"
                         rel="noreferrer"
-                        className="group flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
+                        className="group flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-slate-200/60 hover:bg-slate-50/80 hover:border-slate-300/60 transition-all duration-200 shadow-[0_1px_4px_-2px_rgba(15,23,42,0.06)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2"
                       >
-                        <span className="p-2 rounded-lg bg-blue-50 text-blue-500 border border-blue-200">
+                        <span className="p-2 rounded-lg bg-blue-50/80 text-blue-500 border border-blue-200/60">
                           <Globe size={14} />
                         </span>
                         <span className="text-sm font-bold text-slate-700">
@@ -2089,14 +2100,14 @@ export default function Page() {
                         </span>
                         <ArrowUpRight
                           size={14}
-                          className="ml-auto text-slate-400 group-hover:text-slate-700"
+                          className="ml-auto text-slate-400 group-hover:text-slate-700 transition-colors duration-200"
                         />
                       </a>
                       <a
                         href="https://github.com/roshhellwett"
                         target="_blank"
                         rel="noreferrer"
-                        className="group flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
+                        className="group flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-slate-200/60 hover:bg-slate-50/80 hover:border-slate-300/60 transition-all duration-200 shadow-[0_1px_4px_-2px_rgba(15,23,42,0.06)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2"
                       >
                         <span className="p-2 rounded-lg bg-slate-900 text-white border border-slate-900">
                           <Github size={14} />
@@ -2111,8 +2122,8 @@ export default function Page() {
                       </a>
                     </div>
 
-                    <div className="pt-6 border-t border-slate-200">
-                      <div className="text-[10px] font-bold tracking-[0.25em] uppercase text-slate-500 mb-4">
+                    <div className="pt-6 border-t border-slate-200/40">
+                      <div className="text-[10px] font-bold tracking-[0.25em] uppercase text-slate-400 mb-4">
                         Vertices
                       </div>
                       <div className="grid grid-cols-2 gap-2">
@@ -2123,10 +2134,10 @@ export default function Page() {
                             target="_blank"
                             rel="noreferrer"
                             aria-label={s.label}
-                            className="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
+                            className="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/80 border border-slate-200/60 hover:bg-slate-50/80 hover:border-slate-300/60 transition-all duration-200 shadow-[0_1px_3px_-2px_rgba(15,23,42,0.04)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2"
                           >
-                            <span className={`text-${s.accent}-500`}>{s.icon}</span>
-                            <span className="text-[11px] font-bold text-slate-600 group-hover:text-slate-900 truncate">
+                            <span className={`text-${s.accent}-500 group-hover:scale-110 transition-transform duration-200`}>{s.icon}</span>
+                            <span className="text-[11px] font-bold text-slate-500 group-hover:text-slate-900 truncate transition-colors duration-200">
                               {s.label}
                             </span>
                           </a>
@@ -2145,16 +2156,16 @@ export default function Page() {
         {/* =========================================================
             NATION BAND — closing call (final section before footer)
             ========================================================= */}
-        <section className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24">
+        <section className="max-w-7xl mx-auto px-6 md:px-6 py-20 md:py-28">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={spring}
-            className="grain relative overflow-hidden rounded-[2rem] border border-white/60 ring-1 ring-slate-200/50 bg-gradient-to-br from-orange-50/80 via-white/60 to-emerald-50/80 backdrop-blur-2xl backdrop-saturate-150 p-8 md:p-14 text-center shadow-[0_30px_70px_-30px_rgba(15,23,42,0.15)]"
+            className="grain relative overflow-hidden rounded-[2rem] border border-white/70 ring-1 ring-slate-200/40 bg-gradient-to-br from-orange-50/80 via-white/60 to-emerald-50/80 backdrop-blur-xl backdrop-saturate-150 p-8 md:p-14 text-center shadow-[0_12px_40px_-24px_rgba(15,23,42,0.12)]"
           >
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-orange-400 via-slate-300 to-emerald-500" />
-            <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-amber-100/50 blur-[120px]" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-[2.5px] bg-gradient-to-r from-orange-400/80 via-slate-300/60 to-emerald-500/80" />
+            <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-amber-100/40 blur-[120px]" />
 
             {/* Animated tricolor wave + code particles */}
             <BharatWave />
@@ -2164,8 +2175,13 @@ export default function Page() {
                 <Flag size={11} /> Bharat First
               </Pill>
             </div>
+            <div className="relative flex items-center justify-center gap-3 mt-6 mb-4">
+              <div className="w-8 h-px bg-gradient-to-r from-transparent to-slate-300/50" />
+              <div className="w-1 h-1 rounded-full bg-slate-300/50" />
+              <div className="w-8 h-px bg-gradient-to-l from-transparent to-slate-300/50" />
+            </div>
             <h3
-              className="relative mt-6 font-black tracking-tight text-slate-900 mx-auto leading-tight whitespace-nowrap"
+              className="relative font-black tracking-tight text-slate-900 mx-auto leading-tight whitespace-nowrap"
               style={{ fontSize: "clamp(1rem, 4.2vw, 3rem)" }}
             >
               Code as contribution. Code as{" "}
@@ -2173,7 +2189,7 @@ export default function Page() {
                 citizenship.
               </span>
             </h3>
-            <p className="relative mt-5 text-sm md:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="relative mt-5 text-sm md:text-base text-slate-500/90 max-w-xl mx-auto leading-relaxed">
               Every commit pushed under Zenith is a small contribution toward a
               more transparent, self-reliant digital India — open standards,
               open code, open opportunity.
@@ -2183,21 +2199,21 @@ export default function Page() {
       </main>
 
       {/* FOOTER */}
-      <footer className="relative z-10 border-t border-white/60 mt-8 bg-white/40 backdrop-blur-2xl backdrop-saturate-150">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
+      <footer className="relative z-10 border-t border-slate-200/40 mt-8 bg-white/50 backdrop-blur-xl backdrop-saturate-150">
+        <div className="max-w-7xl mx-auto px-6 md:px-6 py-10">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <BrandMark size={36} rounded="rounded-xl" />
+              <BrandMark size={34} rounded="rounded-xl" />
               <div>
                 <div className="text-sm font-black tracking-tight text-slate-900">
                   Zenith Open Source Projects
                 </div>
-                <div className="text-[10px] font-bold tracking-widest uppercase text-slate-500">
+                <div className="text-[9px] font-bold tracking-[0.15em] uppercase text-slate-400">
                   © {new Date().getFullYear()} · Roshan Kr Singh · MIT
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               {SOCIALS.slice(0, 6).map((s) => (
                 <a
                   key={s.label}
@@ -2205,32 +2221,32 @@ export default function Page() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={s.label}
-                  className={`p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-${s.accent}-500 transition-colors shadow-sm`}
+                  className={`p-2 rounded-lg bg-white/80 border border-slate-200/50 hover:bg-slate-50/80 text-${s.accent}-500 transition-all duration-200 shadow-[0_1px_3px_-2px_rgba(15,23,42,0.06)] hover:shadow-[0_4px_8px_-4px_rgba(15,23,42,0.1)] hover:scale-110 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2`}
                 >
                   {s.icon}
                 </a>
               ))}
             </div>
           </div>
-          <div className="mt-8 pt-6 border-t border-slate-200/60 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-[10px] font-bold tracking-widest uppercase text-slate-500">
+          <div className="mt-8 pt-6 border-t border-slate-200/40 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-[9px] font-bold tracking-[0.15em] uppercase text-slate-400">
               Built with{" "}
-              <span className="text-slate-700">Claude</span>{" "}
+              <span className="text-slate-500">Claude</span>{" "}
               <span className="text-slate-300">&amp;</span>{" "}
-              <span className="text-slate-700">Gemini</span>
+              <span className="text-slate-500">Gemini</span>
             </p>
-            <p className="text-[10px] font-bold tracking-widest uppercase text-slate-500">
+            <p className="text-[9px] font-bold tracking-[0.15em] uppercase text-slate-400">
               Design by{" "}
               <a
                 href="https://github.com/roshhellwett"
                 target="_blank"
                 rel="noreferrer"
-                className="text-slate-900 hover:text-slate-700 transition-colors underline decoration-slate-300 underline-offset-4"
+                className="text-slate-700 hover:text-slate-900 transition-colors duration-200 underline decoration-slate-300/50 underline-offset-4 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 rounded"
               >
                 Roshhellwett
               </a>
             </p>
-            <p className="text-[10px] font-medium text-slate-400">
+            <p className="text-[9px] font-medium text-slate-400">
               Next.js · Tailwind · Framer Motion
             </p>
           </div>
