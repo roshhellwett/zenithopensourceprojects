@@ -75,7 +75,7 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   verification: {
-    google: "googlefb7efcaaa017ab28",
+    google: "CWEIddbWw_sSmzFyikcyLv3jLzWUYDb-0V5JUNUjmvw",
   },
   openGraph: {
     title: "Zenith Open Source Projects – Roshan Kr Singh",
