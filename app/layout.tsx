@@ -13,11 +13,42 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = "https://zenithopensourceprojects.vercel.app";
+
 // 1. Standard Metadata with Favicon
 export const metadata: Metadata = {
   title: "Zenith Open Source Projects – Roshan Kr Singh (@roshhellwett)",
   description:
-    "Explore open source Telegram bots, Windows utilities, GRUB themes, audio pipelines, and logic simulators by Roshan Kr Singh (@roshhellwett).",
+    "Explore open source Telegram bots, Windows utilities, GRUB themes, audio pipelines, and logic simulators by Roshan Kr Singh (@roshhellwett). Built with one rule: be useful, be transparent, be free.",
+  keywords: [
+    "roshhellwett",
+    "roshan kr singh",
+    "zenith open source projects",
+    "open source",
+    "telegram bot",
+    "civic tech india",
+    "windows utilities",
+    "grub themes",
+    "ai news aggregator",
+    "project sentinel",
+    "developer tools",
+    "indian open source",
+    "github projects",
+  ],
+  authors: [
+    { name: "Roshan Kr Singh", url: "https://github.com/roshhellwett" },
+  ],
+  creator: "Roshan Kr Singh",
+  publisher: "Roshan Kr Singh",
+  robots: {
+    index: true,
+    follow: true,
+    "max-snippet": -1,
+    "max-image-preview": "large",
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -43,19 +74,26 @@ export const metadata: Metadata = {
     ],
   },
   manifest: "/site.webmanifest",
+  verification: {
+    google: "googlefb7efcaaa017ab28",
+  },
   openGraph: {
-    title: "Zenith Open Source Projects",
+    title: "Zenith Open Source Projects – Roshan Kr Singh",
     description:
-      "A curated collection of open source tools, bots, and system experiments by Roshan Kr Singh.",
-    url: "https://zenithopensourceprojects.vercel.app",
+      "A curated collection of open source tools, bots, and system experiments by Roshan Kr Singh. Telegram bots, Windows utilities, GRUB themes, AI news, and more.",
+    url: SITE_URL,
     siteName: "Zenith Open Source Projects",
+    locale: "en_IN",
     type: "website",
+    countryName: "India",
   },
   twitter: {
     card: "summary_large_image",
     title: "Zenith Open Source Projects",
     description:
       "Open source Telegram bots, Windows tools, GRUB themes, and more by @roshhellwett.",
+    creator: "@roshhellwett",
+    creatorId: "roshhellwett",
   },
 };
 
@@ -75,6 +113,31 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Zenith Open Source Projects",
+              url: SITE_URL,
+              description:
+                "A curated collection of open source tools, bots, and system experiments by Roshan Kr Singh.",
+              author: {
+                "@type": "Person",
+                name: "Roshan Kr Singh",
+                url: "https://github.com/roshhellwett",
+                sameAs: [
+                  "https://github.com/roshhellwett",
+                  "https://x.com/roshhellwett",
+                ],
+              },
+              inLanguage: "en-IN",
+              isAccessibleForFree: true,
+              license: "https://opensource.org/licenses/MIT",
+            }),
+          }}
+        />
         {children}
         <SpeedInsights />
       </body>
