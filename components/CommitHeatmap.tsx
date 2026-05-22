@@ -22,13 +22,13 @@ export function CommitHeatmap() {
   const levelClass = ["bg-slate-100", "bg-emerald-200", "bg-emerald-300", "bg-emerald-400", "bg-emerald-600"];
 
   return (
-    <div className="grain relative overflow-hidden rounded-2xl border border-white/50 ring-1 ring-slate-200/30 bg-white/65 backdrop-blur-lg backdrop-saturate-150 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
-      <div className="flex items-center justify-between mb-3">
+    <div className="grain relative overflow-hidden rounded-2xl border border-white/50 ring-1 ring-slate-200/30 bg-white/65 backdrop-blur-lg backdrop-saturate-150 p-3 sm:p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-white/80 border border-slate-200/60 text-slate-500">
             <Zap size={11} />
           </span>
-          <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-slate-500">
+          <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.12em] sm:tracking-[0.15em] uppercase text-slate-500">
             Commit Cadence · Last 26 weeks
           </span>
         </div>

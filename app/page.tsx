@@ -121,7 +121,9 @@ export default function Page() {
       <a href="#main" className="skip-link">Skip to content</a>
       <StructuredData />
       <Background />
-      <DashField />
+      <div className="hidden sm:block">
+        <DashField />
+      </div>
 
       <motion.div
         style={{ scaleX: scrollYProgress }}
@@ -129,12 +131,12 @@ export default function Page() {
       />
 
       <header className="sticky top-0 z-50 backdrop-blur-lg backdrop-saturate-150 bg-white/65 border-b border-slate-200/40 shadow-[inset_0_-0.5px_0_rgba(15,23,42,0.04)]">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-4">
-          <a href="#top" className="flex items-center gap-3 group">
-            <BrandMark size={38} rounded="rounded-xl" />
-            <div className="flex flex-col leading-tight">
+        <div className="mobile-container py-2.5 sm:py-3 flex items-center justify-between gap-3">
+          <a href="#top" className="flex min-w-0 items-center gap-2.5 sm:gap-3 group">
+            <BrandMark size={36} rounded="rounded-xl" />
+            <div className="flex min-w-0 flex-col leading-tight">
               <span className="text-sm md:text-[15px] font-black tracking-tight text-slate-900">ZENITH</span>
-              <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-slate-500">Open Source Projects</span>
+              <span className="truncate text-[8px] sm:text-[9px] font-bold tracking-[0.16em] sm:tracking-[0.2em] uppercase text-slate-500">Open Source Projects</span>
             </div>
           </a>
           <nav className="hidden md:flex items-center gap-1">
@@ -146,7 +148,7 @@ export default function Page() {
             ))}
           </nav>
           <a href="https://github.com/roshhellwett?tab=repositories" target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2">
+            className="touch-target shrink-0 inline-flex items-center justify-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2">
             <Github size={14} />
             <span className="hidden sm:inline">All Repos</span>
             <ArrowUpRight size={12} />
@@ -157,7 +159,7 @@ export default function Page() {
       <main id="main" className="relative z-10 w-full flex-grow">
         <span id="top" />
 
-        <section className="relative max-w-7xl mx-auto px-6 md:px-6 pt-20 md:pt-28 pb-16 md:pb-24">
+        <section className="relative mobile-container pt-14 sm:pt-20 md:pt-28 pb-12 sm:pb-16 md:pb-24">
           <motion.div variants={stagger} initial="hidden" animate="show" className="relative text-center max-w-4xl mx-auto">
             <motion.div variants={fadeUp} className="flex flex-col items-center gap-4 mb-6">
               <Pill>
@@ -169,39 +171,39 @@ export default function Page() {
             </motion.div>
 
             <motion.h1 variants={fadeUp}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-[-0.04em] leading-[0.85] text-slate-900">
+              className="text-[2.7rem] sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight sm:tracking-[-0.04em] leading-[0.9] sm:leading-[0.85] text-slate-900">
               Zenith
               <span className="block text-slate-400/80 mt-1 font-black tracking-[-0.02em]">Open Source.</span>
             </motion.h1>
 
             <motion.p variants={fadeUp}
-              className="mt-6 md:mt-8 text-base md:text-lg text-slate-500 leading-relaxed max-w-2xl mx-auto">
+              className="mt-5 md:mt-8 text-[15px] md:text-lg text-slate-500 leading-relaxed max-w-2xl mx-auto">
               A collective of premium, transparent open source projects —
               Telegram bots, civic-tech, Linux audio, OS utilities, and AI
               tooling — engineered to give back to developers, students, and the nation.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="mt-6 md:mt-8 flex flex-wrap justify-center gap-3">
+            <motion.div variants={fadeUp} className="mt-6 md:mt-8 grid w-full grid-cols-1 sm:flex sm:flex-wrap justify-center gap-3">
               <a href="#featured"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2">
+                className="touch-target inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2">
                 <Sparkles size={16} /> Featured Project <ArrowRight size={14} />
               </a>
               <a href="#projects"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/90 border border-slate-200/50 text-slate-700 font-bold text-sm hover:bg-white transition-all duration-200 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2">
+                className="touch-target inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/90 border border-slate-200/50 text-slate-700 font-bold text-sm hover:bg-white transition-all duration-200 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2">
                 <FolderGit2 size={16} /> Explore Projects
               </a>
               <a href="https://github.com/roshhellwett?tab=repositories" target="_blank" rel="noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/90 border border-slate-200/50 text-slate-700 font-bold text-sm hover:bg-white transition-all duration-200 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2">
+                className="touch-target inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/90 border border-slate-200/50 text-slate-700 font-bold text-sm hover:bg-white transition-all duration-200 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2">
                 <Github size={16} /> GitHub <ArrowUpRight size={14} />
               </a>
             </motion.div>
           </motion.div>
 
           <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }}
-            className="mt-12 md:mt-16 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            className="mt-10 md:mt-16 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {ORG_STATS.map((s, i) => (
               <motion.div key={s.label} variants={fadeUp} transition={{ ...springT, delay: i * 0.05 }}
-                className="grain relative rounded-2xl bg-white/65 backdrop-blur-lg backdrop-saturate-150 border border-white/50 ring-1 ring-slate-200/30 p-4 md:p-5 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+                className="grain relative rounded-2xl bg-white/65 backdrop-blur-lg backdrop-saturate-150 border border-white/50 ring-1 ring-slate-200/30 p-3.5 md:p-5 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/70 to-transparent" />
                 <div className="relative flex items-center gap-2 text-slate-400 text-[9px] font-bold tracking-[0.15em] uppercase">
                   {s.icon} {s.label}
@@ -219,7 +221,7 @@ export default function Page() {
 
         <Divider />
 
-        <section id="mission" className="max-w-7xl mx-auto px-6 md:px-6 py-16 md:py-24">
+        <section id="mission" className="mobile-container py-12 sm:py-16 md:py-24">
           <SectionHeading
             eyebrow="Our Mission"
             title="Open source, by India — for the world."
@@ -229,7 +231,7 @@ export default function Page() {
           <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }}
             className="grid lg:grid-cols-[1fr_1.1fr] gap-8 lg:gap-12 items-center">
             <motion.div variants={fadeUp}
-              className="grain relative rounded-3xl border border-white/50 ring-1 ring-slate-200/30 bg-white/65 backdrop-blur-lg backdrop-saturate-150 p-6 md:p-8 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+              className="grain relative rounded-2xl sm:rounded-3xl border border-white/50 ring-1 ring-slate-200/30 bg-white/65 backdrop-blur-lg backdrop-saturate-150 p-4 sm:p-6 md:p-8 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
               <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 rounded-full bg-amber-100/30 blur-[80px]" />
               <div className="pointer-events-none absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-emerald-100/30 blur-[80px]" />
               <div className="relative flex items-center gap-2 mb-4">
@@ -267,7 +269,7 @@ export default function Page() {
 
         <Divider />
 
-        <section id="featured" className="max-w-7xl mx-auto px-6 md:px-6 py-16 md:py-24">
+        <section id="featured" className="mobile-container py-12 sm:py-16 md:py-24">
           <SectionHeading
             eyebrow="Featured Initiative"
             title="Project Sentinel — AI-powered Indian newsroom."
@@ -280,7 +282,7 @@ export default function Page() {
 
         <Divider />
 
-        <section id="projects" className="max-w-7xl mx-auto px-6 md:px-6 py-16 md:py-24">
+        <section id="projects" className="mobile-container py-12 sm:py-16 md:py-24">
           <SectionHeading
             eyebrow="The Archive"
             title="All Projects"
@@ -289,14 +291,14 @@ export default function Page() {
 
           <EcosystemDiagram active={activeCategory} onSelect={setActiveCategory} countsByCategory={countsByCategory} />
 
-          <div className="mt-8 mb-6 flex flex-wrap items-center gap-2">
+          <div className="mt-6 sm:mt-8 mb-6 flex flex-nowrap sm:flex-wrap items-center gap-2 overflow-x-auto pb-2 sm:overflow-visible sm:pb-0 [-webkit-overflow-scrolling:touch]">
             {CATEGORIES.map((c) => {
               const isActive = activeCategory === c.id;
               const count = c.id === "all" ? repos.length : countsByCategory[c.id] || 0;
               if (c.id !== "all" && count === 0) return null;
               return (
                 <motion.button key={c.id} type="button" onClick={() => setActiveCategory(c.id)} whileTap={{ scale: 0.97 }}
-                  className={`group inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-bold tracking-wide border transition-all duration-200 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 ${
+                  className={`touch-target group shrink-0 inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-bold tracking-wide border transition-all duration-200 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 ${
                     isActive
                       ? "bg-slate-900 border-slate-900 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)]"
                       : "bg-white/80 border-slate-200/60 text-slate-500 hover:bg-slate-50/80 hover:shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)]"
@@ -341,13 +343,13 @@ export default function Page() {
           )}
 
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="mt-8 flex flex-wrap justify-center gap-3">
+            className="mt-8 grid grid-cols-1 sm:flex sm:flex-wrap justify-center gap-3">
             <a href="https://github.com/roshhellwett?tab=repositories" target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2">
+              className="touch-target inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2">
               <Github size={16} /> View all on GitHub <ArrowUpRight size={14} />
             </a>
             <a href="https://roshhellwett.github.io/zenithpages/" target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/90 border border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-white transition-all duration-200 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2">
+              className="touch-target inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/90 border border-slate-200/60 text-slate-700 font-bold text-sm hover:bg-white transition-all duration-200 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2">
               <Layers size={16} /> Zenith Tools Registry <ArrowUpRight size={14} />
             </a>
           </motion.div>
@@ -355,7 +357,7 @@ export default function Page() {
 
         <Divider />
 
-        <section id="stack" className="max-w-7xl mx-auto px-6 md:px-6 py-16 md:py-24">
+        <section id="stack" className="mobile-container py-12 sm:py-16 md:py-24">
           <SectionHeading
             eyebrow="Capability"
             title="Technology Spectrum"
@@ -366,7 +368,7 @@ export default function Page() {
             className="grid lg:grid-cols-3 gap-5">
             {STACK.map((g, i) => (
               <motion.div key={g.category} variants={fadeUp} transition={{ ...springT, delay: i * 0.05 }}
-                className="grain relative rounded-3xl border border-white/50 ring-1 ring-slate-200/30 bg-white/65 backdrop-blur-lg backdrop-saturate-150 p-6 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+                className="grain relative rounded-2xl sm:rounded-3xl border border-white/50 ring-1 ring-slate-200/30 bg-white/65 backdrop-blur-lg backdrop-saturate-150 p-5 sm:p-6 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
                 <div className="pointer-events-none absolute -top-20 -right-20 w-48 h-48 rounded-full blur-[60px] bg-slate-200/50" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/70 to-transparent" />
                 <div className="relative">
@@ -391,7 +393,7 @@ export default function Page() {
 
         <Divider />
 
-        <section id="founder" className="max-w-7xl mx-auto px-6 md:px-6 py-16 md:py-24">
+        <section id="founder" className="mobile-container py-12 sm:py-16 md:py-24">
           <SectionHeading
             eyebrow="Behind Zenith"
             title="The Founder"
@@ -400,7 +402,7 @@ export default function Page() {
 
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={stagger}>
             <motion.div variants={fadeUp}>
-              <Panel className="p-6 md:p-8">
+              <Panel className="p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl">
                 <CommitHeatmap />
 
                 <div className="mt-8 grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-10 items-start">
@@ -456,9 +458,9 @@ export default function Page() {
 
         <Divider />
 
-        <section className="max-w-7xl mx-auto px-6 md:px-6 py-16 md:py-24">
+        <section className="mobile-container py-12 sm:py-16 md:py-24">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={springT}
-            className="grain relative overflow-hidden rounded-[2rem] border border-white/50 ring-1 ring-slate-200/30 bg-gradient-to-br from-orange-50/80 via-white/65 to-emerald-50/80 backdrop-blur-lg backdrop-saturate-150 p-8 md:p-12 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+            className="grain relative overflow-hidden rounded-2xl sm:rounded-[2rem] border border-white/50 ring-1 ring-slate-200/30 bg-gradient-to-br from-orange-50/80 via-white/65 to-emerald-50/80 backdrop-blur-lg backdrop-saturate-150 p-5 sm:p-8 md:p-12 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
             <div className="absolute inset-x-0 top-0 h-px bg-slate-200/50" />
             <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-amber-100/40 blur-[120px]" />
             <BharatWave />
@@ -480,7 +482,7 @@ export default function Page() {
       </main>
 
       <footer className="relative z-10 border-t border-slate-200/40 mt-6 bg-white/50 backdrop-blur-lg backdrop-saturate-150">
-        <div className="max-w-7xl mx-auto px-6 md:px-6 py-8">
+        <div className="mobile-container py-7 sm:py-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <BrandMark size={34} rounded="rounded-xl" />

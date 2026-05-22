@@ -20,18 +20,18 @@ export function EcosystemDiagram({
   const cats = CATEGORIES.filter((c) => c.id !== "all");
 
   return (
-    <div className="grain relative rounded-3xl border border-white/50 ring-1 ring-slate-200/30 bg-white/65 backdrop-blur-lg backdrop-saturate-150 p-6 md:p-8 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+    <div className="grain relative rounded-2xl sm:rounded-3xl border border-white/50 ring-1 ring-slate-200/30 bg-white/65 backdrop-blur-lg backdrop-saturate-150 p-4 sm:p-6 md:p-8 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
       <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-amber-100/40 blur-[80px]" />
       <div className="pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-emerald-100/40 blur-[80px]" />
 
-      <div className="relative flex flex-wrap items-center justify-between gap-3 mb-6 md:mb-8">
+      <div className="relative flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center mb-5 md:mb-8">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-white/80 border border-slate-200/60 text-slate-500 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)]">
             <Workflow size={14} />
           </span>
           <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-slate-400">Ecosystem Map</span>
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold tracking-[0.25em] uppercase text-slate-400">
+        <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-bold tracking-[0.18em] sm:tracking-[0.25em] uppercase text-slate-400">
           <span className="relative flex h-1.5 w-1.5">
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]" />
           </span>
@@ -39,7 +39,7 @@ export function EcosystemDiagram({
         </div>
       </div>
 
-      <div className="relative grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-10 items-center">
+      <div className="relative grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-5 md:gap-10 items-center">
         <svg className="hidden md:block absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
           <defs>
             <linearGradient id="lineGrad_eco" x1="0" x2="1">
@@ -70,7 +70,7 @@ export function EcosystemDiagram({
           ))}
         </svg>
 
-        <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-1 gap-2">
+        <div className="relative z-10 grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-1 gap-2">
           {cats.map((c, i) => {
             const isActive = active === c.id;
             return (
@@ -78,7 +78,7 @@ export function EcosystemDiagram({
                 whileTap={{ scale: 0.97 }}
                 initial={{ opacity: 0, x: -10 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
                 transition={{ delay: i * 0.06, ...spring }}
-                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all duration-200 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 ${
+                className={`touch-target group flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all duration-200 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 ${
                   isActive
                     ? "bg-white/90 border-slate-300/60 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.06)]"
                     : "bg-white/80 border-slate-200/60 hover:bg-slate-50/80 hover:shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)]"
@@ -131,7 +131,7 @@ export function EcosystemDiagram({
         </div>
       </div>
 
-      <div className="relative mt-8 pt-6 border-t border-slate-200/40 flex flex-wrap items-center justify-between gap-2 text-[10px] font-bold tracking-[0.15em] uppercase text-slate-400">
+      <div className="relative mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-200/40 flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-2 text-[10px] font-bold tracking-[0.12em] sm:tracking-[0.15em] uppercase text-slate-400">
         <span className="flex items-center gap-1.5"><Filter size={10} /> Tap a category to filter the grid below</span>
         <span>{active === "all" ? "Showing all projects" : `Filtering: ${CATEGORIES.find((c) => c.id === active)?.label}`}</span>
       </div>

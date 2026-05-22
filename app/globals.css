@@ -22,6 +22,8 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 76px;
+  overflow-x: hidden;
 }
 
 body {
@@ -31,6 +33,31 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  min-width: 320px;
+  touch-action: manipulation;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-container {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  .mobile-container {
+    padding-inline: 1.5rem;
+  }
+}
+
+.touch-target {
+  min-height: 44px;
 }
 
 /* ── Screen‑reader skip link — engraved plaque ── */
