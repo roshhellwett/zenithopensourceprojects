@@ -1,1 +1,1 @@
-export const SITE_URL = "https://zenithopensourceprojects.vercel.app/";
+export const SITE_URL = "https://zenithopensourceprojects.vercel.app";

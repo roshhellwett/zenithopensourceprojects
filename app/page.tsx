@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   motion,
   AnimatePresence,
@@ -22,6 +22,9 @@ import {
   Layers,
   Globe,
   Eye,
+  Menu,
+  X,
+  ChevronUp,
 } from "lucide-react";
 
 import { BrandMark } from "@/components/BrandMark";
@@ -49,13 +52,116 @@ import type { Repo, CategoryId } from "@/types";
 
 const springT: Transition = spring;
 
+/* ── Mobile Nav Drawer ── */
+function MobileNav({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  // Lock body scroll when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[70] bg-slate-900/20 mobile-nav-backdrop"
+            onClick={onClose}
+          />
+          {/* Drawer */}
+          <motion.nav
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed top-[57px] inset-x-0 z-[80] mx-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/60 shadow-[0_24px_48px_-12px_rgba(15,23,42,0.15),inset_0_1px_0_rgba(255,255,255,0.8)] overflow-hidden"
+            role="navigation"
+            aria-label="Mobile navigation"
+          >
+            <div className="p-2">
+              {NAV_LINKS.map((l, i) => (
+                <motion.a
+                  key={l.href}
+                  href={l.href}
+                  onClick={onClose}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05, ...spring }}
+                  className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold tracking-wide text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                  {l.label}
+                </motion.a>
+              ))}
+              <div className="mt-1 p-2 pt-3 border-t border-slate-200/50">
+                <a
+                  href="https://github.com/roshhellwett?tab=repositories"
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={onClose}
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)]"
+                >
+                  <Github size={16} />
+                  All Repos
+                  <ArrowUpRight size={14} />
+                </a>
+              </div>
+            </div>
+          </motion.nav>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ── Main Page ── */
 export default function Page() {
   const [featured, setFeatured] = useState<Repo>(FEATURED_FALLBACK);
   const [repos, setRepos] = useState<Repo[]>(FALLBACK_REPOS);
   const [stats, setStats] = useState({ repos: 0, stars: 0, langs: 0 });
+  const [isLoaded, setIsLoaded] = useState(false);
   const [activeCategory, setActiveCategory] = useState<CategoryId | "all">("all");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const { scrollYProgress } = useScroll();
+
+  // Back-to-top visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 600);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close mobile nav on resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileNavOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchGithubData = async () => {
@@ -88,6 +194,8 @@ export default function Page() {
         setStats({ repos: own.length, stars: totalStars, langs: langs.size });
       } catch {
         console.warn("Using fallback repo data");
+      } finally {
+        setIsLoaded(true);
       }
     };
     fetchGithubData();
@@ -106,6 +214,8 @@ export default function Page() {
     return repos.filter((r) => r.category === activeCategory);
   }, [repos, activeCategory]);
 
+  const totalProjectCount = useMemo(() => repos.length + 1, [repos]); // +1 for featured
+
   const ORG_STATS = useMemo(
     () => [
       { label: "Public Repos", value: stats.repos || 18, icon: <FolderGit2 size={16} /> },
@@ -116,6 +226,10 @@ export default function Page() {
     [stats]
   );
 
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-slate-900 selection:text-white relative flex flex-col">
       <a href="#main" className="skip-link">Skip to content</a>
@@ -125,11 +239,13 @@ export default function Page() {
         <DashField />
       </div>
 
+      {/* ── Scroll progress bar ── */}
       <motion.div
         style={{ scaleX: scrollYProgress }}
-        className="fixed top-0 left-0 right-0 h-[2px] origin-left z-[60] bg-gradient-to-r from-orange-500 via-slate-300 to-emerald-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
+        className="fixed top-0 left-0 right-0 h-[2px] origin-left z-[55] bg-gradient-to-r from-orange-500 via-slate-300 to-emerald-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
       />
 
+      {/* ── Header ── */}
       <header className="sticky top-0 z-50 backdrop-blur-lg backdrop-saturate-150 bg-white/65 border-b border-slate-200/40 shadow-[inset_0_-0.5px_0_rgba(15,23,42,0.04)]">
         <div className="mobile-container py-2.5 sm:py-3 flex items-center justify-between gap-3">
           <a href="#top" className="flex min-w-0 items-center gap-2.5 sm:gap-3 group">
@@ -139,7 +255,7 @@ export default function Page() {
               <span className="truncate text-[8px] sm:text-[9px] font-bold tracking-[0.16em] sm:tracking-[0.2em] uppercase text-slate-500">Open Source Projects</span>
             </div>
           </a>
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
             {NAV_LINKS.map((l) => (
               <a key={l.href} href={l.href}
                 className="px-3 py-1.5 text-xs font-bold tracking-wide text-slate-500 hover:text-slate-900 rounded-lg transition-all duration-200 hover:shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2">
@@ -147,23 +263,50 @@ export default function Page() {
               </a>
             ))}
           </nav>
-          <a href="https://github.com/roshhellwett?tab=repositories" target="_blank" rel="noreferrer"
-            className="touch-target shrink-0 inline-flex items-center justify-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2">
-            <Github size={14} />
-            <span className="hidden sm:inline">All Repos</span>
-            <ArrowUpRight size={12} />
-          </a>
+          <div className="flex items-center gap-2">
+            <a href="https://github.com/roshhellwett?tab=repositories" target="_blank" rel="noreferrer"
+              className="touch-target shrink-0 hidden sm:inline-flex items-center justify-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)] focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2">
+              <Github size={14} />
+              <span className="hidden sm:inline">All Repos</span>
+              <ArrowUpRight size={12} />
+            </a>
+            {/* Mobile hamburger */}
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              className="md:hidden touch-target inline-flex items-center justify-center p-2 rounded-xl bg-white/80 border border-slate-200/60 text-slate-600 hover:bg-slate-50 transition-all duration-200 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2"
+              aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={mobileNavOpen}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {mobileNavOpen ? (
+                  <motion.span key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                    <X size={18} />
+                  </motion.span>
+                ) : (
+                  <motion.span key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                    <Menu size={18} />
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
+          </div>
         </div>
       </header>
+
+      {/* Mobile Nav Drawer */}
+      <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
 
       <main id="main" className="relative z-10 w-full flex-grow">
         <span id="top" />
 
+        {/* ── Hero Section ── */}
         <section className="relative mobile-container pt-14 sm:pt-20 md:pt-28 pb-12 sm:pb-16 md:pb-24">
           <motion.div variants={stagger} initial="hidden" animate="show" className="relative text-center max-w-4xl mx-auto">
             <motion.div variants={fadeUp} className="flex flex-col items-center gap-4 mb-6">
               <Pill>
                 <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 live-dot-pulse" />
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]" />
                 </span>
                 Open source · Building from India
@@ -199,6 +342,7 @@ export default function Page() {
             </motion.div>
           </motion.div>
 
+          {/* ── Stat cards ── */}
           <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }}
             className="mt-10 md:mt-16 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {ORG_STATS.map((s, i) => (
@@ -209,9 +353,15 @@ export default function Page() {
                   {s.icon} {s.label}
                 </div>
                 <div className="relative mt-2 text-2xl md:text-3xl font-black tracking-tight text-slate-900">
-                  {s.value}
-                  {typeof s.value === "number" && (
-                    <span className="text-slate-400 text-lg ml-0.5 align-super text-[0.5em]">+</span>
+                  {!isLoaded && typeof s.value === "number" ? (
+                    <span className="inline-block w-10 h-7 md:h-8 rounded-lg bg-slate-200/60 animate-pulse" />
+                  ) : (
+                    <>
+                      {s.value}
+                      {typeof s.value === "number" && (
+                        <span className="text-slate-400 text-lg ml-0.5 align-super text-[0.5em]">+</span>
+                      )}
+                    </>
                   )}
                 </div>
               </motion.div>
@@ -221,6 +371,7 @@ export default function Page() {
 
         <Divider />
 
+        {/* ── Mission Section ── */}
         <section id="mission" className="mobile-container py-12 sm:py-16 md:py-24">
           <SectionHeading
             eyebrow="Our Mission"
@@ -269,6 +420,7 @@ export default function Page() {
 
         <Divider />
 
+        {/* ── Featured Section ── */}
         <section id="featured" className="mobile-container py-12 sm:py-16 md:py-24">
           <SectionHeading
             eyebrow="Featured Initiative"
@@ -282,6 +434,7 @@ export default function Page() {
 
         <Divider />
 
+        {/* ── All Projects Section ── */}
         <section id="projects" className="mobile-container py-12 sm:py-16 md:py-24">
           <SectionHeading
             eyebrow="The Archive"
@@ -291,13 +444,20 @@ export default function Page() {
 
           <EcosystemDiagram active={activeCategory} onSelect={setActiveCategory} countsByCategory={countsByCategory} />
 
-          <div className="mt-6 sm:mt-8 mb-6 flex flex-nowrap sm:flex-wrap items-center gap-2 overflow-x-auto pb-2 sm:overflow-visible sm:pb-0 [-webkit-overflow-scrolling:touch]">
+          <div
+            className="mt-6 sm:mt-8 mb-6 flex flex-nowrap sm:flex-wrap items-center gap-2 overflow-x-auto pb-2 sm:overflow-visible sm:pb-0 [-webkit-overflow-scrolling:touch]"
+            role="tablist"
+            aria-label="Filter projects by category"
+          >
             {CATEGORIES.map((c) => {
               const isActive = activeCategory === c.id;
-              const count = c.id === "all" ? repos.length : countsByCategory[c.id] || 0;
+              const count = c.id === "all" ? totalProjectCount : countsByCategory[c.id] || 0;
               if (c.id !== "all" && count === 0) return null;
               return (
                 <motion.button key={c.id} type="button" onClick={() => setActiveCategory(c.id)} whileTap={{ scale: 0.97 }}
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls="project-grid"
                   className={`touch-target group shrink-0 inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-bold tracking-wide border transition-all duration-200 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 ${
                     isActive
                       ? "bg-slate-900 border-slate-900 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)]"
@@ -314,7 +474,7 @@ export default function Page() {
           </div>
 
           <LayoutGroup>
-            <motion.div layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+            <motion.div layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6" id="project-grid" role="tabpanel">
               <AnimatePresence mode="popLayout">
                 {filteredRepos.map((r, i) => (
                   <motion.div key={r.name} layout
@@ -357,6 +517,7 @@ export default function Page() {
 
         <Divider />
 
+        {/* ── Stack Section ── */}
         <section id="stack" className="mobile-container py-12 sm:py-16 md:py-24">
           <SectionHeading
             eyebrow="Capability"
@@ -393,6 +554,7 @@ export default function Page() {
 
         <Divider />
 
+        {/* ── Founder Section ── */}
         <section id="founder" className="mobile-container py-12 sm:py-16 md:py-24">
           <SectionHeading
             eyebrow="Behind Zenith"
@@ -458,16 +620,16 @@ export default function Page() {
 
         <Divider />
 
+        {/* ── Bharat CTA Section ── */}
         <section className="mobile-container py-12 sm:py-16 md:py-24">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={springT}
             className="grain relative overflow-hidden rounded-2xl sm:rounded-[2rem] border border-white/50 ring-1 ring-slate-200/30 bg-gradient-to-br from-orange-50/80 via-white/65 to-emerald-50/80 backdrop-blur-lg backdrop-saturate-150 p-5 sm:p-8 md:p-12 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
             <div className="absolute inset-x-0 top-0 h-px bg-slate-200/50" />
             <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-amber-100/40 blur-[120px]" />
             <BharatWave />
-            <div className="relative flex justify-center">
+            <div className="relative flex justify-center mb-6">
               <Pill><Flag size={11} /> Bharat First</Pill>
             </div>
-            <div className="h-px bg-slate-200/50" />
             <h3 className="relative font-black tracking-tight text-slate-900 mx-auto leading-tight"
               style={{ fontSize: "clamp(1rem, 4.2vw, 3rem)" }}>
               Code as contribution. Code as{" "}
@@ -481,42 +643,107 @@ export default function Page() {
         </section>
       </main>
 
+      {/* ── Footer ── */}
       <footer className="relative z-10 border-t border-slate-200/40 mt-6 bg-white/50 backdrop-blur-lg backdrop-saturate-150">
-        <div className="mobile-container py-7 sm:py-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <BrandMark size={34} rounded="rounded-xl" />
-              <div>
-                <div className="text-sm font-black tracking-tight text-slate-900">Zenith Open Source Projects</div>
-                <div className="text-[9px] font-bold tracking-[0.15em] uppercase text-slate-400">
-                  &copy; {new Date().getFullYear()} &middot; Roshan Kr Singh &middot; MIT
+        <div className="mobile-container py-8 sm:py-10 md:py-12">
+          {/* Top row: Brand + Link groups */}
+          <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_1fr] gap-8 md:gap-6">
+            {/* Brand column */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <BrandMark size={38} rounded="rounded-xl" />
+                <div>
+                  <div className="text-sm font-black tracking-tight text-slate-900">Zenith Open Source</div>
+                  <div className="text-[9px] font-bold tracking-[0.15em] uppercase text-slate-400">
+                    Projects by Roshan Kr Singh
+                  </div>
                 </div>
               </div>
+              <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
+                A collective of premium, transparent open source projects — engineered to give back to developers, students, and the nation.
+              </p>
             </div>
-            <div className="flex flex-wrap items-center gap-1.5">
-              {SOCIALS.slice(0, 6).map((s) => (
-                <a key={s.label} href={s.link} target="_blank" rel="noreferrer" aria-label={s.label}
-                  className="p-2 rounded-lg bg-white/80 border border-slate-200/50 hover:bg-slate-50/80 text-slate-500 transition-all duration-200 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] hover:shadow-[inset_0_2px_3px_-1px_rgba(15,23,42,0.08)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2">
-                  {s.icon}
-                </a>
-              ))}
+
+            {/* Navigate column */}
+            <div>
+              <div className="text-[9px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-3">Navigate</div>
+              <div className="flex flex-col gap-1.5">
+                {NAV_LINKS.map((l) => (
+                  <a key={l.href} href={l.href}
+                    className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors duration-200 py-0.5 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 rounded w-fit">
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Community column */}
+            <div>
+              <div className="text-[9px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-3">Community</div>
+              <div className="flex flex-col gap-1.5">
+                {SOCIALS.slice(0, 4).map((s) => (
+                  <a key={s.label} href={s.link} target="_blank" rel="noreferrer"
+                    className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors duration-200 py-0.5 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 rounded w-fit">
+                    {s.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* More column */}
+            <div>
+              <div className="text-[9px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-3">More</div>
+              <div className="flex flex-col gap-1.5">
+                {SOCIALS.slice(4).map((s) => (
+                  <a key={s.label} href={s.link} target="_blank" rel="noreferrer"
+                    className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors duration-200 py-0.5 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 rounded w-fit">
+                    {s.label}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
+
+          {/* Social icons row */}
+          <div className="mt-8 pt-6 border-t border-slate-200/40 flex flex-wrap items-center gap-1.5">
+            {SOCIALS.slice(0, 6).map((s) => (
+              <a key={s.label} href={s.link} target="_blank" rel="noreferrer" aria-label={s.label}
+                className="p-2 rounded-lg bg-white/80 border border-slate-200/50 hover:bg-slate-50/80 text-slate-500 transition-all duration-200 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] hover:shadow-[inset_0_2px_3px_-1px_rgba(15,23,42,0.08)] focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2">
+                {s.icon}
+              </a>
+            ))}
+          </div>
+
+          {/* Bottom bar */}
           <div className="mt-6 pt-5 border-t border-slate-200/40 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-[9px] font-bold tracking-[0.15em] uppercase text-slate-400">
-              Built with <span className="text-slate-500">Claude</span> <span className="text-slate-300">&amp;</span> <span className="text-slate-500">Gemini</span>
+              &copy; {new Date().getFullYear()} Zenith Open Source Projects &middot; MIT License
             </p>
             <p className="text-[9px] font-bold tracking-[0.15em] uppercase text-slate-400">
-              Design by{" "}
-              <a href="https://github.com/roshhellwett" target="_blank" rel="noreferrer"
-                className="text-slate-700 hover:text-slate-900 transition-colors duration-200 underline decoration-slate-300/50 underline-offset-4 focus-visible:outline-2 focus-visible:outline-orange-600 focus-visible:outline-offset-2 rounded">
-                Roshhellwett
-              </a>
+              Built with <span className="text-slate-500">Claude</span> <span className="text-slate-300">&amp;</span> <span className="text-slate-500">Gemini</span>
             </p>
             <p className="text-[9px] font-medium text-slate-400">Next.js &middot; Tailwind &middot; Framer Motion</p>
           </div>
         </div>
       </footer>
+
+      {/* ── Back to Top ── */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            onClick={scrollToTop}
+            type="button"
+            aria-label="Back to top"
+            className="fixed bottom-6 right-6 z-50 p-3 rounded-2xl bg-slate-900 text-white shadow-[0_8px_24px_-8px_rgba(15,23,42,0.3),inset_0_1px_0_rgba(255,255,255,0.06)] hover:bg-slate-800 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-orange-400 focus-visible:outline-offset-2"
+          >
+            <ChevronUp size={18} />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

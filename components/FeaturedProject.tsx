@@ -1,11 +1,108 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Github, Eye, ArrowUpRight, Sparkles, Flag, ChevronRight, CheckCircle2, Shield } from "lucide-react";
 import { Pill } from "@/components/Pill";
 import { TrafficLights } from "@/components/TrafficLights";
 import { spring, fadeUp } from "@/lib/animations";
 import type { Repo } from "@/types";
+
+const TERMINAL_LINES = [
+  { text: "sentinel --pull --india", type: "command" as const },
+  { text: "→ resolving sources... 200 OK", type: "output" as const, highlight: "200 OK" },
+  { text: "→ classifying headlines (AI) ✓", type: "output" as const },
+  { text: "→ cross-verifying with mirror feeds ✓", type: "output" as const },
+  { text: "✓ 142 verified stories published", type: "success" as const },
+];
+
+function TypingTerminal() {
+  const [visibleLines, setVisibleLines] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hasStarted) return;
+    if (visibleLines >= TERMINAL_LINES.length) return;
+
+    const delays = [0, 600, 400, 400, 500];
+    const timer = setTimeout(() => {
+      setVisibleLines((v) => v + 1);
+    }, delays[visibleLines] || 400);
+    return () => clearTimeout(timer);
+  }, [visibleLines, hasStarted]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasStarted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="p-4 sm:p-5 font-mono text-[10px] sm:text-[11px] md:text-xs space-y-2 text-white/80 overflow-hidden min-h-[140px]">
+      {TERMINAL_LINES.slice(0, visibleLines).map((line, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, x: -8 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+        >
+          {line.type === "command" && (
+            <div><span className="text-amber-300">$</span> {line.text}</div>
+          )}
+          {line.type === "output" && (
+            <div className="text-white/50">
+              {line.highlight ? (
+                <>
+                  {line.text.replace(line.highlight, "")}<span className="text-emerald-300">{line.highlight}</span>
+                </>
+              ) : (
+                line.text
+              )}
+            </div>
+          )}
+          {line.type === "success" && (
+            <div className="text-emerald-300 flex items-center gap-2">
+              <CheckCircle2 size={12} /> {line.text.replace("✓ ", "")}
+            </div>
+          )}
+        </motion.div>
+      ))}
+      {visibleLines < TERMINAL_LINES.length && hasStarted && (
+        <motion.span
+          animate={{ opacity: [1, 0] }}
+          transition={{ duration: 0.6, repeat: Infinity }}
+          className="inline-block w-1.5 h-3 bg-amber-300/70 rounded-[1px]"
+        />
+      )}
+      {visibleLines >= TERMINAL_LINES.length && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+          className="pt-3 grid grid-cols-3 gap-1.5 sm:gap-2"
+        >
+          {["AI", "TS", "Next", "Edge", "RSS", "NLP"].map((t) => (
+            <span key={t}
+              className="text-center px-1.5 sm:px-2 py-1.5 rounded-lg bg-white/[0.06] border border-white/[0.12] text-white/70 text-[9px] sm:text-[10px] font-bold tracking-[0.1em] sm:tracking-[0.15em] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] hover:bg-white/[0.1] transition-colors duration-200">
+              {t}
+            </span>
+          ))}
+        </motion.div>
+      )}
+    </div>
+  );
+}
 
 export function FeaturedProject({ repo }: { repo: Repo }) {
   return (
@@ -54,21 +151,7 @@ export function FeaturedProject({ repo }: { repo: Repo }) {
                 <span className="text-[9px] font-bold tracking-[0.15em] uppercase text-white/40">sentinel ~ live</span>
                 <div className="w-10" />
               </div>
-              <div className="p-4 sm:p-5 font-mono text-[10px] sm:text-[11px] md:text-xs space-y-2 text-white/80 overflow-hidden">
-                <div><span className="text-amber-300">$</span> sentinel --pull --india</div>
-                <div className="text-white/50">→ resolving sources... <span className="text-emerald-300">200 OK</span></div>
-                <div className="text-white/50">→ classifying headlines (AI) ✓</div>
-                <div className="text-white/50">→ cross-verifying with mirror feeds ✓</div>
-                <div className="text-emerald-300 flex items-center gap-2"><CheckCircle2 size={12} /> 142 verified stories published</div>
-                <div className="pt-3 grid grid-cols-3 gap-1.5 sm:gap-2">
-                  {["AI", "TS", "Next", "Edge", "RSS", "NLP"].map((t) => (
-                    <span key={t}
-                      className="text-center px-1.5 sm:px-2 py-1.5 rounded-lg bg-white/[0.06] border border-white/[0.12] text-white/70 text-[9px] sm:text-[10px] font-bold tracking-[0.1em] sm:tracking-[0.15em] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] hover:bg-white/[0.1] transition-colors duration-200">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
+              <TypingTerminal />
             </div>
             <div className="mt-4 flex items-center gap-2 text-[11px] text-slate-500">
               <Shield size={12} /> MIT Licensed · Built in India · Public good

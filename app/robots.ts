@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/data/site";
 
 export const dynamic = "force-static";
-
-const SITE = "https://zenithopensourceprojects.vercel.app";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -12,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: `${SITE}/sitemap.xml`,
-    host: SITE,
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

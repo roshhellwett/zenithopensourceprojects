@@ -1,4 +1,3 @@
-import Script from "next/script";
 import { SITE_URL } from "@/data/site";
 
 export function StructuredData() {
@@ -26,10 +25,8 @@ export function StructuredData() {
   };
 
   return (
-    <Script
-      id="zenith-structured-data"
+    <script
       type="application/ld+json"
-      strategy="afterInteractive"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
     />
   );

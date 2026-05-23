@@ -26,8 +26,9 @@ export function RepoCard({ repo, index }: { repo: Repo; index: number }) {
       variants={fadeUp}
       transition={{ ...spring, delay: index * 0.04 }}
       className="group block h-full"
+      aria-label={`${repo.displayName} — ${repo.desc}. Built with ${repo.lang}. View on GitHub.`}
     >
-      <div className="grain relative h-full bg-white/65 hover:bg-white/80 backdrop-blur-lg backdrop-saturate-150 border border-white/50 ring-1 ring-slate-200/30 hover:ring-slate-300/40 rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_8px_24px_-16px_rgba(15,23,42,0.1)]">
+      <div className="grain relative h-full bg-white/65 hover:bg-white/80 backdrop-blur-lg backdrop-saturate-150 border border-white/50 ring-1 ring-slate-200/30 hover:ring-slate-300/40 rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_8px_24px_-16px_rgba(15,23,42,0.1)] hover:-translate-y-0.5">
         <div className="pointer-events-none absolute -inset-px rounded-2xl sm:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-slate-200/30 via-transparent to-transparent" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/70 to-transparent" />
 
@@ -48,7 +49,7 @@ export function RepoCard({ repo, index }: { repo: Repo; index: number }) {
 
         <div className="relative p-4 sm:p-5 flex flex-col h-[calc(100%-45px)]">
           <div className="flex items-start gap-3 sm:gap-4 mb-4">
-            <div className="shrink-0 p-2.5 rounded-xl border border-slate-200/60 bg-white/80 text-slate-500 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] transition-all duration-200 group-hover:shadow-[inset_0_2px_4px_-1px_rgba(15,23,42,0.08)]">
+            <div className="shrink-0 p-2.5 rounded-xl border border-slate-200/60 bg-white/80 text-slate-500 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] transition-all duration-300 group-hover:shadow-[inset_0_2px_4px_-1px_rgba(15,23,42,0.08)] group-hover:scale-105">
               {icon}
             </div>
             <div className="flex-1 min-w-0">
@@ -69,7 +70,7 @@ export function RepoCard({ repo, index }: { repo: Repo; index: number }) {
               {repo.lang}
             </span>
             <div className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-slate-400 group-hover:text-slate-800 transition-colors duration-200">
-              View repo <ArrowUpRight size={13} />
+              View repo <ArrowUpRight size={13} className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </div>
           </div>
         </div>

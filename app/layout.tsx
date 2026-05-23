@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SITE_URL } from "@/data/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,9 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_URL = "https://zenithopensourceprojects.vercel.app";
-
-// 1. Standard Metadata with Favicon
+// 1. Standard Metadata
 export const metadata: Metadata = {
   title: "Zenith Open Source Projects – Roshan Kr Singh (@roshhellwett)",
   description:
@@ -50,30 +49,8 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-    ],
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-    other: [
-      {
-        rel: "icon",
-        type: "image/png",
-        sizes: "192x192",
-        url: "/android-chrome-192x192.png",
-      },
-      {
-        rel: "icon",
-        type: "image/png",
-        sizes: "512x512",
-        url: "/android-chrome-512x512.png",
-      },
-    ],
+    icon: [{ url: "/favicon.ico" }],
   },
-  manifest: "/site.webmanifest",
   verification: {
     google: "CWEIddbWw_sSmzFyikcyLv3jLzWUYDb-0V5JUNUjmvw",
   },
