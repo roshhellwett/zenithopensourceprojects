@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Zap } from "lucide-react";
 
@@ -25,6 +25,7 @@ export function CommitHeatmap() {
   const dayNames = ["Mon", "", "Wed", "", "Fri", "", ""];
 
   const [tooltip, setTooltip] = useState<{ index: number; x: number; y: number } | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="grain relative overflow-hidden rounded-2xl border border-white/50 ring-1 ring-slate-200/30 bg-white/65 backdrop-blur-lg backdrop-saturate-150 p-3 sm:p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
@@ -48,6 +49,7 @@ export function CommitHeatmap() {
 
       <div className="relative">
         <div
+          ref={gridRef}
           className="grid gap-[2px]"
           style={{
             gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
@@ -62,10 +64,10 @@ export function CommitHeatmap() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.2, delay: (i / cells.length) * 0.4 }}
-              className={`aspect-square rounded-[3px] cursor-default transition-transform duration-150 hover:scale-[1.6] hover:z-10 relative ${levelClass[c.level]}`}
+              className={`aspect-square rounded-[3px] cursor-default transition-transform duration-150 hover:scale-[1.6] hover:z-10 ${levelClass[c.level]}`}
               onMouseEnter={(e) => {
                 const rect = (e.target as HTMLElement).getBoundingClientRect();
-                const parent = (e.target as HTMLElement).closest('.relative')?.getBoundingClientRect();
+                const parent = gridRef.current?.getBoundingClientRect();
                 if (parent) {
                   setTooltip({
                     index: i,

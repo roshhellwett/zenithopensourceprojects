@@ -18,7 +18,7 @@ export function LifecycleLoop() {
   });
 
   return (
-    <div className="relative aspect-square w-full max-w-[300px] sm:max-w-[360px] md:max-w-[420px] mx-auto">
+    <div className="relative aspect-square w-full max-w-[300px] sm:max-w-[360px] md:max-w-[420px] mx-auto p-3">
       <svg viewBox="0 0 100 100" className="w-full h-full">
         <defs>
           <radialGradient id="loopGlow" cx="50%" cy="50%" r="50%">
@@ -56,7 +56,7 @@ export function LifecycleLoop() {
       </svg>
 
       {stages.map((s) => {
-        const p = polar(s.angle, 43);
+        const p = polar(s.angle, 39);
         return (
           <div key={`label-${s.label}`} className="absolute" style={{ left: `${p.x}%`, top: `${p.y}%`, transform: "translate(-50%, -50%)" }}>
             <span className="inline-flex items-center gap-1.5 px-2 py-1 sm:px-2.5 rounded-full bg-white/90 border border-slate-200/60 text-slate-700 text-[9px] sm:text-[10px] font-bold tracking-[0.12em] sm:tracking-[0.15em] uppercase shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] whitespace-nowrap">

@@ -100,9 +100,12 @@ export function DashField() {
       style={{ zIndex: 0, "--cx": "-500px", "--cy": "-500px" } as React.CSSProperties}
     >
       <style>{`
-        @property --pulse-r { syntax: '<length>'; inherits: false; initial-value: 240px; }
+        @supports (font-tech(color-COLRv1)) or (background: paint(a)) {
+          @property --pulse-r { syntax: '<length>'; inherits: false; initial-value: 240px; }
+        }
         @keyframes dashFade { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.9; } }
         @keyframes pulseBreathe { 0%, 100% { --pulse-r: 200px; } 50% { --pulse-r: 380px; } }
+        @keyframes pulseBreatheScale { 0%, 100% { transform: scale(0.8); } 50% { transform: scale(1.5); } }
         @keyframes haloPulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
       `}</style>
 
@@ -121,7 +124,7 @@ export function DashField() {
 
       {!reduce && (
         <div className="absolute inset-0" style={{
-          animation: "pulseBreathe 3.6s ease-in-out infinite",
+          animation: "pulseBreathe 3.6s ease-in-out infinite, pulseBreatheScale 3.6s ease-in-out infinite",
           WebkitMaskImage: "radial-gradient(var(--pulse-r) circle at var(--cx) var(--cy), rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%)",
           maskImage: "radial-gradient(var(--pulse-r) circle at var(--cx) var(--cy), rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%)",
         }}>
@@ -141,7 +144,7 @@ export function DashField() {
 
       {!reduce && (
         <div className="absolute inset-0" style={{
-          animation: "pulseBreathe 3.6s ease-in-out infinite, haloPulse 3.6s ease-in-out infinite",
+          animation: "pulseBreathe 3.6s ease-in-out infinite, pulseBreatheScale 3.6s ease-in-out infinite, haloPulse 3.6s ease-in-out infinite",
           background: "radial-gradient(var(--pulse-r) circle at var(--cx) var(--cy), rgba(251,146,60,0.18) 0%, rgba(16,185,129,0.10) 40%, rgba(255,255,255,0) 75%)",
         }} />
       )}

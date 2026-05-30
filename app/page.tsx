@@ -40,8 +40,6 @@ import { CommitHeatmap } from "@/components/CommitHeatmap";
 import { BharatWave } from "@/components/BharatWave";
 import { RepoCard } from "@/components/RepoCard";
 import { FeaturedProject } from "@/components/FeaturedProject";
-import { StructuredData } from "@/components/StructuredData";
-
 import { FEATURED_FALLBACK, FALLBACK_REPOS } from "@/data/repos";
 import { CATEGORIES } from "@/data/categories";
 import { STACK } from "@/data/stack";
@@ -80,7 +78,7 @@ function MobileNav({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, pointerEvents: "none" as const }}
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[70] bg-slate-900/20 mobile-nav-backdrop"
             onClick={onClose}
@@ -203,11 +201,11 @@ export default function Page() {
 
   const countsByCategory = useMemo(() => {
     const map: Record<string, number> = {};
-    [featured, ...repos].forEach((r) => {
+    repos.forEach((r) => {
       map[r.category] = (map[r.category] || 0) + 1;
     });
     return map;
-  }, [featured, repos]);
+  }, [repos]);
 
   const filteredRepos = useMemo(() => {
     if (activeCategory === "all") return repos;
@@ -233,7 +231,6 @@ export default function Page() {
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-slate-900 selection:text-white relative flex flex-col">
       <a href="#main" className="skip-link">Skip to content</a>
-      <StructuredData />
       <Background />
       <div className="hidden sm:block">
         <DashField />
@@ -242,7 +239,7 @@ export default function Page() {
       {/* ── Scroll progress bar ── */}
       <motion.div
         style={{ scaleX: scrollYProgress }}
-        className="fixed top-0 left-0 right-0 h-[2px] origin-left z-[55] bg-gradient-to-r from-orange-500 via-slate-300 to-emerald-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
+        className="fixed top-0 left-0 right-0 h-[2px] origin-left z-[49] bg-gradient-to-r from-orange-500 via-slate-300 to-emerald-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
       />
 
       {/* ── Header ── */}
