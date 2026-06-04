@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducedMotion, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Github, Eye, Users, Workflow, Filter } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
 import { spring } from "@/lib/animations";
@@ -16,7 +16,6 @@ export function EcosystemDiagram({
   onSelect: (id: CategoryId | "all") => void;
   countsByCategory: Record<string, number>;
 }) {
-  const reduce = useReducedMotion();
   const cats = CATEGORIES.filter((c) => c.id !== "all");
 
   return (
@@ -49,24 +48,10 @@ export function EcosystemDiagram({
             </linearGradient>
           </defs>
           {[20, 35, 50, 65, 80].map((y, i) => (
-            <g key={`l${i}`}>
-              <line x1="18" y1={y} x2="50" y2="50" stroke="url(#lineGrad_eco)" strokeWidth="0.4" strokeDasharray="1 1.5" />
-              {!reduce && (
-                <motion.circle r="0.7" fill="rgb(245 158 11)" initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 1, 0], cx: [18, 50], cy: [y, 50] }}
-                  transition={{ duration: 2.6, delay: i * 0.45, repeat: Infinity, ease: "easeInOut" }} />
-              )}
-            </g>
+            <line key={`l${i}`} x1="18" y1={y} x2="50" y2="50" stroke="url(#lineGrad_eco)" strokeWidth="0.4" strokeDasharray="1 1.5" />
           ))}
           {[30, 50, 70].map((y, i) => (
-            <g key={`r${i}`}>
-              <line x1="50" y1="50" x2="82" y2={y} stroke="url(#lineGrad_eco)" strokeWidth="0.4" strokeDasharray="1 1.5" />
-              {!reduce && (
-                <motion.circle r="0.7" fill="rgb(16 185 129)" initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 1, 0], cx: [50, 82], cy: [50, y] }}
-                  transition={{ duration: 2.4, delay: 0.6 + i * 0.4, repeat: Infinity, ease: "easeInOut" }} />
-              )}
-            </g>
+            <line key={`r${i}`} x1="50" y1="50" x2="82" y2={y} stroke="url(#lineGrad_eco)" strokeWidth="0.4" strokeDasharray="1 1.5" />
           ))}
         </svg>
 
@@ -95,14 +80,6 @@ export function EcosystemDiagram({
 
         <div className="relative z-10 flex justify-center">
           <motion.div initial={{ scale: 0.9, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} viewport={{ once: true }} transition={spring} className="relative">
-            {!reduce && (
-              <>
-                <motion.div animate={{ scale: [1, 1.4], opacity: [0.5, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: "easeOut" }}
-                  className="absolute inset-0 rounded-3xl border-2 border-slate-300" />
-                <motion.div animate={{ scale: [1, 1.6], opacity: [0.35, 0] }} transition={{ duration: 2.4, delay: 0.8, repeat: Infinity, ease: "easeOut" }}
-                  className="absolute inset-0 rounded-3xl border-2 border-slate-300" />
-              </>
-            )}
             <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-3xl bg-slate-900 flex flex-col items-center justify-center text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-slate-700/40">
               <BrandMark size={64} rounded="rounded-2xl" />
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-white/90 border border-slate-200/60 text-[9px] font-bold tracking-[0.15em] uppercase text-slate-500 shadow-[inset_0_1px_2px_-1px_rgba(15,23,42,0.04)] whitespace-nowrap">

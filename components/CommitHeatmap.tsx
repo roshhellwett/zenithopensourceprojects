@@ -22,26 +22,25 @@ export function CommitHeatmap() {
   });
 
   const levelClass = ["bg-slate-100", "bg-emerald-200", "bg-emerald-300", "bg-emerald-400", "bg-emerald-600"];
-  const dayNames = ["Mon", "", "Wed", "", "Fri", "", ""];
 
   const [tooltip, setTooltip] = useState<{ index: number; x: number; y: number } | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="grain relative overflow-hidden rounded-2xl border border-white/50 ring-1 ring-slate-200/30 bg-white/65 backdrop-blur-lg backdrop-saturate-150 p-3 sm:p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="p-1.5 rounded-lg bg-white/80 border border-slate-200/60 text-slate-500">
-            <Zap size={11} />
+    <div className="grain relative overflow-hidden rounded-xl border border-slate-200/50 ring-1 ring-slate-100/80 bg-white/70 backdrop-blur-lg backdrop-saturate-150 p-2.5 sm:p-3 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
+      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between mb-2">
+        <div className="flex items-center gap-1.5">
+          <span className="p-1 rounded-md bg-white/80 border border-slate-200/50 text-slate-400 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)]">
+            <Zap size={9} />
           </span>
-          <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.12em] sm:tracking-[0.15em] uppercase text-slate-500">
+          <span className="text-[8px] font-bold tracking-[0.15em] uppercase text-slate-400">
             Commit Cadence · Last 26 weeks
           </span>
         </div>
-        <span className="text-[8px] font-bold tracking-[0.15em] uppercase text-slate-400">
-          Less <span className="inline-flex gap-[2px] mx-1 align-middle">
+        <span className="text-[7px] font-bold tracking-[0.12em] uppercase text-slate-400">
+          Less <span className="inline-flex gap-[1.5px] mx-1 align-middle">
             {[0, 1, 2, 3, 4].map((l) => (
-              <span key={l} className={`w-[5px] h-[5px] rounded-[1px] ${levelClass[l]}`} />
+              <span key={l} className={`w-[4px] h-[4px] rounded-[1px] ${levelClass[l]}`} />
             ))}
           </span> More
         </span>
@@ -50,7 +49,7 @@ export function CommitHeatmap() {
       <div className="relative">
         <div
           ref={gridRef}
-          className="grid gap-[2px]"
+          className="grid gap-[1.5px]"
           style={{
             gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
             gridAutoFlow: "column",
@@ -63,8 +62,8 @@ export function CommitHeatmap() {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.2, delay: (i / cells.length) * 0.4 }}
-              className={`aspect-square rounded-[3px] cursor-default transition-transform duration-150 hover:scale-[1.6] hover:z-10 ${levelClass[c.level]}`}
+              transition={{ duration: 0.15, delay: (i / cells.length) * 0.3 }}
+              className={`aspect-square rounded-[2px] cursor-default transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.8] hover:z-10 ${levelClass[c.level]}`}
               onMouseEnter={(e) => {
                 const rect = (e.target as HTMLElement).getBoundingClientRect();
                 const parent = gridRef.current?.getBoundingClientRect();
@@ -72,7 +71,7 @@ export function CommitHeatmap() {
                   setTooltip({
                     index: i,
                     x: rect.left - parent.left + rect.width / 2,
-                    y: rect.top - parent.top - 4,
+                    y: rect.top - parent.top - 3,
                   });
                 }
               }}
@@ -81,14 +80,13 @@ export function CommitHeatmap() {
           ))}
         </div>
 
-        {/* Tooltip */}
         {tooltip !== null && (
           <div
-            className="absolute pointer-events-none z-20 px-2 py-1 rounded-lg bg-slate-900 text-white text-[9px] font-bold tracking-wide shadow-lg whitespace-nowrap -translate-x-1/2 -translate-y-full"
+            className="absolute pointer-events-none z-20 px-2 py-1 rounded-md bg-slate-900 text-white text-[8px] font-bold tracking-wide shadow-[0_2px_8px_-2px_rgba(15,23,42,0.4)] whitespace-nowrap -translate-x-1/2 -translate-y-full"
             style={{ left: tooltip.x, top: tooltip.y }}
           >
             {cells[tooltip.index].commits} commits
-            <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-[4px] border-r-[4px] border-t-[4px] border-transparent border-t-slate-900" />
+            <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-[3px] border-r-[3px] border-t-[3px] border-transparent border-t-slate-900" />
           </div>
         )}
       </div>

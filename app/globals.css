@@ -31,6 +31,13 @@ body {
   touch-action: manipulation;
 }
 
+/* ── GPU acceleration ── */
+*,
+*::before,
+*::after {
+  -webkit-backface-visibility: hidden;
+}
+
 button,
 a {
   -webkit-tap-highlight-color: transparent;
@@ -53,7 +60,7 @@ a {
   min-height: 44px;
 }
 
-/* ── Screen‑reader skip link — engraved plaque ── */
+/* ── Screen‑reader skip link ── */
 .skip-link {
   position: absolute;
   width: 1px;
@@ -89,7 +96,7 @@ a {
   outline-offset: -1px;
 }
 
-/* ── Grain texture — fine metal etch ── */
+/* ── Grain texture ── */
 .grain::before {
   content: "";
   position: absolute;
@@ -103,13 +110,13 @@ a {
   mix-blend-mode: multiply;
 }
 
-/* ── Focus‑visible — fine engraved ring ── */
+/* ── Focus‑visible ── */
 *:focus-visible {
   outline: 1px solid #ea580c;
   outline-offset: 1px;
 }
 
-/* ── Custom scrollbar — thin, recessed track ── */
+/* ── Custom scrollbar ── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
@@ -121,17 +128,57 @@ a {
 /* ── Smooth image rendering ── */
 img { -webkit-user-drag: none; user-select: none; }
 
-/* ── Pulse animation for live dot ── */
+/* ── Live dot pulse ── */
 @keyframes livePulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.8); }
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(2.2); }
 }
 .live-dot-pulse {
-  animation: livePulse 2s ease-in-out infinite;
+  animation: livePulse 2.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* ── Text shimmer — metallic gradient sweep ── */
+@keyframes textShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.shimmer-text {
+  background: linear-gradient(
+    120deg,
+    #94a3b8 0%,
+    #334155 20%,
+    #94a3b8 40%,
+    #1e293b 60%,
+    #94a3b8 80%,
+    #334155 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 5s ease-in-out infinite;
+}
+
+/* ── Scroll indicator bounce ── */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+.scroll-indicator {
+  animation: scrollBounce 2s ease-in-out infinite;
 }
 
 /* ── Mobile nav overlay ── */
 .mobile-nav-backdrop {
   backdrop-filter: blur(12px) saturate(150%);
   -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+/* ── Premium ease curve for all interactive elements ── */
+@media (prefers-reduced-motion: no-preference) {
+  a, button {
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
 }
