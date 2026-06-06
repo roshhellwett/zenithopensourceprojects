@@ -14,7 +14,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// 1. Standard Metadata
 export const metadata: Metadata = {
   title: "Zenith Open Source Projects – Roshan Kr Singh (@roshhellwett)",
   description:
@@ -74,12 +73,10 @@ export const metadata: Metadata = {
   },
 };
 
-// 2. Viewport with theme color
 export const viewport: Viewport = {
   themeColor: "#4A7FA7",
 };
 
-// 3. Root Layout
 export default function RootLayout({
   children,
 }: Readonly<{

@@ -3,10 +3,8 @@
 export function Background() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden" style={{ backgroundColor: "#FAFAF7" }}>
-      {/* Subtle radial highlight at top */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.9),transparent_70%)]" />
 
-      {/* Noise texture overlay for premium feel */}
       <div
         className="absolute inset-0 opacity-[0.018] mix-blend-multiply pointer-events-none"
         style={{
@@ -16,7 +14,6 @@ export function Background() {
         }}
       />
 
-      {/* Static gradient blobs — no animation */}
       <div className="absolute top-[-15%] left-[-10%] w-[55vw] h-[55vw] blur-[140px] rounded-full bg-gradient-to-br from-amber-200/20 to-orange-100/15" />
       <div className="absolute bottom-[-15%] right-[-10%] w-[60vw] h-[60vw] blur-[140px] rounded-full bg-gradient-to-tl from-emerald-200/20 to-teal-100/15" />
     </div>

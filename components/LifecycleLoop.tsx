@@ -30,7 +30,6 @@ export function LifecycleLoop() {
         <circle cx="50" cy="50" r="34" fill="none" stroke="rgb(15,23,42)" strokeOpacity="0.12" strokeWidth="0.3" strokeDasharray="0.6 1" />
         <circle cx="50" cy="50" r="12" fill="white" stroke="rgb(15,23,42)" strokeOpacity="0.08" strokeWidth="0.25" />
 
-        {/* Static accent dot */}
         <circle cx="50" cy="16" r="1.2" fill="rgb(245,158,11)" />
         <circle cx="50" cy="16" r="2.2" fill="rgb(245,158,11)" fillOpacity="0.2" />
 

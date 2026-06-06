@@ -48,7 +48,6 @@ import type { Repo } from "@/types";
 
 const springT: Transition = spring;
 
-/* ── Animated Counter ── */
 function AnimatedCounter({ target, isLoaded }: { target: number; isLoaded: boolean }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
@@ -73,7 +72,6 @@ function AnimatedCounter({ target, isLoaded }: { target: number; isLoaded: boole
   return <span ref={ref}>{isLoaded ? count : 0}</span>;
 }
 
-/* ── Mobile Nav ── */
 function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -115,9 +113,6 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   );
 }
 
-/* ══════════════════════════════════════════
-   ── MAIN PAGE ──
-   ══════════════════════════════════════════ */
 export default function Page() {
   const [featured, setFeatured] = useState<Repo>(FEATURED_FALLBACK);
   const [stats, setStats] = useState({ repos: 0, stars: 0, langs: 0 });
@@ -174,11 +169,9 @@ export default function Page() {
       <Background />
       <div className="hidden sm:block"><DashField /></div>
 
-      {/* Progress bar */}
       <motion.div style={{ scaleX: scrollYProgress }}
         className="fixed top-0 left-0 right-0 h-[1.5px] origin-left z-[49] bg-gradient-to-r from-orange-500 via-slate-300 to-emerald-600 will-change-transform" />
 
-      {/* ── Header ── */}
       <header className="sticky top-0 z-50 backdrop-blur-lg backdrop-saturate-150 bg-white/65 border-b border-slate-200/30 shadow-[inset_0_-0.5px_0_rgba(15,23,42,0.03)]">
         <div className="mobile-container py-2 flex items-center justify-between gap-2">
           <a href="#top" className="flex min-w-0 items-center gap-2 group">
@@ -220,7 +213,6 @@ export default function Page() {
       <main id="main" className="relative z-10 w-full flex-grow">
         <span id="top" />
 
-        {/* ═══ HERO ═══ */}
         <section className="relative mobile-container pt-10 sm:pt-14 md:pt-20 pb-8 sm:pb-10 md:pb-14">
           <motion.div variants={stagger} initial="hidden" animate="show" className="relative text-center max-w-3xl mx-auto">
             <motion.div variants={fadeUp} className="flex justify-center mb-4">
@@ -262,7 +254,6 @@ export default function Page() {
             </motion.div>
           </motion.div>
 
-          {/* Stat cards */}
           <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }}
             className="mt-8 md:mt-10 grid grid-cols-4 gap-2 md:gap-3 max-w-2xl mx-auto">
             {ORG_STATS.map((s, i) => (
@@ -280,7 +271,6 @@ export default function Page() {
             ))}
           </motion.div>
 
-          {/* Scroll indicator */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5, duration: 0.8 }}
             className="hidden md:flex flex-col items-center gap-1 mt-8">
             <span className="text-[7px] font-bold tracking-[0.3em] uppercase text-slate-400/60">Scroll</span>
@@ -290,7 +280,6 @@ export default function Page() {
 
 
 
-        {/* ═══ MISSION ═══ */}
         <section id="mission" className="mobile-container py-8 sm:py-10 md:py-14">
           <SectionHeading
             eyebrow="Our Mission"
@@ -300,7 +289,6 @@ export default function Page() {
 
           <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }}
             className="grid lg:grid-cols-[0.9fr_1fr] gap-5 lg:gap-8 items-start">
-            {/* Lifecycle */}
             <motion.div variants={fadeUp}
               className="grain relative rounded-2xl border border-slate-200/50 ring-1 ring-slate-100/80 bg-white/70 backdrop-blur-lg backdrop-saturate-150 p-3 sm:p-4 overflow-hidden shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
               <div className="pointer-events-none absolute -top-16 -right-16 w-48 h-48 rounded-full bg-amber-100/25 blur-[60px]" />
@@ -317,7 +305,6 @@ export default function Page() {
               </p>
             </motion.div>
 
-            {/* Value cards */}
             <motion.div variants={staggerSlow} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid sm:grid-cols-2 gap-2.5">
               {[
                 { icon: <Eye size={14} />, title: "Transparent by default", desc: "MIT licensed, public history, public issues. No black boxes." },
@@ -341,7 +328,6 @@ export default function Page() {
 
 
 
-        {/* ═══ FEATURED ═══ */}
         <section id="featured" className="mobile-container py-8 sm:py-10 md:py-14">
           <SectionHeading
             eyebrow="Featured Initiative"
@@ -355,7 +341,6 @@ export default function Page() {
 
 
 
-        {/* ═══ STACK ═══ */}
         <section id="stack" className="mobile-container py-8 sm:py-10 md:py-14">
           <SectionHeading
             eyebrow="Capability"
@@ -391,7 +376,6 @@ export default function Page() {
 
 
 
-        {/* ═══ FOUNDER ═══ */}
         <section id="founder" className="mobile-container py-8 sm:py-10 md:py-14">
           <SectionHeading
             eyebrow="Behind Zenith"
@@ -452,7 +436,6 @@ export default function Page() {
 
 
 
-        {/* ═══ BHARAT CTA ═══ */}
         <section className="mobile-container py-8 sm:py-10 md:py-14">
           <motion.div initial={{ opacity: 0, y: 20, filter: "blur(4px)" }} whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} viewport={{ once: true, amount: 0.3 }} transition={springT}
             className="grain relative overflow-hidden rounded-2xl border border-slate-200/50 ring-1 ring-slate-100/80 bg-gradient-to-br from-orange-50/60 via-white/70 to-emerald-50/60 backdrop-blur-lg p-5 sm:p-7 md:p-10 text-center shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
@@ -486,7 +469,6 @@ export default function Page() {
         </section>
       </main>
 
-      {/* ── Footer ── */}
       <footer className="relative z-10 border-t border-slate-200/30 mt-4 bg-white/50 backdrop-blur-lg">
         <div className="mobile-container py-6 sm:py-8 md:py-10">
           <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_1fr] gap-6 md:gap-4">
@@ -547,7 +529,6 @@ export default function Page() {
         </div>
       </footer>
 
-      {/* Back to Top */}
       <AnimatePresence>
         {showBackToTop && (
           <motion.button initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}
