@@ -2,8 +2,6 @@ import { type Transition, type Variants } from "framer-motion";
 
 export const spring: Transition = { type: "spring", stiffness: 250, damping: 25, mass: 0.5 };
 
-export const smoothSpring: Transition = { type: "spring", stiffness: 150, damping: 19, mass: 1.2 };
-
 export const fadeUp: Variants = {
   hidden: { opacity: 0, y: 32, filter: "blur(8px)" },
   show: {

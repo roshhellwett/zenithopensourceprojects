@@ -145,10 +145,7 @@ a {
   background: rgba(255, 255, 255, 0.15);
 }
 
-::selection {
-  background: rgba(56, 189, 248, 0.25);
-  color: #ffffff;
-}
+
 
 img {
   -webkit-user-drag: none;
@@ -238,34 +235,19 @@ img {
     0 20px 40px -12px rgba(0, 0, 0, 0.6);
 }
 
-/* ── Liquid Glass Hero Typography (Apple Hello Style) ── */
+/* ── Liquid Glass Hero Typography ── */
 .glass-tube-hero {
-  position: relative;
-  display: inline-block;
-  color: rgba(255, 255, 255, 0.15); /* Translucent liquid inside */
-  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.95); /* Bright glass edge */
-  text-shadow: 
-    0px 8px 24px rgba(0, 0, 0, 0.8), /* Soft cast shadow */
-    0px 0px 40px rgba(56, 189, 248, 0.3); /* Ambient glow */
-}
-
-.glass-tube-hero::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  /* Simulating specular reflection on the top curve of the tube */
   background: linear-gradient(
-    180deg, 
-    rgba(255, 255, 255, 0.95) 0%, 
-    rgba(255, 255, 255, 0) 35%
+    180deg,
+    #ffffff 0%,
+    rgba(255, 255, 255, 0.85) 35%,
+    rgba(255, 255, 255, 0.5) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent !important;
-  -webkit-text-stroke: 0px transparent;
-  filter: drop-shadow(0px 2px 4px rgba(255, 255, 255, 0.4)); /* extra pop for the highlight */
+  color: transparent;
+  -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.2);
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 }
 
 /* ══════════════════════════════════════
@@ -352,9 +334,12 @@ img {
   box-shadow: 0 0 10px var(--accent-1);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a, button {
-    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

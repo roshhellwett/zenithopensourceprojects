@@ -25,7 +25,6 @@ import { Divider } from "@/components/Divider";
 import { BharatWave } from "@/components/BharatWave";
 import { Pill } from "@/components/Pill";
 import { Panel } from "@/components/Panel";
-import { StructuredData } from "@/components/StructuredData";
 import { RepoCard } from "@/components/RepoCard";
 
 import { STACK } from "@/data/stack";
@@ -34,7 +33,9 @@ import { FALLBACK_REPOS, FEATURED_FALLBACK } from "@/data/repos";
 import type { Repo } from "@/types";
 
 function AnimatedCounter({ target, isLoaded }: { target: number; isLoaded: boolean }) {
-  const [count, setCount] = useState(0);
+  const [display, setDisplay] = useState(target);
+  const [started, setStarted] = useState(false);
+  const startedRef = useRef(false);
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.5 });
   const hasAnimated = useRef(false);
@@ -44,17 +45,23 @@ function AnimatedCounter({ target, isLoaded }: { target: number; isLoaded: boole
     hasAnimated.current = true;
     const duration = 1800;
     const start = performance.now();
+
     const step = (now: number) => {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * target));
+      const next = Math.round(eased * target);
+      setDisplay(next);
+      if (!startedRef.current && next > 0) {
+        startedRef.current = true;
+        setStarted(true);
+      }
       if (progress < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
   }, [isInView, isLoaded, target]);
 
-  return <span ref={ref}>{isLoaded ? count : target}</span>;
+  return <span ref={ref}>{started ? display : target}</span>;
 }
 
 function AnimatedBentoTile({ children, className, delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
@@ -130,7 +137,6 @@ export default function Page() {
 
   return (
     <div className="min-h-screen font-sans text-slate-100 selection:bg-accent-1 selection:text-slate-950 relative overflow-hidden" ref={containerRef}>
-      <StructuredData />
       <Background />
       
       {/* Floating Navigation Dock */}
@@ -153,10 +159,10 @@ export default function Page() {
         </div>
         <div className="h-4 w-[1px] bg-white/[0.08] mx-0.5 hidden sm:block" />
         <a href="https://github.com/roshhellwett" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">
-          <Github size={12} /> <span className="hidden xs:inline">Profile</span>
+          <Github size={12} /> <span className="hidden sm:inline">Profile</span>
         </a>
         <a href="https://roshhellwett.github.io/zenithpages/" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-semibold bg-white text-slate-950 hover:bg-white/90 transition-all shadow-[0_0_24px_rgba(255,255,255,0.15)] ml-0.5">
-          <Layers size={11} /> <span className="hidden xs:inline">Registry</span>
+          <Layers size={11} /> <span className="hidden sm:inline">Registry</span>
         </a>
       </motion.nav>
 
@@ -166,49 +172,30 @@ export default function Page() {
         className="fixed top-0 left-0 right-0 h-[1px] origin-left z-[49] bg-gradient-to-r from-accent-1 via-white/60 to-accent-3 will-change-transform" 
       />
 
-      <main className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 pt-32 pb-24 lg:pt-40" id="top">
+      <main className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 pt-36 pb-24 lg:pt-48" id="top">
         
         {/* Hero Title */}
-        <motion.div style={{ y: yParallax }} className="mb-16 lg:mb-24 flex flex-col items-center text-center">
+        <motion.div style={{ y: yParallax }} className="mb-20 lg:mb-32 flex flex-col items-center text-center">
 
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center text-center select-none mb-6"
+          <h1 
+            className="flex flex-col items-center text-center select-none mb-8"
+            aria-label="Zenith open source"
           >
-            <span className="relative inline-flex overflow-hidden pt-12 -mt-12">
-              <motion.span
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 1.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="inline-block whitespace-nowrap overflow-hidden pr-2 text-7xl sm:text-8xl md:text-9xl lg:text-[11rem] font-sacramento font-normal leading-none glass-tube-hero"
-                data-text="Zenith"
-              >
+            <span className="flex justify-center">
+              <span className="text-8xl sm:text-9xl md:text-[10rem] lg:text-[13rem] font-sacramento font-normal leading-[1.2] glass-tube-hero">
                 Zenith
-              </motion.span>
+              </span>
             </span>
-            <span className="relative inline-flex overflow-hidden -mt-2 lg:-mt-5 pt-4 -mt-4 pb-4 -mb-4">
-              <motion.span
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 1.6, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                className="inline-block whitespace-nowrap overflow-hidden pr-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-dancing font-normal leading-none glass-tube-hero"
-                data-text="open source"
-              >
+            <span className="flex justify-center -mt-3 lg:-mt-6">
+              <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-dancing font-normal leading-[1.2] glass-tube-hero">
                 open source
-              </motion.span>
+              </span>
             </span>
-          </motion.h1>
+          </h1>
           
-          <motion.p 
-            initial={{ opacity: 0, y: 15 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 1, delay: 0.3 }}
-            className="text-base sm:text-lg md:text-xl text-white/45 font-medium max-w-2xl leading-relaxed tracking-[-0.01em]"
-          >
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/45 font-medium max-w-2xl leading-relaxed tracking-[-0.01em]">
             A systems collective and project forge building open-specification developer utilities, automation pipelines, and civic diagnostics. Crafted in India, optimized for standard performance, and free forever.
-          </motion.p>
+          </p>
         </motion.div>
 
         {/* Section 1: Overview & Mission Bento Grid */}

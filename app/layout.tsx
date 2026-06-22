@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Outfit, Sacramento, Dancing_Script } from "next/font
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/data/site";
+import { StructuredData } from "@/components/StructuredData";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -128,6 +129,8 @@ export default function RootLayout({
             }),
           }}
         />
+        <StructuredData />
+        <a href="#top" className="skip-link">Skip to content</a>
         {children}
         <SpeedInsights />
       </body>
