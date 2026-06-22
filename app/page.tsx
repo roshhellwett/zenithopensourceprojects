@@ -1,52 +1,37 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useInView,
-  type Transition,
-} from "framer-motion";
-
-import {
-  Github,
-  FolderGit2,
-  Star,
-  Code2,
-  Sparkles,
-  Flag,
-  ArrowUpRight,
-  ArrowRight,
-  Layers,
-  Globe,
-  Eye,
-  Menu,
-  X,
-  ChevronUp,
-  ChevronDown,
+import { motion, AnimatePresence, useScroll, useTransform, useInView } from "framer-motion";
+import { 
+  Github, 
+  FolderGit2, 
+  Star, 
+  Code2, 
+  Globe, 
+  Layers, 
+  ArrowUpRight, 
+  Zap, 
+  ChevronUp, 
+  Flag, 
+  Boxes
 } from "lucide-react";
 
 import { BrandMark } from "@/components/BrandMark";
 import { Background } from "@/components/Background";
-import { DashField } from "@/components/DashField";
-import { Pill } from "@/components/Pill";
-
-import { SectionHeading } from "@/components/SectionHeading";
-import { Panel } from "@/components/Panel";
-import { LifecycleLoop } from "@/components/LifecycleLoop";
 import { CommitHeatmap } from "@/components/CommitHeatmap";
-import { BharatWave } from "@/components/BharatWave";
 import { FeaturedProject } from "@/components/FeaturedProject";
+import { SectionHeading } from "@/components/SectionHeading";
+import { Divider } from "@/components/Divider";
+import { BharatWave } from "@/components/BharatWave";
+import { Pill } from "@/components/Pill";
+import { Panel } from "@/components/Panel";
 import { StructuredData } from "@/components/StructuredData";
-import { FEATURED_FALLBACK } from "@/data/repos";
+import { RepoCard } from "@/components/RepoCard";
+
 import { STACK } from "@/data/stack";
 import { SOCIALS } from "@/data/socials";
-import { NAV_LINKS } from "@/data/nav";
-import { spring, fadeUp, stagger, staggerSlow } from "@/lib/animations";
+import { FALLBACK_REPOS, FEATURED_FALLBACK } from "@/data/repos";
 import type { Repo } from "@/types";
-
-const springT: Transition = spring;
 
 function AnimatedCounter({ target, isLoaded }: { target: number; isLoaded: boolean }) {
   const [count, setCount] = useState(0);
@@ -69,473 +54,512 @@ function AnimatedCounter({ target, isLoaded }: { target: number; isLoaded: boole
     requestAnimationFrame(step);
   }, [isInView, isLoaded, target]);
 
-  return <span ref={ref}>{isLoaded ? count : 0}</span>;
+  return <span ref={ref}>{isLoaded ? count : target}</span>;
 }
 
-function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [isOpen]);
-
+function AnimatedBentoTile({ children, className, delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[70] bg-slate-900/20 mobile-nav-backdrop" onClick={onClose} />
-          <motion.nav initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 34 }}
-            className="fixed top-[53px] inset-x-0 z-[80] mx-3 rounded-xl bg-white/95 backdrop-blur-xl border border-slate-200/60 shadow-[0_16px_32px_-8px_rgba(15,23,42,0.12),inset_0_0.5px_0_rgba(255,255,255,0.8)] overflow-hidden"
-            role="navigation" aria-label="Mobile navigation">
-            <div className="p-1.5">
-              {NAV_LINKS.map((l, i) => (
-                <motion.a key={l.href} href={l.href} onClick={onClose}
-                  initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.03, type: "spring", stiffness: 400, damping: 34 }}
-                  className="flex items-center gap-2.5 px-3 py-3 rounded-lg text-xs font-bold tracking-wide text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 transition-all duration-200">
-                  <span className="w-1 h-1 rounded-full bg-slate-300" />
-                  {l.label}
-                </motion.a>
-              ))}
-              <div className="mt-0.5 p-1.5 pt-2 border-t border-slate-200/50">
-                <a href="https://github.com/roshhellwett?tab=repositories" target="_blank" rel="noreferrer" onClick={onClose}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.06)]">
-                  <Github size={13} /> All Repos <ArrowUpRight size={11} />
-                </a>
-              </div>
-            </div>
-          </motion.nav>
-        </>
-      )}
-    </AnimatePresence>
+    <motion.div
+      initial={{ opacity: 0, y: 35, filter: "blur(8px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ type: "spring", stiffness: 90, damping: 22, delay, mass: 0.8 }}
+      className={`group relative overflow-hidden rounded-[2rem] liquid-glass p-8 shadow-2xl ${className}`}
+    >
+      <div className="liquid-glass-shine" />
+      <div className="liquid-glass-sheen" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-accent-1/5 via-transparent to-accent-3/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      {children}
+    </motion.div>
   );
 }
 
 export default function Page() {
-  const [featured, setFeatured] = useState<Repo>(FEATURED_FALLBACK);
   const [stats, setStats] = useState({ repos: 0, stars: 0, langs: 0 });
+  const [reposList, setReposList] = useState<Repo[]>(() => [FEATURED_FALLBACK, ...FALLBACK_REPOS]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const { scrollYProgress } = useScroll();
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
+  const yParallax = useTransform(scrollYProgress, [0, 1], [0, -100]);
+
+  const featuredRepos = useMemo(() => {
+    return reposList.slice(0, 3);
+  }, [reposList]);
 
   useEffect(() => {
-    const h = () => setShowBackToTop(window.scrollY > 400);
-    window.addEventListener("scroll", h, { passive: true });
-    return () => window.removeEventListener("scroll", h);
+    const handleScroll = () => setShowBackToTop(window.scrollY > 400);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  useEffect(() => {
-    const h = () => { if (window.innerWidth >= 768) setMobileNavOpen(false); };
-    window.addEventListener("resize", h);
-    return () => window.removeEventListener("resize", h);
-  }, []);
-
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === "Escape" && mobileNavOpen) setMobileNavOpen(false); };
-    window.addEventListener("keydown", h);
-    return () => window.removeEventListener("keydown", h);
-  }, [mobileNavOpen]);
 
   useEffect(() => {
     (async () => {
       try {
         const res = await fetch("https://api.github.com/users/roshhellwett/repos?per_page=100");
         if (!res.ok) throw new Error("rate limited");
-        const data: { name: string; html_url: string; homepage: string | null; stargazers_count: number; language: string | null; fork: boolean }[] = await res.json();
-        const sentinel = data.find((r) => r.name === FEATURED_FALLBACK.name);
-        if (sentinel) setFeatured((f) => ({ ...f, link: sentinel.html_url, homepage: sentinel.homepage || f.homepage, stars: sentinel.stargazers_count, lang: sentinel.language || f.lang }));
+        const data: { name: string; stargazers_count: number; language: string | null; fork: boolean }[] = await res.json();
         const own = data.filter((r) => !r.fork);
-        setStats({ repos: own.length, stars: own.reduce((s, r) => s + (r.stargazers_count || 0), 0), langs: new Set(own.map((r) => r.language).filter(Boolean)).size });
-      } catch { setStats({ repos: 18, stars: 38, langs: 8 }); } finally { setIsLoaded(true); }
+        
+        // Merge star counts into fallback lists
+        const allLocal = [FEATURED_FALLBACK, ...FALLBACK_REPOS];
+        const updatedRepos = allLocal.map((fallback) => {
+          const apiMatch = own.find((r) => r.name.toLowerCase() === fallback.name.toLowerCase());
+          return {
+            ...fallback,
+            stars: apiMatch ? apiMatch.stargazers_count : fallback.stars ?? 0,
+          };
+        });
+        setReposList(updatedRepos);
+
+        setStats({ 
+          repos: own.length, 
+          stars: own.reduce((s, r) => s + (r.stargazers_count || 0), 0), 
+          langs: new Set(own.map((r) => r.language).filter(Boolean)).size 
+        });
+      } catch { 
+        setStats({ repos: 22, stars: 45, langs: 4 }); 
+      } finally {
+        setIsLoaded(true);
+      }
     })();
   }, []);
-
-  const ORG_STATS = useMemo(() => [
-    { label: "Repos", value: stats.repos || 18, icon: <FolderGit2 size={12} /> },
-    { label: "Stars", value: stats.stars || 38, icon: <Star size={12} /> },
-    { label: "Languages", value: stats.langs || 8, icon: <Code2 size={12} /> },
-    { label: "Mission", value: "Bharat", icon: <Flag size={12} />, isText: true },
-  ], [stats]);
 
   const scrollToTop = useCallback(() => window.scrollTo({ top: 0, behavior: "smooth" }), []);
 
   return (
-    <div className="min-h-screen font-sans text-slate-900 selection:bg-slate-900 selection:text-white relative flex flex-col">
-      <a href="#main" className="skip-link">Skip to content</a>
+    <div className="min-h-screen font-sans text-slate-100 selection:bg-accent-1 selection:text-slate-950 relative overflow-hidden" ref={containerRef}>
       <StructuredData />
       <Background />
-      <div className="hidden sm:block"><DashField /></div>
-
-      <motion.div style={{ scaleX: scrollYProgress }}
-        className="fixed top-0 left-0 right-0 h-[1.5px] origin-left z-[49] bg-gradient-to-r from-orange-500 via-slate-300 to-emerald-600 will-change-transform" />
-
-      <header className="sticky top-0 z-50 backdrop-blur-lg backdrop-saturate-150 bg-white/65 border-b border-slate-200/30 shadow-[inset_0_-0.5px_0_rgba(15,23,42,0.03)]">
-        <div className="mobile-container py-2 flex items-center justify-between gap-2">
-          <a href="#top" className="flex min-w-0 items-center gap-2 group">
-            <BrandMark size={30} rounded="rounded-lg" />
-            <div className="flex min-w-0 flex-col leading-none">
-              <span className="text-xs font-black tracking-tight text-slate-900">ZENITH</span>
-              <span className="truncate text-[7px] font-bold tracking-[0.18em] uppercase text-slate-400">Open Source Projects</span>
-            </div>
-          </a>
-          <nav className="hidden md:flex items-center gap-0.5" aria-label="Main navigation">
-            {NAV_LINKS.map((l) => (
-              <a key={l.href} href={l.href}
-                className="px-2.5 py-1 text-[10px] font-bold tracking-wide text-slate-500 hover:text-slate-900 rounded-md transition-all duration-200 hover:bg-slate-50/60">
-                {l.label}
-              </a>
-            ))}
-          </nav>
-          <div className="flex items-center gap-1.5">
-            <a href="https://github.com/roshhellwett?tab=repositories" target="_blank" rel="noreferrer"
-              className="touch-target shrink-0 hidden sm:inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-[10px] font-bold hover:bg-slate-800 transition-all duration-200 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.06)]">
-              <Github size={11} /><span className="hidden sm:inline">Repos</span><ArrowUpRight size={10} />
-            </a>
-            <button type="button" onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="md:hidden touch-target inline-flex items-center justify-center p-1.5 rounded-lg bg-white/80 border border-slate-200/50 text-slate-600 hover:bg-slate-50 transition-all duration-200 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)]"
-              aria-label={mobileNavOpen ? "Close menu" : "Open menu"} aria-expanded={mobileNavOpen}>
-              <AnimatePresence mode="wait" initial={false}>
-                {mobileNavOpen ? (
-                  <motion.span key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.12 }}><X size={15} /></motion.span>
-                ) : (
-                  <motion.span key="m" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.12 }}><Menu size={15} /></motion.span>
-                )}
-              </AnimatePresence>
-            </button>
-          </div>
+      
+      {/* Floating Navigation Dock */}
+      <motion.nav 
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 200, damping: 22, delay: 0.2 }}
+        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 p-1.5 rounded-full liquid-glass shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
+      >
+        <a href="#top" className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.08] hover:border-white/[0.15] transition-colors">
+          <BrandMark size={16} rounded="rounded-full" />
+        </a>
+        <div className="h-4 w-[1px] bg-white/[0.08] mx-0.5" />
+        <div className="hidden sm:flex items-center">
+          <a href="#mission" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Mission</a>
+          <a href="#telemetry" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Telemetry</a>
+          <a href="#projects" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Projects</a>
+          <a href="#stack" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Stack</a>
+          <a href="#founder" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Founder</a>
         </div>
-      </header>
-      <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+        <div className="h-4 w-[1px] bg-white/[0.08] mx-0.5 hidden sm:block" />
+        <a href="https://github.com/roshhellwett" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">
+          <Github size={12} /> <span className="hidden xs:inline">Profile</span>
+        </a>
+        <a href="https://roshhellwett.github.io/zenithpages/" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-semibold bg-white text-slate-950 hover:bg-white/90 transition-all shadow-[0_0_24px_rgba(255,255,255,0.15)] ml-0.5">
+          <Layers size={11} /> <span className="hidden xs:inline">Registry</span>
+        </a>
+      </motion.nav>
 
-      <main id="main" className="relative z-10 w-full flex-grow">
-        <span id="top" />
+      {/* Parallax Progress Line */}
+      <motion.div 
+        style={{ scaleX: scrollYProgress }}
+        className="fixed top-0 left-0 right-0 h-[1px] origin-left z-[49] bg-gradient-to-r from-accent-1 via-white/60 to-accent-3 will-change-transform" 
+      />
 
-        <section className="relative mobile-container pt-10 sm:pt-14 md:pt-20 pb-8 sm:pb-10 md:pb-14">
-          <motion.div variants={stagger} initial="hidden" animate="show" className="relative text-center max-w-3xl mx-auto">
-            <motion.div variants={fadeUp} className="flex justify-center mb-4">
-              <Pill>
-                <span className="relative flex h-1 w-1">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 live-dot-pulse" />
-                  <span className="relative inline-flex rounded-full h-1 w-1 bg-emerald-500" />
-                </span>
-                Open source · Building from India
-              </Pill>
-            </motion.div>
+      <main className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 pt-32 pb-24 lg:pt-40" id="top">
+        
+        {/* Hero Title */}
+        <motion.div style={{ y: yParallax }} className="mb-16 lg:mb-24 flex flex-col items-center text-center">
 
-            <motion.h1 variants={fadeUp}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-[-0.04em] leading-[0.88] text-slate-900">
-              Zenith
-              <span className="block shimmer-text mt-1 tracking-[-0.03em]">Open Source.</span>
-            </motion.h1>
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center text-center select-none mb-6"
+          >
+            <span className="relative inline-flex overflow-hidden pt-12 -mt-12">
+              <motion.span
+                initial={{ width: 0 }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 1.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                className="inline-block whitespace-nowrap overflow-hidden pr-2 text-7xl sm:text-8xl md:text-9xl lg:text-[11rem] font-sacramento font-normal leading-none glass-tube-hero"
+                data-text="Zenith"
+              >
+                Zenith
+              </motion.span>
+            </span>
+            <span className="relative inline-flex overflow-hidden -mt-2 lg:-mt-5 pt-4 -mt-4 pb-4 -mb-4">
+              <motion.span
+                initial={{ width: 0 }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 1.6, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="inline-block whitespace-nowrap overflow-hidden pr-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-dancing font-normal leading-none glass-tube-hero"
+                data-text="open source"
+              >
+                open source
+              </motion.span>
+            </span>
+          </motion.h1>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 15 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 1, delay: 0.3 }}
+            className="text-base sm:text-lg md:text-xl text-white/45 font-medium max-w-2xl leading-relaxed tracking-[-0.01em]"
+          >
+            A systems collective and project forge building open-specification developer utilities, automation pipelines, and civic diagnostics. Crafted in India, optimized for standard performance, and free forever.
+          </motion.p>
+        </motion.div>
 
-            <motion.p variants={fadeUp}
-              className="mt-4 md:mt-6 text-sm md:text-[15px] text-slate-500 leading-relaxed max-w-lg mx-auto">
-              Premium, transparent open source projects —
-              Telegram bots, civic-tech, Linux audio, OS utilities, and AI
-              tooling — for developers, students, and the nation.
-            </motion.p>
-
-            <motion.div variants={fadeUp} className="mt-5 md:mt-6 flex flex-wrap justify-center gap-2">
-              <a href="#featured"
-                className="touch-target inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.06),0_2px_8px_-3px_rgba(15,23,42,0.2)]">
-                <Sparkles size={12} /> Featured Project <ArrowRight size={11} />
-              </a>
-              <a href="https://roshhellwett.github.io/zenithpages/" target="_blank" rel="noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/90 border border-slate-200/50 text-slate-700 font-bold text-xs hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_2px_-1px_rgba(15,23,42,0.06)]">
-                <Layers size={12} /> Zenith Registry <ArrowUpRight size={11} />
-              </a>
-              <a href="https://github.com/roshhellwett?tab=repositories" target="_blank" rel="noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/90 border border-slate-200/50 text-slate-700 font-bold text-xs hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_2px_-1px_rgba(15,23,42,0.06)]">
-                <Github size={12} /> GitHub <ArrowUpRight size={11} />
-              </a>
-            </motion.div>
-          </motion.div>
-
-          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }}
-            className="mt-8 md:mt-10 grid grid-cols-4 gap-2 md:gap-3 max-w-2xl mx-auto">
-            {ORG_STATS.map((s, i) => (
-              <motion.div key={s.label} variants={fadeUp} transition={{ ...springT, delay: i * 0.05 }}
-                className="grain relative rounded-xl bg-white/70 border border-slate-200/50 ring-1 ring-slate-100/80 p-2.5 md:p-3 overflow-hidden shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)] hover:shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_4px_12px_-6px_rgba(15,23,42,0.06)] transition-shadow duration-400 text-center">
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/60 to-transparent" />
-                <div className="relative flex justify-center text-slate-400 mb-1">{s.icon}</div>
-                <div className="relative text-xl md:text-2xl font-black tracking-tight text-slate-900 leading-none">
-                  {s.isText ? s.value : (
-                    <><AnimatedCounter target={s.value as number} isLoaded={isLoaded} /><span className="text-slate-300 text-xs ml-0.5">+</span></>
-                  )}
-                </div>
-                <div className="relative text-[7px] font-bold tracking-[0.12em] uppercase text-slate-400 mt-0.5">{s.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5, duration: 0.8 }}
-            className="hidden md:flex flex-col items-center gap-1 mt-8">
-            <span className="text-[7px] font-bold tracking-[0.3em] uppercase text-slate-400/60">Scroll</span>
-            <div className="scroll-indicator text-slate-300"><ChevronDown size={12} /></div>
-          </motion.div>
-        </section>
-
-
-
-        <section id="mission" className="mobile-container py-8 sm:py-10 md:py-14">
-          <SectionHeading
-            eyebrow="Our Mission"
-            title="Open source, by India — for the world."
-            subtitle="Every project under Zenith is built with one rule: be useful, be transparent, be free."
-          />
-
-          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }}
-            className="grid lg:grid-cols-[0.9fr_1fr] gap-5 lg:gap-8 items-start">
-            <motion.div variants={fadeUp}
-              className="grain relative rounded-2xl border border-slate-200/50 ring-1 ring-slate-100/80 bg-white/70 backdrop-blur-lg backdrop-saturate-150 p-3 sm:p-4 overflow-hidden shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
-              <div className="pointer-events-none absolute -top-16 -right-16 w-48 h-48 rounded-full bg-amber-100/25 blur-[60px]" />
-              <div className="pointer-events-none absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-emerald-100/25 blur-[60px]" />
-              <div className="relative flex items-center gap-1.5 mb-2">
-                <span className="p-1 rounded-md bg-white/80 border border-slate-200/50 text-slate-400 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)]">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
-                </span>
-                <span className="text-[8px] font-bold tracking-[0.2em] uppercase text-slate-400">How we operate</span>
+        {/* Section 1: Overview & Mission Bento Grid */}
+        <section id="mission" className="mb-20 scroll-mt-28">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(280px,auto)]">
+            
+            {/* Bento Tile 1: Main Thesis */}
+            <AnimatedBentoTile className="md:col-span-2 flex flex-col justify-center bg-gradient-to-br from-slate-950/80 to-slate-900/60 overflow-hidden" delay={0.05}>
+              <div className="absolute -top-24 -right-24 text-slate-800/10 rotate-12 transition-transform duration-1000 group-hover:rotate-0 pointer-events-none">
+                <Globe size={320} strokeWidth={0.5} />
               </div>
-              <LifecycleLoop />
-              <p className="relative mt-2 text-center text-[8px] font-bold tracking-[0.12em] uppercase text-slate-400">
-                Build · Ship · Open · Iterate — forever
-              </p>
-            </motion.div>
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6 items-center w-full">
+                <div className="max-w-xl">
+                  <div className="mb-3 text-[9px] font-semibold tracking-[0.25em] text-accent-1 uppercase">Core Thesis</div>
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-[-0.02em] leading-tight mb-4">
+                    Code as <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-1 via-accent-2 to-accent-3">Citizenship.</span>
+                  </h2>
+                  <p className="text-sm sm:text-base text-white/50 leading-relaxed font-medium">
+                    Every pipeline, tool, and utility built under Zenith is open‑source by design. We develop highly transparent architectures for public service, academic networks, and systems auditing.
+                  </p>
+                </div>
+                <div className="w-full h-[200px] bg-[#02040a] rounded-xl border border-slate-900 overflow-hidden shadow-2xl">
+                  <FeaturedProject />
+                </div>
+              </div>
+            </AnimatedBentoTile>
 
-            <motion.div variants={staggerSlow} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid sm:grid-cols-2 gap-2.5">
-              {[
-                { icon: <Eye size={14} />, title: "Transparent by default", desc: "MIT licensed, public history, public issues. No black boxes." },
-                { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>, title: "Built for scale", desc: "From single-file scripts to multi-tenant SaaS — production-minded." },
-                { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>, title: "Civic-first", desc: "Projects for students, voters, listeners, and developers." },
-                { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>, title: "Continuously shipped", desc: "Weekly commits, live demos, real users — not vanity repos." },
-              ].map((c) => (
-                <motion.div key={c.title} variants={fadeUp}
-                  className="grain relative rounded-xl border border-slate-200/50 ring-1 ring-slate-100/80 bg-white/70 backdrop-blur-lg p-3.5 overflow-hidden group hover:bg-white/85 transition-all duration-300 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)] hover:shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_4px_12px_-6px_rgba(15,23,42,0.06)] hover:-translate-y-px">
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/40 to-transparent" />
-                  <div className="relative inline-flex p-2 rounded-lg bg-white/80 text-slate-500 border border-slate-200/50 mb-2.5 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)] transition-all duration-300 group-hover:scale-105">
-                    {c.icon}
+            {/* Bento Tile 2: Stats Hub */}
+            <AnimatedBentoTile className="md:col-span-1 flex flex-col justify-between p-8 bg-slate-950/40" delay={0.1}>
+              <div className="text-[9px] font-semibold tracking-[0.22em] text-white/30 uppercase pb-4 border-b border-white/[0.06]">Telemetry Statistics</div>
+              <div className="space-y-6 py-6">
+                <div className="flex items-center justify-between">
+                  <div className="text-[10px] font-semibold tracking-wider text-white/40 uppercase flex items-center gap-2">
+                    <FolderGit2 size={13} className="text-accent-1" /> Active Repos
                   </div>
-                  <h4 className="relative text-xs font-bold text-slate-900 tracking-tight">{c.title}</h4>
-                  <p className="relative mt-1 text-[11px] text-slate-500 leading-relaxed">{c.desc}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
+                  <div className="text-4xl font-black text-white tracking-tight">
+                    <AnimatedCounter target={stats.repos || 22} isLoaded={isLoaded} />
+                    <span className="text-accent-1 text-base ml-1">+</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-[10px] font-semibold tracking-wider text-white/40 uppercase flex items-center gap-2">
+                    <Star size={13} className="text-amber-400" /> Global Stars
+                  </div>
+                  <div className="text-4xl font-black text-white tracking-tight">
+                    <AnimatedCounter target={stats.stars || 45} isLoaded={isLoaded} />
+                    <span className="text-amber-400 text-base ml-1">+</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-[10px] font-semibold tracking-wider text-white/40 uppercase flex items-center gap-2">
+                    <Code2 size={13} className="text-accent-3" /> Core Languages
+                  </div>
+                  <div className="text-4xl font-black text-white tracking-tight">
+                    <AnimatedCounter target={stats.langs || 4} isLoaded={isLoaded} />
+                  </div>
+                </div>
+              </div>
+            </AnimatedBentoTile>
+
+            {/* Bento Tile 3: Civic Initiative & Bharat First */}
+            <AnimatedBentoTile className="md:col-span-3 flex flex-col justify-end overflow-hidden p-8 bg-gradient-to-br from-slate-950/70 to-[#0c0d12]/90" delay={0.15}>
+              <BharatWave />
+              <div className="relative z-10">
+                <div className="mb-4">
+                  <Pill><Flag size={10} className="mr-1 text-orange-400" /> Bharat First</Pill>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight mb-3">
+                  Engineering self-reliance through open code.
+                </h3>
+                <p className="text-xs sm:text-sm text-white/45 leading-relaxed max-w-2xl">
+                  Zenith stands for open specifications and verified digital infrastructure. By sharing code pipelines, systems scripts, and civic prototypes, we build blocks that empower Indian developers, students, and system administrators.
+                </p>
+              </div>
+            </AnimatedBentoTile>
+
+          </div>
         </section>
 
+        <Divider />
 
-
-        <section id="featured" className="mobile-container py-8 sm:py-10 md:py-14">
-          <SectionHeading
-            eyebrow="Featured Initiative"
-            title="Project Sentinel"
-            subtitle="AI-powered, source-verified news aggregator — built for India, built in the open."
+        {/* Section 2: Telemetry & Performance Cadence */}
+        <section id="telemetry" className="py-12 scroll-mt-28">
+          <SectionHeading 
+            eyebrow="Telemetry Logs"
+            title="Systems Telemetry & Build Cadence"
+            subtitle="Visualizing our deployment pipeline activity logs and live compilation processes."
           />
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={stagger}>
-            <FeaturedProject repo={featured} />
-          </motion.div>
+
+          <div className="w-full">
+            
+            {/* Heatmap Card */}
+            <AnimatedBentoTile className="w-full flex flex-col justify-between p-8" delay={0.05}>
+              <div className="flex items-center justify-between mb-6 pb-3 border-b border-white/[0.06]">
+                <div>
+                  <h3 className="text-lg font-bold text-white tracking-[-0.01em] flex items-center gap-2">
+                    <Boxes size={16} className="text-accent-1" /> Engineering Cadence
+                  </h3>
+                  <p className="text-[10px] text-white/30 mt-0.5">Heatmap mapping commit distribution history</p>
+                </div>
+                <div className="p-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-accent-1"><Zap size={14} /></div>
+              </div>
+              <div className="flex-grow flex flex-col justify-center">
+                <CommitHeatmap />
+              </div>
+            </AnimatedBentoTile>
+
+          </div>
         </section>
 
+        <Divider />
 
+        {/* Projects Showcase */}
+        <section id="projects" className="py-12 scroll-mt-28">
+          <SectionHeading 
+            eyebrow="Open Source Registry"
+            title="Featured Repositories"
+            subtitle="A curated selection of our primary open-source systems, automation pipelines, and utilities."
+          />
 
-        <section id="stack" className="mobile-container py-8 sm:py-10 md:py-14">
-          <SectionHeading
-            eyebrow="Capability"
+          <div className="space-y-10">
+            <motion.div 
+              layout
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              <AnimatePresence mode="popLayout">
+                {featuredRepos.map((repo, idx) => (
+                  <motion.div
+                    layout
+                    key={repo.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3 }}
+                    className="h-full"
+                  >
+                    <RepoCard repo={repo} index={idx} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+
+            <div className="flex justify-center mt-10">
+              <a 
+                href="https://roshhellwett.github.io/zenithpages/" 
+                target="_blank" 
+                rel="noreferrer"
+                className="group flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-all text-xs font-bold shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer"
+              >
+                Explore More Registry Projects
+                <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <Divider />
+
+        {/* Section 3: Capability & Technology Spectrum */}
+        <section id="stack" className="py-12 scroll-mt-28">
+          <SectionHeading 
+            eyebrow="Capability Hub"
             title="Technology Spectrum"
-            subtitle="What we build with — not a buzzword cloud."
+            subtitle="The core languages, runtimes, development frameworks, and database engines behind our builds."
           />
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={stagger}
-            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-            {STACK.map((g, i) => (
-              <motion.div key={g.category} variants={fadeUp} transition={{ ...springT, delay: i * 0.05 }}
-                className="grain relative rounded-xl border border-slate-200/50 ring-1 ring-slate-100/80 bg-white/70 backdrop-blur-lg p-4 overflow-hidden shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)] hover:shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_4px_12px_-6px_rgba(15,23,42,0.06)] hover:-translate-y-px transition-all duration-300">
-                <div className="pointer-events-none absolute -top-12 -right-12 w-32 h-32 rounded-full blur-[40px] bg-slate-200/40" />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/50 to-transparent" />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {STACK.map((group, idx) => (
+              <AnimatedBentoTile key={group.category} className="flex flex-col justify-between p-6 bg-slate-950/60" delay={idx * 0.05}>
                 <div className="relative flex flex-col h-full">
-                  <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/80 border border-slate-200/50 text-slate-600 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)] w-fit">
-                    {g.icon}
-                    <span className="text-[8px] font-bold tracking-[0.15em] uppercase">{g.category}</span>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-white/60 w-fit mb-4">
+                    <span className="text-accent-1">{group.icon}</span>
+                    <span className="text-[9px] font-semibold tracking-[0.15em] uppercase">{group.category}</span>
                   </div>
-                  <p className="mt-3 text-[11px] text-slate-500 leading-relaxed">{g.concept}</p>
-                  <div className="mt-auto pt-3 flex flex-wrap gap-1">
-                    {g.items.map((item) => (
-                      <span key={item}
-                        className="px-2 py-0.5 rounded-md bg-white/80 border border-slate-200/40 text-[8px] font-bold text-slate-500 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)] hover:bg-white transition-colors duration-200">
+                  
+                  <p className="text-xs text-white/45 leading-relaxed mb-6 font-medium">
+                    {group.concept}
+                  </p>
+                  
+                  <div className="mt-auto pt-4 border-t border-white/[0.05] flex flex-wrap gap-1.5">
+                    {group.items.map((item) => (
+                      <span 
+                        key={item}
+                        className="px-2.5 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.06] text-[9px] font-semibold text-white/40 hover:text-white hover:border-white/[0.12] hover:bg-white/[0.06] transition-colors duration-200"
+                      >
                         {item}
                       </span>
                     ))}
                   </div>
                 </div>
-              </motion.div>
+              </AnimatedBentoTile>
             ))}
-          </motion.div>
+          </div>
         </section>
 
+        <Divider />
 
-
-        <section id="founder" className="mobile-container py-8 sm:py-10 md:py-14">
-          <SectionHeading
-            eyebrow="Behind Zenith"
-            title="The Founder"
-            subtitle="Independently maintained. Here's the human behind the commits."
+        {/* Section 4: The Founder & Bio Dashboard */}
+        <section id="founder" className="py-12 scroll-mt-28">
+          <SectionHeading 
+            eyebrow="Core Developer"
+            title="Behind Zenith"
+            subtitle="Designed, built, and maintained independently. Here is the human writing the commits."
           />
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={stagger}>
-            <motion.div variants={fadeUp}>
-              <Panel className="p-3 sm:p-4 md:p-6 rounded-2xl">
-                <CommitHeatmap />
-                <div className="mt-5 grid lg:grid-cols-[1.1fr_1fr] gap-5 lg:gap-8 items-start">
-                  <div className="flex flex-col">
-                    <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Roshan Kr Singh</h3>
-                    <div className="mt-1 text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400">@roshhellwett · Founder</div>
-                    <p className="mt-3 text-sm text-slate-500 leading-relaxed">
-                      Independent developer, Google Dev member, and open source maintainer based in India.
-                      I build systems I wish existed — for students, for democracy, for the open web.
-                    </p>
-                    <blockquote className="mt-3 p-3 rounded-xl bg-slate-50/80 border border-slate-200/40 text-slate-500 text-xs italic leading-relaxed shadow-[inset_0_0.5px_0_rgba(255,255,255,0.6)]">
-                      &ldquo;Open Source is the first step of development.&rdquo;
-                    </blockquote>
+
+          <Panel className="p-6 sm:p-8 md:p-10 rounded-3xl">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-8 items-start">
+              
+              <div className="flex flex-col">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-1 via-accent-2 to-accent-3 flex items-center justify-center border border-slate-700 shadow-inner">
+                    <BrandMark size={32} rounded="rounded-xl" />
                   </div>
-
-                  <div className="flex flex-col gap-4">
-                    <div className="grid grid-cols-2 gap-2">
-                      <a href="https://g.dev/roshhellwett" target="_blank" rel="noreferrer"
-                        className="group flex items-center gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/50 hover:bg-slate-50/80 hover:-translate-y-px transition-all duration-300 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)] hover:shadow-[0_3px_10px_-4px_rgba(15,23,42,0.08)]">
-                        <span className="p-1.5 rounded-md bg-white/80 text-slate-500 border border-slate-200/50"><Globe size={11} /></span>
-                        <span className="text-[10px] font-bold text-slate-700">Google Dev</span>
-                        <ArrowUpRight size={10} className="ml-auto text-slate-400 group-hover:text-slate-700 transition-colors" />
-                      </a>
-                      <a href="https://github.com/roshhellwett" target="_blank" rel="noreferrer"
-                        className="group flex items-center gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/50 hover:bg-slate-50/80 hover:-translate-y-px transition-all duration-300 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)] hover:shadow-[0_3px_10px_-4px_rgba(15,23,42,0.08)]">
-                        <span className="p-1.5 rounded-md bg-slate-900 text-white border border-slate-800"><Github size={11} /></span>
-                        <span className="text-[10px] font-bold text-slate-700">GitHub</span>
-                        <ArrowUpRight size={10} className="ml-auto text-slate-400 group-hover:text-slate-700 transition-colors" />
-                      </a>
-                    </div>
-
-                    <div className="pt-3 border-t border-slate-200/30">
-                      <div className="text-[8px] font-bold tracking-[0.25em] uppercase text-slate-400 mb-2">Vertices</div>
-                      <div className="grid grid-cols-2 gap-1.5">
-                        {SOCIALS.map((s) => (
-                          <a key={s.label} href={s.link} target="_blank" rel="noreferrer" aria-label={s.label}
-                            className="group flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-white/80 border border-slate-200/40 hover:bg-slate-50/80 hover:-translate-y-px transition-all duration-300 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)]">
-                            <span className="text-slate-400">{s.icon}</span>
-                            <span className="text-[9px] font-bold text-slate-500 group-hover:text-slate-900 truncate transition-colors duration-200">{s.label}</span>
-                          </a>
-                        ))}
-                      </div>
-                    </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white tracking-tight">Roshan Kr Singh</h3>
+                    <div className="mt-0.5 text-[9px] font-bold tracking-[0.2em] uppercase text-accent-1">@roshhellwett · Founder</div>
                   </div>
                 </div>
-              </Panel>
-            </motion.div>
-          </motion.div>
-        </section>
 
+                <p className="text-sm sm:text-base text-white/50 leading-relaxed font-medium mb-6">
+                  Independent developer, systems engineer, and Google Dev member based in India. I develop micro-utilities, civic projects, and bot systems designed to optimize academic and local workloads in real time.
+                </p>
 
+                <blockquote className="p-4 rounded-2xl liquid-glass text-white/50 text-xs sm:text-sm italic leading-relaxed">
+                  &ldquo;Open Source is the first step of development. Build public tools, verified lines, and transparent frameworks to empower the next generation.&rdquo;
+                </blockquote>
+              </div>
 
-        <section className="mobile-container py-8 sm:py-10 md:py-14">
-          <motion.div initial={{ opacity: 0, y: 20, filter: "blur(4px)" }} whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} viewport={{ once: true, amount: 0.3 }} transition={springT}
-            className="grain relative overflow-hidden rounded-2xl border border-slate-200/50 ring-1 ring-slate-100/80 bg-gradient-to-br from-orange-50/60 via-white/70 to-emerald-50/60 backdrop-blur-lg p-5 sm:p-7 md:p-10 text-center shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-200/40 to-transparent" />
-            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[400px] h-[200px] rounded-full bg-amber-100/30 blur-[80px]" />
-            <BharatWave />
-            <div className="relative flex justify-center mb-4">
-              <Pill><Flag size={8} /> Bharat First</Pill>
+              <div className="flex flex-col gap-5 lg:pl-6 lg:border-l border-white/[0.06]">
+                <div className="text-[10px] font-semibold tracking-[0.25em] uppercase text-white/30">Developer Vertices</div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <a href="https://g.dev/roshhellwett" target="_blank" rel="noreferrer"
+                    className="group flex items-center gap-2.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:-translate-y-0.5 hover:border-white/[0.12] transition-all duration-300">
+                    <span className="p-1.5 rounded-lg bg-white/[0.04] text-white/40 group-hover:text-accent-1 border border-white/[0.06]"><Globe size={12} /></span>
+                    <span className="text-[10px] font-semibold text-white/60 group-hover:text-white">Google Dev</span>
+                    <ArrowUpRight size={10} className="ml-auto text-white/25 group-hover:text-white transition-colors" />
+                  </a>
+                  <a href="https://github.com/roshhellwett" target="_blank" rel="noreferrer"
+                    className="group flex items-center gap-2.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:-translate-y-0.5 hover:border-white/[0.12] transition-all duration-300">
+                    <span className="p-1.5 rounded-lg bg-white/[0.04] text-white/40 group-hover:text-white border border-white/[0.06]"><Github size={12} /></span>
+                    <span className="text-[10px] font-semibold text-white/60 group-hover:text-white">GitHub</span>
+                    <ArrowUpRight size={10} className="ml-auto text-white/25 group-hover:text-white transition-colors" />
+                  </a>
+                </div>
+
+                <div className="pt-4 border-t border-white/[0.06]">
+                  <div className="text-[8px] font-semibold tracking-[0.2em] uppercase text-white/25 mb-3">Other Profiles</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {SOCIALS.slice(0, 6).map((s) => (
+                      <a key={s.label} href={s.link} target="_blank" rel="noreferrer" aria-label={s.label}
+                        className="group flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.10] hover:-translate-y-px transition-all duration-300">
+                        <span className="text-white/30 group-hover:text-white transition-colors">{s.icon}</span>
+                        <span className="text-[10px] font-semibold text-white/40 group-hover:text-white/80 truncate transition-colors duration-200">{s.label}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
             </div>
-            <h3 className="relative font-black tracking-tight text-slate-900 mx-auto leading-tight"
-              style={{ fontSize: "clamp(1rem, 3.5vw, 2.5rem)" }}>
-              Code as contribution. Code as{" "}
-              <span className="bg-gradient-to-r from-orange-500 via-slate-700 to-emerald-600 bg-clip-text text-transparent">citizenship.</span>
-            </h3>
-            <p className="relative mt-3 text-xs md:text-sm text-slate-500/90 max-w-md mx-auto leading-relaxed">
-              Every commit under Zenith is a contribution toward a
-              transparent, self-reliant digital India — open standards, open code, open opportunity.
-            </p>
-            <motion.div initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, ...springT }}
-              className="relative mt-5 flex flex-wrap justify-center gap-2">
-              <a href="https://roshhellwett.github.io/zenithpages/" target="_blank" rel="noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.06),0_2px_8px_-3px_rgba(15,23,42,0.2)]">
-                <Layers size={12} /> Explore All Tools <ArrowUpRight size={11} />
-              </a>
-              <a href="https://github.com/roshhellwett?tab=repositories" target="_blank" rel="noreferrer"
-                className="touch-target inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/90 border border-slate-200/50 text-slate-700 font-bold text-xs hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)]">
-                <Github size={12} /> View on GitHub <ArrowUpRight size={11} />
-              </a>
-            </motion.div>
-          </motion.div>
+          </Panel>
         </section>
+
       </main>
 
-      <footer className="relative z-10 border-t border-slate-200/30 mt-4 bg-white/50 backdrop-blur-lg">
-        <div className="mobile-container py-6 sm:py-8 md:py-10">
-          <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_1fr] gap-6 md:gap-4">
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
+      {/* Premium Detailed Footer */}
+      <footer className="relative z-10 border-t border-white/[0.06] bg-[#030712]/80 backdrop-blur-xl mt-12">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-12 md:py-16">
+          <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_1fr] gap-8 md:gap-4">
+            
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2.5">
                 <BrandMark size={28} rounded="rounded-lg" />
                 <div>
-                  <div className="text-[10px] font-black tracking-tight text-slate-900">Zenith Open Source</div>
-                  <div className="text-[7px] font-bold tracking-[0.15em] uppercase text-slate-400">by Roshan Kr Singh</div>
+                  <div className="text-xs font-black tracking-tight text-white">Zenith Open Source</div>
+                  <div className="text-[8px] font-semibold tracking-[0.2em] uppercase text-white/30">by Roshan Kr Singh</div>
                 </div>
               </div>
-              <p className="text-[10px] text-slate-400 leading-relaxed max-w-xs">
-                Premium, transparent open source — for developers, students, and the nation.
+              <p className="text-xs text-white/40 leading-relaxed max-w-xs">
+                Designing transparent software, low‑level systems interfaces, and automation infrastructure. Designed in India.
               </p>
+              <div className="flex items-center gap-1.5 mt-2">
+                {SOCIALS.slice(0, 6).map((s) => (
+                  <a key={s.label} href={s.link} target="_blank" rel="noreferrer" aria-label={s.label}
+                    className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] text-white/35 hover:text-white hover:-translate-y-px transition-all duration-200">
+                    {s.icon}
+                  </a>
+                ))}
+              </div>
             </div>
+
             <div>
-              <div className="text-[7px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-2">Navigate</div>
-              <div className="flex flex-col gap-1">
-                {NAV_LINKS.map((l) => (
-                  <a key={l.href} href={l.href} className="text-[10px] font-bold text-slate-500 hover:text-slate-900 transition-colors duration-200 py-0.5 w-fit">{l.label}</a>
+              <div className="text-[9px] font-semibold tracking-[0.22em] uppercase text-white/25 mb-3.5">Navigation</div>
+              <div className="flex flex-col gap-2">
+                <a href="#mission" className="text-xs font-semibold text-white/40 hover:text-white transition-colors duration-200 w-fit">Mission</a>
+                <a href="#telemetry" className="text-xs font-semibold text-white/40 hover:text-white transition-colors duration-200 w-fit">Telemetry</a>
+                <a href="#projects" className="text-xs font-semibold text-white/40 hover:text-white transition-colors duration-200 w-fit">Projects</a>
+                <a href="#stack" className="text-xs font-semibold text-white/40 hover:text-white transition-colors duration-200 w-fit">Tech Stack</a>
+                <a href="#founder" className="text-xs font-semibold text-white/40 hover:text-white transition-colors duration-200 w-fit">Founder bio</a>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-[9px] font-semibold tracking-[0.22em] uppercase text-white/25 mb-3.5">Community</div>
+              <div className="flex flex-col gap-2">
+                {SOCIALS.slice(0, 4).map((s) => (
+                  <a key={s.label} href={s.link} target="_blank" rel="noreferrer" className="text-xs font-semibold text-white/40 hover:text-white transition-colors duration-200 w-fit">{s.label}</a>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-[9px] font-semibold tracking-[0.22em] uppercase text-white/25 mb-3.5">Other Hubs</div>
+              <div className="flex flex-col gap-2">
+                {SOCIALS.slice(4).map((s) => (
+                  <a key={s.label} href={s.link} target="_blank" rel="noreferrer" className="text-xs font-semibold text-white/40 hover:text-white transition-colors duration-200 w-fit">{s.label}</a>
                 ))}
                 <a href="https://roshhellwett.github.io/zenithpages/" target="_blank" rel="noreferrer"
-                  className="text-[10px] font-bold text-slate-500 hover:text-slate-900 transition-colors duration-200 py-0.5 w-fit flex items-center gap-0.5">
-                  Tools Registry <ArrowUpRight size={8} />
+                  className="text-xs font-semibold text-accent-1 hover:text-white transition-colors duration-200 w-fit flex items-center gap-0.5">
+                  Registry Pages <ArrowUpRight size={10} />
                 </a>
               </div>
             </div>
-            <div>
-              <div className="text-[7px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-2">Community</div>
-              <div className="flex flex-col gap-1">
-                {SOCIALS.slice(0, 4).map((s) => (
-                  <a key={s.label} href={s.link} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-slate-500 hover:text-slate-900 transition-colors py-0.5 w-fit">{s.label}</a>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div className="text-[7px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-2">More</div>
-              <div className="flex flex-col gap-1">
-                {SOCIALS.slice(4).map((s) => (
-                  <a key={s.label} href={s.link} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-slate-500 hover:text-slate-900 transition-colors py-0.5 w-fit">{s.label}</a>
-                ))}
-              </div>
-            </div>
+
           </div>
-          <div className="mt-6 pt-4 border-t border-slate-200/30 flex flex-wrap items-center gap-1">
-            {SOCIALS.slice(0, 6).map((s) => (
-              <a key={s.label} href={s.link} target="_blank" rel="noreferrer" aria-label={s.label}
-                className="p-2 rounded-md bg-white/80 border border-slate-200/40 hover:bg-slate-50/80 text-slate-400 hover:-translate-y-px transition-all duration-200 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)]">
-                {s.icon}
-              </a>
-            ))}
-          </div>
-          <div className="mt-4 pt-4 border-t border-slate-200/30 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p className="text-[7px] font-bold tracking-[0.12em] uppercase text-slate-400">&copy; {new Date().getFullYear()} Zenith Open Source · MIT</p>
-            <p className="text-[7px] font-bold tracking-[0.12em] uppercase text-slate-400">Built with <span className="text-slate-500">Claude</span> & <span className="text-slate-500">Gemini</span></p>
-            <p className="text-[7px] font-medium text-slate-400">Next.js · Tailwind · Framer Motion</p>
+
+          <div className="mt-12 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-[9px] font-semibold tracking-[0.15em] uppercase text-white/25">&copy; {new Date().getFullYear()} Zenith Open Source · MIT License</p>
+            <p className="text-[9px] font-medium text-white/30 flex items-center gap-1">
+              Next.js · Tailwind · Framer Motion · Lucide
+            </p>
           </div>
         </div>
       </footer>
 
+      {/* Back to Top Navigation */}
       <AnimatePresence>
         {showBackToTop && (
-          <motion.button initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}
+          <motion.button 
+            initial={{ opacity: 0, scale: 0.8 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            exit={{ opacity: 0, scale: 0.8 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            onClick={scrollToTop} type="button" aria-label="Back to top"
-            className="fixed bottom-4 right-4 z-50 p-2 rounded-xl bg-slate-900 text-white shadow-[0_4px_16px_-4px_rgba(15,23,42,0.25),inset_0_0.5px_0_rgba(255,255,255,0.06)] hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all duration-200">
-            <ChevronUp size={14} />
+            onClick={scrollToTop} 
+            type="button" 
+            aria-label="Back to top"
+            className="fixed bottom-6 right-6 z-50 p-3 rounded-2xl bg-slate-900 text-white shadow-[0_4px_24px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)] border border-slate-800 hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all duration-200"
+          >
+            <ChevronUp size={16} />
           </motion.button>
         )}
       </AnimatePresence>

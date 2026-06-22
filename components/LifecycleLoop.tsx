@@ -1,63 +1,44 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { spring } from "@/lib/animations";
+import React from "react";
 
 export function LifecycleLoop() {
-  const stages = [
-    { label: "Build", angle: -90, accent: "amber" },
-    { label: "Ship", angle: 0, accent: "emerald" },
-    { label: "Open", angle: 90, accent: "sky" },
-    { label: "Iterate", angle: 180, accent: "rose" },
+  const codeLines = [
+    { num: "01", content: <><span className="text-pink-500">import</span> {"{"} <span className="text-sky-400">Zenith</span> {"}"} <span className="text-pink-500">from</span> <span className="text-emerald-400">{"\"@zenith/core\""}</span>;</> },
+    { num: "02", content: <>&nbsp;</> },
+    { num: "03", content: <><span className="text-pink-500">export default</span> <span className="text-sky-400">Zenith</span>.<span className="text-teal-400">configure</span>({"{"}</> },
+    { num: "04", content: <>&nbsp;&nbsp;engine: <span className="text-emerald-400">{"\"v2.4-IN\""}</span>,</> },
+    { num: "05", content: <>&nbsp;&nbsp;threads: <span className="text-violet-400">8</span>,</> },
+    { num: "06", content: <>&nbsp;&nbsp;metrics: [<span className="text-emerald-400">{"\"git\""}</span>, <span className="text-emerald-400">{"\"cli\""}</span>],</> },
+    { num: "07", content: <>&nbsp;</> },
+    { num: "08", content: <>&nbsp;&nbsp;<span className="text-pink-500">async</span> <span className="text-teal-400">onTick</span>(ctx) {"{"}</> },
+    { num: "09", content: <>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-pink-500">const</span> logs = <span className="text-pink-500">await</span> ctx.<span className="text-teal-400">fetch</span>();</> },
+    { num: "10", content: <>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-pink-500">return</span> ctx.<span className="text-teal-400">broadcast</span>(logs);</> },
+    { num: "11", content: <>&nbsp;&nbsp;{"}"}</> },
+    { num: "12", content: <>{"});"}</> }
   ];
 
-  const polar = (angle: number, r: number) => ({
-    x: 50 + r * Math.cos((angle * Math.PI) / 180),
-    y: 50 + r * Math.sin((angle * Math.PI) / 180),
-  });
-
   return (
-    <div className="relative aspect-square w-full max-w-[220px] sm:max-w-[260px] md:max-w-[300px] mx-auto p-2">
-      <svg viewBox="0 0 100 100" className="w-full h-full">
-        <defs>
-          <radialGradient id="loopGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgb(255,255,255)" />
-            <stop offset="100%" stopColor="rgb(248,250,252)" />
-          </radialGradient>
-        </defs>
-        <circle cx="50" cy="50" r="40" fill="url(#loopGlow)" />
-        <circle cx="50" cy="50" r="40" fill="none" stroke="rgb(15,23,42)" strokeOpacity="0.06" strokeWidth="0.3" />
-        <circle cx="50" cy="50" r="34" fill="none" stroke="rgb(15,23,42)" strokeOpacity="0.12" strokeWidth="0.3" strokeDasharray="0.6 1" />
-        <circle cx="50" cy="50" r="12" fill="white" stroke="rgb(15,23,42)" strokeOpacity="0.08" strokeWidth="0.25" />
+    <div className="w-full max-w-[280px] sm:max-w-[320px] mx-auto bg-[#02040a] rounded-xl border border-slate-900 overflow-hidden font-mono shadow-2xl relative select-none">
+      {/* IDE Editor Header */}
+      <div className="flex items-center justify-between px-4 py-2 bg-slate-950/60 border-b border-slate-900/80">
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-rose-500/70" />
+          <div className="w-2 h-2 rounded-full bg-amber-500/70" />
+          <div className="w-2 h-2 rounded-full bg-emerald-500/70" />
+        </div>
+        <span className="text-[9px] text-slate-500 font-bold tracking-wider">config.ts</span>
+        <div className="w-8" />
+      </div>
 
-        <circle cx="50" cy="16" r="1.2" fill="rgb(245,158,11)" />
-        <circle cx="50" cy="16" r="2.2" fill="rgb(245,158,11)" fillOpacity="0.2" />
-
-        {stages.map((s, i) => {
-          const p = polar(s.angle, 34);
-          return (
-            <motion.circle key={s.label} cx={p.x} cy={p.y} r="3" fill="white" stroke="rgb(15,23,42)" strokeOpacity="0.2" strokeWidth="0.3"
-              initial={{ scale: 0, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} viewport={{ once: true }}
-              transition={{ delay: i * 0.1, ...spring }} style={{ transformOrigin: `${p.x}px ${p.y}px` }} />
-          );
-        })}
-      </svg>
-
-      {stages.map((s) => {
-        const p = polar(s.angle, 37);
-        return (
-          <div key={`label-${s.label}`} className="absolute" style={{ left: `${p.x}%`, top: `${p.y}%`, transform: "translate(-50%, -50%)" }}>
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white/90 border border-slate-200/50 text-slate-600 text-[7px] sm:text-[8px] font-bold tracking-[0.12em] uppercase shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)] whitespace-nowrap">
-              <span className="w-0.5 h-0.5 rounded-full bg-slate-400/50" />
-              {s.label}
-            </span>
+      {/* Editor Body */}
+      <div className="p-3 text-[10px] sm:text-[11px] leading-relaxed text-slate-300 overflow-x-auto">
+        {codeLines.map((line) => (
+          <div key={line.num} className="flex items-start">
+            <span className="w-5 shrink-0 text-right pr-2 text-slate-600 select-none">{line.num}</span>
+            <code className="text-slate-300 font-medium whitespace-nowrap">{line.content}</code>
           </div>
-        );
-      })}
-
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <div className="text-[6px] sm:text-[7px] font-bold tracking-[0.3em] uppercase text-slate-400">Open Source</div>
-        <div className="text-[10px] sm:text-xs font-bold tracking-tight text-slate-800">Lifecycle</div>
+        ))}
       </div>
     </div>
   );

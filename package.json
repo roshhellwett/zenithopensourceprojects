@@ -1,7 +1,14 @@
 {
-  "name": "portfolio",
+  "name": "zenithopensourceprojects",
   "version": "0.1.0",
   "private": true,
+  "description": "Portfolio and registry showcase for Zenith Open Source Projects - designed in India and built for the global developer ecosystem.",
+  "author": "Roshan Kr Singh <roshhellwett>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roshhellwett/zenithopensourceprojects.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -39,15 +39,15 @@ export function DashField() {
       const cRoll = (r2 + r5) / 2;
       let color: string;
       if (focalIdx === 0) {
-        if (cRoll < 0.55) color = "rgba(234,88,12,0.95)";
-        else if (cRoll < 0.78) color = "rgba(245,158,11,0.85)";
-        else if (cRoll < 0.92) color = "rgba(15,23,42,0.55)";
-        else color = "rgba(5,150,105,0.7)";
+        if (cRoll < 0.55) color = "rgba(56,189,248,0.8)"; // sky-400
+        else if (cRoll < 0.78) color = "rgba(129,140,248,0.6)"; // indigo-400
+        else if (cRoll < 0.92) color = "rgba(30,41,59,0.5)"; // slate-800
+        else color = "rgba(45,212,191,0.6)"; // teal-400
       } else {
-        if (cRoll < 0.55) color = "rgba(5,150,105,0.95)";
-        else if (cRoll < 0.78) color = "rgba(16,185,129,0.85)";
-        else if (cRoll < 0.92) color = "rgba(15,23,42,0.55)";
-        else color = "rgba(234,88,12,0.7)";
+        if (cRoll < 0.55) color = "rgba(45,212,191,0.8)"; // teal-400
+        else if (cRoll < 0.78) color = "rgba(56,189,248,0.6)"; // sky-400
+        else if (cRoll < 0.92) color = "rgba(30,41,59,0.5)"; // slate-800
+        else color = "rgba(129,140,248,0.6)"; // indigo-400
       }
 
       arr.push({ x, y, angle: dashAngle, length, color });
@@ -68,8 +68,8 @@ export function DashField() {
           const dy = Math.round(((Math.sin(rad) * d.length) / 2) * 10000) / 10000;
           return (
             <line key={i} x1={d.x - dx} y1={d.y - dy} x2={d.x + dx} y2={d.y + dy}
-              stroke={d.color} strokeWidth={1.2} strokeLinecap="round" vectorEffect="non-scaling-stroke"
-              style={{ opacity: 0.5 }} />
+              stroke={d.color} strokeWidth={0.8} strokeLinecap="round" vectorEffect="non-scaling-stroke"
+              style={{ opacity: 0.4 }} />
           );
         })}
       </svg>

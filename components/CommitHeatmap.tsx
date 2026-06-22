@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion } from "framer-motion";
-import { Zap } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function CommitHeatmap() {
   const seed = (i: number) => ((i * 9301 + 49297) % 233280) / 233280;
@@ -21,35 +20,37 @@ export function CommitHeatmap() {
     return { level, commits };
   });
 
-  const levelClass = ["bg-slate-100", "bg-emerald-200", "bg-emerald-300", "bg-emerald-400", "bg-emerald-600"];
+  const levelClass = [
+    "bg-slate-900/60 border border-slate-800/80",
+    "bg-accent-3/20 border border-accent-3/20",
+    "bg-accent-3/50 border border-accent-3/40",
+    "bg-accent-3/80 shadow-[0_0_8px_rgba(45,212,191,0.4)]",
+    "bg-accent-3 shadow-[0_0_15px_rgba(45,212,191,0.8)]"
+  ];
 
   const [tooltip, setTooltip] = useState<{ index: number; x: number; y: number } | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
+  // Stripped outer container to integrate seamlessly into Bento Tile
   return (
-    <div className="grain relative overflow-hidden rounded-xl border border-slate-200/50 ring-1 ring-slate-100/80 bg-white/70 backdrop-blur-lg backdrop-saturate-150 p-2.5 sm:p-3 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
-      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between mb-2">
-        <div className="flex items-center gap-1.5">
-          <span className="p-1 rounded-md bg-white/80 border border-slate-200/50 text-slate-400 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.8)]">
-            <Zap size={9} />
-          </span>
-          <span className="text-[8px] font-bold tracking-[0.15em] uppercase text-slate-400">
-            Commit Cadence · Last 26 weeks
-          </span>
-        </div>
-        <span className="text-[7px] font-bold tracking-[0.12em] uppercase text-slate-400">
-          Less <span className="inline-flex gap-[1.5px] mx-1 align-middle">
+    <div className="relative w-full h-full flex flex-col justify-center">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-slate-500">
+          Last 26 weeks
+        </span>
+        <span className="text-[8px] font-bold tracking-[0.15em] uppercase text-slate-600 flex items-center">
+          L <span className="inline-flex gap-[3px] mx-2 align-middle">
             {[0, 1, 2, 3, 4].map((l) => (
-              <span key={l} className={`w-[4px] h-[4px] rounded-[1px] ${levelClass[l]}`} />
+              <span key={l} className={`w-[8px] h-[8px] rounded-sm ${levelClass[l]}`} />
             ))}
-          </span> More
+          </span> M
         </span>
       </div>
 
       <div className="relative">
         <div
           ref={gridRef}
-          className="grid gap-[1.5px]"
+          className="grid gap-1 md:gap-[5px]"
           style={{
             gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
             gridAutoFlow: "column",
@@ -59,11 +60,11 @@ export function CommitHeatmap() {
           {cells.map((c, i) => (
             <motion.span
               key={i}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, scale: 0.5 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.15, delay: (i / cells.length) * 0.3 }}
-              className={`aspect-square rounded-[2px] cursor-default transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.8] hover:z-10 ${levelClass[c.level]}`}
+              transition={{ duration: 0.2, delay: (i / cells.length) * 0.4 }}
+              className={`aspect-square rounded-[3px] cursor-default transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.8] hover:z-10 hover:shadow-[0_0_20px_rgba(45,212,191,1)] ${levelClass[c.level]}`}
               onMouseEnter={(e) => {
                 const rect = (e.target as HTMLElement).getBoundingClientRect();
                 const parent = gridRef.current?.getBoundingClientRect();
@@ -71,7 +72,7 @@ export function CommitHeatmap() {
                   setTooltip({
                     index: i,
                     x: rect.left - parent.left + rect.width / 2,
-                    y: rect.top - parent.top - 3,
+                    y: rect.top - parent.top - 8,
                   });
                 }
               }}
@@ -80,15 +81,21 @@ export function CommitHeatmap() {
           ))}
         </div>
 
-        {tooltip !== null && (
-          <div
-            className="absolute pointer-events-none z-20 px-2 py-1 rounded-md bg-slate-900 text-white text-[8px] font-bold tracking-wide shadow-[0_2px_8px_-2px_rgba(15,23,42,0.4)] whitespace-nowrap -translate-x-1/2 -translate-y-full"
-            style={{ left: tooltip.x, top: tooltip.y }}
-          >
-            {cells[tooltip.index].commits} commits
-            <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-[3px] border-r-[3px] border-t-[3px] border-transparent border-t-slate-900" />
-          </div>
-        )}
+        <AnimatePresence>
+          {tooltip !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 6, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.15 }}
+              className="absolute pointer-events-none z-20 px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-white text-[10px] font-black tracking-widest uppercase shadow-[0_10px_20px_-5px_rgba(0,0,0,0.8)] whitespace-nowrap -translate-x-1/2 -translate-y-full"
+              style={{ left: tooltip.x, top: tooltip.y }}
+            >
+              <span className="text-accent-3">{cells[tooltip.index].commits}</span> commits
+              <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-transparent border-t-slate-800" />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

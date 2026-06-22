@@ -2,7 +2,7 @@ export function BrandMark({ size = 36, rounded = "rounded-2xl" }: { size?: numbe
   const s = (n: number) => Math.round((n / 36) * size);
   return (
     <div
-      className={`relative ${rounded} bg-slate-900 flex items-center justify-center overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.3)] ring-1 ring-slate-700/40`}
+      className={`relative ${rounded} bg-slate-950 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(56,189,248,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.5)] ring-1 ring-slate-800/80 group-hover:ring-accent-1/50 transition-all duration-300`}
       style={{ width: size, height: size }}
     >
       <svg
