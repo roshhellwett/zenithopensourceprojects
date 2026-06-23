@@ -165,10 +165,20 @@ export default function Page() {
   }, [reposList, activeCategory]);
 
   useEffect(() => {
-    const handleScroll = () => setShowBackToTop(window.scrollY > 400);
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+      if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+    };
+    const handleResize = () => {
+      if (window.innerWidth >= 640 && isMobileMenuOpen) setIsMobileMenuOpen(false);
+    };
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     (async () => {
@@ -207,32 +217,25 @@ export default function Page() {
     <div className="min-h-screen font-sans text-slate-100 selection:bg-accent-1 selection:text-slate-950 relative overflow-hidden" ref={containerRef}>
       <Background />
       
-      <motion.nav 
+      <nav
         ref={navSpotlight.ref}
         {...navSpotlight.bind}
-        layout
-        transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col overflow-hidden liquid-glass shadow-[0_8px_32px_rgba(0,0,0,0.6)] ${
-          isMobileMenuOpen 
-            ? "w-[calc(100vw-2rem)] max-w-[360px] p-4 rounded-[2rem]" 
-            : "w-[auto] p-1.5 rounded-full"
-        }`}
+        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center w-auto p-1.5 rounded-full liquid-glass shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
       >
         <div className="liquid-glass-shine" />
         <div className="liquid-glass-sheen" />
-        
+
         {navSpotlight.isHovered && (
           <>
-            <div 
+            <div
               className="pointer-events-none absolute inset-0 transition-opacity duration-500 opacity-100"
               style={{
                 background: `radial-gradient(120px circle at ${navSpotlight.x}px ${navSpotlight.y}px, rgba(56,189,248,0.08), transparent 80%)`,
               }}
             />
-            <div 
-              className="absolute inset-0 pointer-events-none z-10 border border-transparent transition-all duration-350"
+            <div
+              className="absolute inset-0 pointer-events-none z-10 border border-transparent rounded-full transition-all duration-350"
               style={{
-                borderRadius: isMobileMenuOpen ? "2rem" : "9999px",
                 borderColor: "transparent",
                 backgroundImage: `radial-gradient(100px circle at ${navSpotlight.x}px ${navSpotlight.y}px, rgba(56,189,248,0.25), transparent 70%)`,
                 WebkitMask: "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
@@ -243,20 +246,11 @@ export default function Page() {
           </>
         )}
 
-        <div className="flex items-center justify-between w-full gap-2 relative z-20">
+        <div className="flex items-center gap-2 relative z-20">
           <div className="flex items-center gap-1.5">
             <a href="#top" className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.08] hover:border-white/[0.15] transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
               <BrandMark size={16} rounded="rounded-full" />
             </a>
-            {isMobileMenuOpen && (
-              <motion.span 
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-[10px] font-black tracking-wider uppercase text-white/80 pl-1"
-              >
-                Zenith
-              </motion.span>
-            )}
           </div>
 
           <div className="hidden sm:flex items-center gap-0.5">
@@ -279,80 +273,99 @@ export default function Page() {
               </a>
             </div>
 
-            <button 
+            <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="sm:hidden w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.08] hover:bg-white/[0.10] text-white/70 hover:text-white transition-colors"
               aria-label="Toggle Navigation Menu"
             >
-              {isMobileMenuOpen ? <X size={15} /> : <Menu size={15} />}
+              <AnimatePresence mode="wait" initial={false}>
+                {isMobileMenuOpen ? (
+                  <motion.span key="close" initial={{ opacity: 0, rotate: -90, scale: 0.6 }} animate={{ opacity: 1, rotate: 0, scale: 1 }} exit={{ opacity: 0, rotate: 90, scale: 0.6 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}>
+                    <X size={15} />
+                  </motion.span>
+                ) : (
+                  <motion.span key="menu" initial={{ opacity: 0, rotate: 90, scale: 0.6 }} animate={{ opacity: 1, rotate: 0, scale: 1 }} exit={{ opacity: 0, rotate: -90, scale: 0.6 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}>
+                    <Menu size={15} />
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
           </div>
         </div>
+      </nav>
 
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div 
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="sm:hidden flex flex-col gap-2 mt-4 pt-4 border-t border-white/[0.06] w-full relative z-20"
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm sm:hidden"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -12, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.8 }}
+              className="fixed top-[4.5rem] left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-2rem)] max-w-[340px] rounded-[1.75rem] liquid-glass shadow-[0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden sm:hidden"
             >
-              <a 
-                href="#mission" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-xs font-semibold text-white/60 hover:text-white transition-all"
-              >
-                <span>Mission</span>
-                <ArrowUpRight size={12} className="text-white/20" />
-              </a>
-              <a 
-                href="#telemetry" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-xs font-semibold text-white/60 hover:text-white transition-all"
-              >
-                <span>Telemetry</span>
-                <ArrowUpRight size={12} className="text-white/20" />
-              </a>
-              <a 
-                href="#projects" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-xs font-semibold text-white/60 hover:text-white transition-all"
-              >
-                <span>Projects</span>
-                <ArrowUpRight size={12} className="text-white/20" />
-              </a>
-              <a 
-                href="#stack" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-xs font-semibold text-white/60 hover:text-white transition-all"
-              >
-                <span>Stack</span>
-                <ArrowUpRight size={12} className="text-white/20" />
-              </a>
-              <a 
-                href="#founder" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-xs font-semibold text-white/60 hover:text-white transition-all"
-              >
-                <span>Founder</span>
-                <ArrowUpRight size={12} className="text-white/20" />
-              </a>
+              <div className="liquid-glass-shine" />
+              <div className="p-5 flex flex-col gap-1">
+                {[
+                  { label: "Mission", href: "#mission" },
+                  { label: "Telemetry", href: "#telemetry" },
+                  { label: "Projects", href: "#projects" },
+                  { label: "Stack", href: "#stack" },
+                  { label: "Founder", href: "#founder" },
+                ].map((item, i) => (
+                  <motion.a
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.04 * i, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-white/[0.05] active:bg-white/[0.08] text-[13px] font-semibold text-white/70 hover:text-white transition-colors"
+                  >
+                    <span>{item.label}</span>
+                    <ArrowUpRight size={13} className="text-white/20" />
+                  </motion.a>
+                ))}
 
-              <div className="h-px bg-white/[0.06] my-2" />
+                <div className="h-px bg-white/[0.06] my-2" />
 
-              <div className="grid grid-cols-2 gap-2">
-                <a href="https://github.com/roshhellwett" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-[10px] font-bold border border-white/[0.08] bg-white/[0.04] text-white/70 hover:text-white hover:bg-white/[0.08] transition-all">
-                  <Github size={12} /> Profile
-                </a>
-                <a href="https://roshhellwett.github.io/zenithpages/" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-[10px] font-bold bg-white text-slate-950 hover:bg-white/90 transition-all shadow-[0_0_24px_rgba(255,255,255,0.15)]">
-                  <Layers size={11} /> Registry
-                </a>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <motion.a
+                    href="https://github.com/roshhellwett"
+                    target="_blank"
+                    rel="noreferrer"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.22, duration: 0.3 }}
+                    className="flex items-center justify-center gap-2 px-3 py-3 rounded-2xl text-[11px] font-bold border border-white/[0.08] bg-white/[0.04] text-white/70 hover:text-white hover:bg-white/[0.08] active:scale-[0.97] transition-all"
+                  >
+                    <Github size={13} /> Profile
+                  </motion.a>
+                  <motion.a
+                    href="https://roshhellwett.github.io/zenithpages/"
+                    target="_blank"
+                    rel="noreferrer"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.26, duration: 0.3 }}
+                    className="flex items-center justify-center gap-2 px-3 py-3 rounded-2xl text-[11px] font-bold bg-white text-slate-950 hover:bg-white/90 active:scale-[0.97] transition-all shadow-[0_0_24px_rgba(255,255,255,0.12)]"
+                  >
+                    <Layers size={12} /> Registry
+                  </motion.a>
+                </div>
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.nav>
+          </>
+        )}
+      </AnimatePresence>
 
       <motion.div 
         style={{ scaleX: scrollYProgress }}
