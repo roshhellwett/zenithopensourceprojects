@@ -41,6 +41,7 @@
 
 /* ── Base Resets ── */
 html, body {
+  background-color: var(--color-dark-bg);
   font-family: var(--font-sans);
   letter-spacing: -0.025em;
   color: var(--color-dark-text);
