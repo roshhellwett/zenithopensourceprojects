@@ -17,7 +17,6 @@ export const LEFT_DESKTOP_ICONS: DesktopIconData[] = [
   { id: "docs", label: "Docs", icon: "docs", position: "left", action: "link", link: "https://github.com/roshhellwett/zenithopensourceprojects#readme" },
   { id: "talk", label: "Talk to founder", icon: "chat-bubble", position: "left", action: "open-tab", tabId: "founder" },
   { id: "ask-ai", label: "Ask a question", icon: "question", position: "left", action: "open-tab", tabId: "ask-ai" },
-  { id: "signup", label: "Sign up ↗", icon: "signup", position: "left", action: "link", link: "https://github.com/roshhellwett" },
   { id: "switch-mode", label: "Switch to\nwebsite mode", icon: "switch", position: "left", action: "toggle-mode" },
 ];
 

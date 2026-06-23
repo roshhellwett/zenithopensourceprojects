@@ -2,6 +2,67 @@ import React, { useState } from 'react';
 import { Send } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
 
+const parseMessage = (text: string) => {
+  if (!text) return null;
+  const lines = text.split('\n');
+  return lines.map((line, i) => {
+    const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = linkRegex.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(line.substring(lastIndex, match.index));
+      }
+      parts.push(
+        <a 
+          key={`${i}-${match.index}`} 
+          href={match[2]} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="inline-block px-3 py-1.5 mt-1 mr-2 bg-dark-surface hover:bg-amber-button text-dark-text hover:text-black border border-dark-border shadow-sm rounded-md text-[11px] font-bold tracking-wide transition-all active:scale-95 no-underline"
+        >
+          {match[1].replace('https://', '')}
+        </a>
+      );
+      lastIndex = linkRegex.lastIndex;
+    }
+
+    if (lastIndex < line.length) {
+      parts.push(line.substring(lastIndex));
+    }
+
+    const parsedParts = parts.map((part, pIdx) => {
+      if (typeof part === 'string') {
+        const boldRegex = /\*\*(.*?)\*\*/g;
+        const bParts = [];
+        let bLastIndex = 0;
+        let bMatch;
+        while ((bMatch = boldRegex.exec(part)) !== null) {
+          if (bMatch.index > bLastIndex) {
+            bParts.push(part.substring(bLastIndex, bMatch.index));
+          }
+          bParts.push(<strong key={`b-${pIdx}-${bMatch.index}`} className="font-bold text-dark-text">{bMatch[1]}</strong>);
+          bLastIndex = boldRegex.lastIndex;
+        }
+        if (bLastIndex < part.length) {
+          bParts.push(part.substring(bLastIndex));
+        }
+        return bParts;
+      }
+      return part;
+    });
+
+    return (
+      <React.Fragment key={i}>
+        {parsedParts}
+        {i !== lines.length - 1 && <br />}
+      </React.Fragment>
+    );
+  });
+};
+
 export default function MascotApp({ playRetroSound }: { playRetroSound: (type: any) => void }) {
   const [messages, setMessages] = useState<any[]>([
     {
@@ -87,7 +148,7 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: a
                     : "bg-cobalt/20 border-cobalt/30 text-dark-text rounded-tr-none"
                 }`}
               >
-                {m.content}
+                {parseMessage(m.content)}
                 <div className={`text-[9px] mt-1.5 font-mono ${isBot ? "text-dark-text-faint" : "text-cobalt/60"}`}>
                   {m.timestamp}
                 </div>
