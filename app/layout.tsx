@@ -32,9 +32,9 @@ const dancingScript = Dancing_Script({
 });
 
 export const metadata: Metadata = {
-  title: "Zenith Open Source Projects – Roshan Kr Singh (@roshhellwett)",
+  title: "Zenith – We make open source tools for civic engineers",
   description:
-    "Explore open source Telegram bots, Windows utilities, GRUB themes, audio pipelines, and logic simulators by Roshan Kr Singh (@roshhellwett). Built with one rule: be useful, be transparent, be free.",
+    "Explore open source civic-tech tools, AI news aggregators, transparent voting blueprints, Telegram bots, Windows utilities, and more by Roshan Kr Singh (@roshhellwett). Built with one rule: be useful, be transparent, be free.",
   keywords: [
     "roshhellwett",
     "roshan kr singh",
@@ -91,7 +91,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#030712",
+  themeColor: "#e1d7c2",
 };
 
 export default function RootLayout({
@@ -130,7 +130,6 @@ export default function RootLayout({
           }}
         />
         <StructuredData />
-        <a href="#top" className="skip-link">Skip to content</a>
         {children}
         <SpeedInsights />
       </body>

@@ -1,0 +1,27 @@
+{
+  "name": "zenith-ai-worker",
+  "version": "1.0.0",
+  "description": "Zenith AI backend worker — handles Groq/Llama chat requests for the Zenith frontend.",
+  "author": "Roshan Kr Singh <roshhellwett>",
+  "license": "MIT",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.17.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
