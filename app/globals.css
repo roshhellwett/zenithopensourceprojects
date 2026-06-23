@@ -218,6 +218,7 @@ img {
   transform: translateX(-100%) rotate(20deg);
   pointer-events: none;
   z-index: 2;
+  opacity: 0;
 }
 
 .group:hover .liquid-glass-sheen {

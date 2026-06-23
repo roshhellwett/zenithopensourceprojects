@@ -220,7 +220,7 @@ export default function Page() {
       <nav
         ref={navSpotlight.ref}
         {...navSpotlight.bind}
-        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center w-auto p-1.5 rounded-full liquid-glass shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
+        className="group fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center w-auto p-1.5 rounded-full overflow-hidden liquid-glass shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
       >
         <div className="liquid-glass-shine" />
         <div className="liquid-glass-sheen" />
