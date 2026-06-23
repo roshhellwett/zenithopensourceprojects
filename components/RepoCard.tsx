@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Flag, Sparkles, Bot, Terminal, Cpu, Workflow, FolderGit2, Star, ArrowUpRight } from "lucide-react";
 import { TrafficLights } from "@/components/TrafficLights";
 import { spring, fadeUp } from "@/lib/animations";
+import { useMouseSpotlight } from "@/lib/useMouseSpotlight";
 import type { Repo } from "@/types";
 
 const categoryIcon: Record<string, React.ReactNode> = {
@@ -17,23 +18,47 @@ const categoryIcon: Record<string, React.ReactNode> = {
 
 export function RepoCard({ repo, index }: { repo: Repo; index: number }) {
   const icon = categoryIcon[repo.category] ?? <FolderGit2 size={18} />;
+  const { ref, x, y, isHovered, bind } = useMouseSpotlight();
 
   return (
     <motion.a
+      ref={ref}
       href={repo.link}
       target="_blank"
       rel="noreferrer"
       variants={fadeUp}
       transition={{ ...spring, delay: index * 0.04 }}
       className="group block h-full"
+      {...bind}
       aria-label={`${repo.displayName} — ${repo.desc}. Built with ${repo.lang}. View on GitHub.`}
     >
-      <div className="grain relative h-full liquid-glass rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[0_12px_32px_-12px_rgba(0,0,0,0.5)] hover:border-white/[0.12] hover:shadow-[0_16px_40px_-12px_rgba(56,189,248,0.1)] hover:-translate-y-1">
+      <div className="grain relative flex flex-col h-full liquid-glass rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[0_12px_32px_-12px_rgba(0,0,0,0.5)] hover:border-white/[0.12] hover:shadow-[0_16px_40px_-12px_rgba(56,189,248,0.1)] hover:-translate-y-1">
         <div className="liquid-glass-shine" />
         <div className="liquid-glass-sheen" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-accent-1/5 via-transparent to-accent-3/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-        <div className="relative px-4 sm:px-5 py-3 border-b border-white/[0.06] flex items-center justify-between">
+        {isHovered && (
+          <>
+            <div 
+              className="pointer-events-none absolute inset-0 transition-opacity duration-500 opacity-100"
+              style={{
+                background: `radial-gradient(180px circle at ${x}px ${y}px, rgba(45,212,191,0.06), transparent 80%)`,
+              }}
+            />
+            <div 
+              className="absolute inset-0 pointer-events-none z-10 border border-transparent rounded-2xl sm:rounded-3xl transition-all duration-350"
+              style={{
+                borderColor: "transparent",
+                backgroundImage: `radial-gradient(160px circle at ${x}px ${y}px, rgba(56,189,248,0.22), transparent 70%)`,
+                WebkitMask: "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
+                WebkitMaskComposite: "destination-out",
+                maskComposite: "exclude",
+              }}
+            />
+          </>
+        )}
+
+        <div className="relative shrink-0 px-4 sm:px-5 py-3 border-b border-white/[0.06] flex items-center justify-between">
           <TrafficLights />
           <span className="text-[9px] font-semibold text-white/30 tracking-[0.15em] uppercase truncate ml-3">
             {repo.name}.sh
@@ -48,24 +73,26 @@ export function RepoCard({ repo, index }: { repo: Repo; index: number }) {
           </div>
         </div>
 
-        <div className="relative p-4 sm:p-5 flex flex-col h-[calc(100%-45px)]">
-          <div className="flex items-start gap-3 sm:gap-4 mb-4">
-            <div className="shrink-0 p-2.5 rounded-xl border border-white/[0.06] bg-white/[0.03] text-white/40 transition-all duration-300 group-hover:text-accent-1 group-hover:border-white/[0.12] group-hover:scale-105">
-              {icon}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-base md:text-lg font-black tracking-[-0.01em] text-white leading-tight">
-                {repo.displayName}
-              </h3>
-              <div className="mt-0.5 text-[9px] font-semibold tracking-[0.15em] uppercase text-white/25">
-                Open Source · MIT
+        <div className="relative p-4 sm:p-5 flex flex-col justify-between flex-grow">
+          <div>
+            <div className="flex items-start gap-3 sm:gap-4 mb-4">
+              <div className="shrink-0 p-2.5 rounded-xl border border-white/[0.06] bg-white/[0.03] text-white/40 transition-all duration-300 group-hover:text-accent-1 group-hover:border-white/[0.12] group-hover:scale-105">
+                {icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base md:text-lg font-black tracking-[-0.01em] text-white leading-tight">
+                  {repo.displayName}
+                </h3>
+                <div className="mt-0.5 text-[9px] font-semibold tracking-[0.15em] uppercase text-white/25">
+                  Open Source · MIT
+                </div>
               </div>
             </div>
+
+            <p className="text-[13px] sm:text-sm leading-relaxed text-white/50 mb-5">{repo.desc}</p>
           </div>
 
-          <p className="text-[13px] sm:text-sm leading-relaxed text-white/50 mb-5 flex-1">{repo.desc}</p>
-
-          <div className="flex items-center justify-between gap-3 mt-auto pt-3.5 border-t border-white/[0.06]">
+          <div className="flex items-center justify-between gap-3 pt-3.5 border-t border-white/[0.06]">
             <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-white/50">
               <span className="w-1.5 h-1.5 rounded-full bg-accent-3" />
               {repo.lang}

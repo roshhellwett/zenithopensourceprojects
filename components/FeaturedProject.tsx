@@ -49,14 +49,12 @@ export function FeaturedProject() {
 
   return (
     <div className="h-full flex flex-col font-mono bg-[#02040a]">
-      {/* Terminal Header */}
       <div className="px-4 py-2 border-b border-slate-900/80 flex items-center justify-between bg-slate-950/40">
         <TrafficLights />
         <span className="text-[8px] font-black tracking-[0.2em] uppercase text-slate-600">sentinel ~ live</span>
         <div className="w-8" />
       </div>
 
-      {/* Terminal Body */}
       <div ref={containerRef} className="p-4 text-[10px] space-y-2 text-slate-300 flex-grow">
         {TERMINAL_LINES.slice(0, visibleLines).map((line, i) => (
           <motion.div

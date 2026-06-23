@@ -13,7 +13,9 @@ import {
   Zap, 
   ChevronUp, 
   Flag, 
-  Boxes
+  Boxes,
+  Menu,
+  X
 } from "lucide-react";
 
 import { BrandMark } from "@/components/BrandMark";
@@ -30,6 +32,8 @@ import { RepoCard } from "@/components/RepoCard";
 import { STACK } from "@/data/stack";
 import { SOCIALS } from "@/data/socials";
 import { FALLBACK_REPOS, FEATURED_FALLBACK } from "@/data/repos";
+import { CATEGORIES } from "@/data/categories";
+import { useMouseSpotlight } from "@/lib/useMouseSpotlight";
 import type { Repo } from "@/types";
 
 function AnimatedCounter({ target, isLoaded }: { target: number; isLoaded: boolean }) {
@@ -65,8 +69,11 @@ function AnimatedCounter({ target, isLoaded }: { target: number; isLoaded: boole
 }
 
 function AnimatedBentoTile({ children, className, delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const { ref, x, y, isHovered, bind } = useMouseSpotlight();
   return (
     <motion.div
+      ref={ref}
+      {...bind}
       initial={{ opacity: 0, y: 35, filter: "blur(8px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "-50px" }}
@@ -76,8 +83,64 @@ function AnimatedBentoTile({ children, className, delay = 0 }: { children: React
       <div className="liquid-glass-shine" />
       <div className="liquid-glass-sheen" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-accent-1/5 via-transparent to-accent-3/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-      {children}
+      {isHovered && (
+        <>
+          <div 
+            className="pointer-events-none absolute inset-0 transition-opacity duration-500 opacity-100"
+            style={{
+              background: `radial-gradient(280px circle at ${x}px ${y}px, rgba(56,189,248,0.06), transparent 85%)`,
+            }}
+          />
+          <div 
+            className="absolute inset-0 pointer-events-none z-10 border border-transparent rounded-[2rem] transition-all duration-350"
+            style={{
+              borderColor: "transparent",
+              backgroundImage: `radial-gradient(240px circle at ${x}px ${y}px, rgba(56,189,248,0.22), transparent 70%)`,
+              WebkitMask: "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
+              WebkitMaskComposite: "destination-out",
+              maskComposite: "exclude",
+            }}
+          />
+        </>
+      )}
+      <div className="relative z-20">{children}</div>
     </motion.div>
+  );
+}
+
+function CategoryTab({ cat, isActive, onClick }: { cat: any; isActive: boolean; onClick: () => void }) {
+  const { ref, x, y, isHovered, bind } = useMouseSpotlight();
+  return (
+    <button
+      ref={ref}
+      onClick={onClick}
+      {...bind}
+      className={`relative flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold transition-all duration-300 select-none whitespace-nowrap cursor-pointer ${
+        isActive 
+          ? "text-slate-950 font-bold" 
+          : "text-white/40 hover:text-white/80 bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1]"
+      }`}
+    >
+      {isActive && (
+        <motion.div
+          layoutId="activeCategoryBackground"
+          className="absolute inset-0 bg-white rounded-full z-0"
+          transition={{ type: "spring", stiffness: 380, damping: 35 }}
+        />
+      )}
+      {!isActive && isHovered && (
+        <div className="absolute inset-0 rounded-full pointer-events-none z-0 overflow-hidden">
+          <div
+            className="absolute inset-0 transition-opacity duration-300"
+            style={{
+              background: `radial-gradient(80px circle at ${x}px ${y}px, rgba(255,255,255,0.08), transparent 80%)`,
+            }}
+          />
+        </div>
+      )}
+      <span className={`relative z-10 ${isActive ? "text-slate-950" : "text-white/50"}`}>{cat.icon}</span>
+      <span className="relative z-10">{cat.label}</span>
+    </button>
   );
 }
 
@@ -86,14 +149,20 @@ export default function Page() {
   const [reposList, setReposList] = useState<Repo[]>(() => [FEATURED_FALLBACK, ...FALLBACK_REPOS]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const containerRef = useRef<HTMLDivElement>(null);
   
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
   const yParallax = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const navSpotlight = useMouseSpotlight();
 
-  const featuredRepos = useMemo(() => {
-    return reposList.slice(0, 3);
-  }, [reposList]);
+  const filteredRepos = useMemo(() => {
+    const matched = activeCategory === "all"
+      ? reposList
+      : reposList.filter((repo) => repo.category === activeCategory);
+    return matched.slice(0, 3);
+  }, [reposList, activeCategory]);
 
   useEffect(() => {
     const handleScroll = () => setShowBackToTop(window.scrollY > 400);
@@ -109,7 +178,6 @@ export default function Page() {
         const data: { name: string; stargazers_count: number; language: string | null; fork: boolean }[] = await res.json();
         const own = data.filter((r) => !r.fork);
         
-        // Merge star counts into fallback lists
         const allLocal = [FEATURED_FALLBACK, ...FALLBACK_REPOS];
         const updatedRepos = allLocal.map((fallback) => {
           const apiMatch = own.find((r) => r.name.toLowerCase() === fallback.name.toLowerCase());
@@ -139,34 +207,153 @@ export default function Page() {
     <div className="min-h-screen font-sans text-slate-100 selection:bg-accent-1 selection:text-slate-950 relative overflow-hidden" ref={containerRef}>
       <Background />
       
-      {/* Floating Navigation Dock */}
       <motion.nav 
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 22, delay: 0.2 }}
-        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 p-1.5 rounded-full liquid-glass shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
+        ref={navSpotlight.ref}
+        {...navSpotlight.bind}
+        layout
+        transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col overflow-hidden liquid-glass shadow-[0_8px_32px_rgba(0,0,0,0.6)] ${
+          isMobileMenuOpen 
+            ? "w-[calc(100vw-2rem)] max-w-[360px] p-4 rounded-[2rem]" 
+            : "w-[auto] p-1.5 rounded-full"
+        }`}
       >
-        <a href="#top" className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.08] hover:border-white/[0.15] transition-colors">
-          <BrandMark size={16} rounded="rounded-full" />
-        </a>
-        <div className="h-4 w-[1px] bg-white/[0.08] mx-0.5" />
-        <div className="hidden sm:flex items-center">
-          <a href="#mission" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Mission</a>
-          <a href="#telemetry" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Telemetry</a>
-          <a href="#projects" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Projects</a>
-          <a href="#stack" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Stack</a>
-          <a href="#founder" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Founder</a>
+        <div className="liquid-glass-shine" />
+        <div className="liquid-glass-sheen" />
+        
+        {navSpotlight.isHovered && (
+          <>
+            <div 
+              className="pointer-events-none absolute inset-0 transition-opacity duration-500 opacity-100"
+              style={{
+                background: `radial-gradient(120px circle at ${navSpotlight.x}px ${navSpotlight.y}px, rgba(56,189,248,0.08), transparent 80%)`,
+              }}
+            />
+            <div 
+              className="absolute inset-0 pointer-events-none z-10 border border-transparent transition-all duration-350"
+              style={{
+                borderRadius: isMobileMenuOpen ? "2rem" : "9999px",
+                borderColor: "transparent",
+                backgroundImage: `radial-gradient(100px circle at ${navSpotlight.x}px ${navSpotlight.y}px, rgba(56,189,248,0.25), transparent 70%)`,
+                WebkitMask: "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
+                WebkitMaskComposite: "destination-out",
+                maskComposite: "exclude",
+              }}
+            />
+          </>
+        )}
+
+        <div className="flex items-center justify-between w-full gap-2 relative z-20">
+          <div className="flex items-center gap-1.5">
+            <a href="#top" className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.08] hover:border-white/[0.15] transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+              <BrandMark size={16} rounded="rounded-full" />
+            </a>
+            {isMobileMenuOpen && (
+              <motion.span 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="text-[10px] font-black tracking-wider uppercase text-white/80 pl-1"
+              >
+                Zenith
+              </motion.span>
+            )}
+          </div>
+
+          <div className="hidden sm:flex items-center gap-0.5">
+            <div className="h-4 w-[1px] bg-white/[0.08] mx-1" />
+            <a href="#mission" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Mission</a>
+            <a href="#telemetry" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Telemetry</a>
+            <a href="#projects" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Projects</a>
+            <a href="#stack" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Stack</a>
+            <a href="#founder" className="px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/50 hover:text-white/90 transition-colors">Founder</a>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <div className="hidden sm:flex items-center gap-1">
+              <div className="h-4 w-[1px] bg-white/[0.08] mx-1" />
+              <a href="https://github.com/roshhellwett" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">
+                <Github size={12} /> <span>Profile</span>
+              </a>
+              <a href="https://roshhellwett.github.io/zenithpages/" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-semibold bg-white text-slate-950 hover:bg-white/90 transition-all shadow-[0_0_24px_rgba(255,255,255,0.15)] ml-0.5">
+                <Layers size={11} /> <span>Registry</span>
+              </a>
+            </div>
+
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="sm:hidden w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.08] hover:bg-white/[0.10] text-white/70 hover:text-white transition-colors"
+              aria-label="Toggle Navigation Menu"
+            >
+              {isMobileMenuOpen ? <X size={15} /> : <Menu size={15} />}
+            </button>
+          </div>
         </div>
-        <div className="h-4 w-[1px] bg-white/[0.08] mx-0.5 hidden sm:block" />
-        <a href="https://github.com/roshhellwett" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">
-          <Github size={12} /> <span className="hidden sm:inline">Profile</span>
-        </a>
-        <a href="https://roshhellwett.github.io/zenithpages/" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-semibold bg-white text-slate-950 hover:bg-white/90 transition-all shadow-[0_0_24px_rgba(255,255,255,0.15)] ml-0.5">
-          <Layers size={11} /> <span className="hidden sm:inline">Registry</span>
-        </a>
+
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="sm:hidden flex flex-col gap-2 mt-4 pt-4 border-t border-white/[0.06] w-full relative z-20"
+            >
+              <a 
+                href="#mission" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-xs font-semibold text-white/60 hover:text-white transition-all"
+              >
+                <span>Mission</span>
+                <ArrowUpRight size={12} className="text-white/20" />
+              </a>
+              <a 
+                href="#telemetry" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-xs font-semibold text-white/60 hover:text-white transition-all"
+              >
+                <span>Telemetry</span>
+                <ArrowUpRight size={12} className="text-white/20" />
+              </a>
+              <a 
+                href="#projects" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-xs font-semibold text-white/60 hover:text-white transition-all"
+              >
+                <span>Projects</span>
+                <ArrowUpRight size={12} className="text-white/20" />
+              </a>
+              <a 
+                href="#stack" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-xs font-semibold text-white/60 hover:text-white transition-all"
+              >
+                <span>Stack</span>
+                <ArrowUpRight size={12} className="text-white/20" />
+              </a>
+              <a 
+                href="#founder" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-xs font-semibold text-white/60 hover:text-white transition-all"
+              >
+                <span>Founder</span>
+                <ArrowUpRight size={12} className="text-white/20" />
+              </a>
+
+              <div className="h-px bg-white/[0.06] my-2" />
+
+              <div className="grid grid-cols-2 gap-2">
+                <a href="https://github.com/roshhellwett" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-[10px] font-bold border border-white/[0.08] bg-white/[0.04] text-white/70 hover:text-white hover:bg-white/[0.08] transition-all">
+                  <Github size={12} /> Profile
+                </a>
+                <a href="https://roshhellwett.github.io/zenithpages/" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-[10px] font-bold bg-white text-slate-950 hover:bg-white/90 transition-all shadow-[0_0_24px_rgba(255,255,255,0.15)]">
+                  <Layers size={11} /> Registry
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
 
-      {/* Parallax Progress Line */}
       <motion.div 
         style={{ scaleX: scrollYProgress }}
         className="fixed top-0 left-0 right-0 h-[1px] origin-left z-[49] bg-gradient-to-r from-accent-1 via-white/60 to-accent-3 will-change-transform" 
@@ -174,9 +361,7 @@ export default function Page() {
 
       <main className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 pt-36 pb-24 lg:pt-48" id="top">
         
-        {/* Hero Title */}
         <motion.div style={{ y: yParallax }} className="mb-20 lg:mb-32 flex flex-col items-center text-center">
-
           <h1 
             className="flex flex-col items-center text-center select-none mb-8"
             aria-label="Zenith open source"
@@ -193,16 +378,14 @@ export default function Page() {
             </span>
           </h1>
           
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/45 font-medium max-w-2xl leading-relaxed tracking-[-0.01em]">
+          <p className="text-lg sm:text-xl md:text-2xl font-dancing font-normal max-w-2xl leading-relaxed tracking-wide text-transparent bg-clip-text bg-gradient-to-b from-white via-white/90 to-white/75">
             A systems collective and project forge building open-specification developer utilities, automation pipelines, and civic diagnostics. Crafted in India, optimized for standard performance, and free forever.
           </p>
         </motion.div>
 
-        {/* Section 1: Overview & Mission Bento Grid */}
         <section id="mission" className="mb-20 scroll-mt-28">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(280px,auto)]">
             
-            {/* Bento Tile 1: Main Thesis */}
             <AnimatedBentoTile className="md:col-span-2 flex flex-col justify-center bg-gradient-to-br from-slate-950/80 to-slate-900/60 overflow-hidden" delay={0.05}>
               <div className="absolute -top-24 -right-24 text-slate-800/10 rotate-12 transition-transform duration-1000 group-hover:rotate-0 pointer-events-none">
                 <Globe size={320} strokeWidth={0.5} />
@@ -223,7 +406,6 @@ export default function Page() {
               </div>
             </AnimatedBentoTile>
 
-            {/* Bento Tile 2: Stats Hub */}
             <AnimatedBentoTile className="md:col-span-1 flex flex-col justify-between p-8 bg-slate-950/40" delay={0.1}>
               <div className="text-[9px] font-semibold tracking-[0.22em] text-white/30 uppercase pb-4 border-b border-white/[0.06]">Telemetry Statistics</div>
               <div className="space-y-6 py-6">
@@ -256,7 +438,6 @@ export default function Page() {
               </div>
             </AnimatedBentoTile>
 
-            {/* Bento Tile 3: Civic Initiative & Bharat First */}
             <AnimatedBentoTile className="md:col-span-3 flex flex-col justify-end overflow-hidden p-8 bg-gradient-to-br from-slate-950/70 to-[#0c0d12]/90" delay={0.15}>
               <BharatWave />
               <div className="relative z-10">
@@ -277,7 +458,6 @@ export default function Page() {
 
         <Divider />
 
-        {/* Section 2: Telemetry & Performance Cadence */}
         <section id="telemetry" className="py-12 scroll-mt-28">
           <SectionHeading 
             eyebrow="Telemetry Logs"
@@ -286,8 +466,6 @@ export default function Page() {
           />
 
           <div className="w-full">
-            
-            {/* Heatmap Card */}
             <AnimatedBentoTile className="w-full flex flex-col justify-between p-8" delay={0.05}>
               <div className="flex items-center justify-between mb-6 pb-3 border-b border-white/[0.06]">
                 <div>
@@ -302,13 +480,11 @@ export default function Page() {
                 <CommitHeatmap />
               </div>
             </AnimatedBentoTile>
-
           </div>
         </section>
 
         <Divider />
 
-        {/* Projects Showcase */}
         <section id="projects" className="py-12 scroll-mt-28">
           <SectionHeading 
             eyebrow="Open Source Registry"
@@ -316,13 +492,24 @@ export default function Page() {
             subtitle="A curated selection of our primary open-source systems, automation pipelines, and utilities."
           />
 
-          <div className="space-y-10">
+          <div className="space-y-8">
+            <div className="flex overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none gap-2 justify-start md:justify-center items-center">
+              {CATEGORIES.map((cat) => (
+                <CategoryTab
+                  key={cat.id}
+                  cat={cat}
+                  isActive={activeCategory === cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                />
+              ))}
+            </div>
+
             <motion.div 
               layout
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
               <AnimatePresence mode="popLayout">
-                {featuredRepos.map((repo, idx) => (
+                {filteredRepos.map((repo, idx) => (
                   <motion.div
                     layout
                     key={repo.name}
@@ -354,7 +541,6 @@ export default function Page() {
 
         <Divider />
 
-        {/* Section 3: Capability & Technology Spectrum */}
         <section id="stack" className="py-12 scroll-mt-28">
           <SectionHeading 
             eyebrow="Capability Hub"
@@ -393,7 +579,6 @@ export default function Page() {
 
         <Divider />
 
-        {/* Section 4: The Founder & Bio Dashboard */}
         <section id="founder" className="py-12 scroll-mt-28">
           <SectionHeading 
             eyebrow="Core Developer"
@@ -463,7 +648,6 @@ export default function Page() {
 
       </main>
 
-      {/* Premium Detailed Footer */}
       <footer className="relative z-10 border-t border-white/[0.06] bg-[#030712]/80 backdrop-blur-xl mt-12">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-12 md:py-16">
           <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_1fr] gap-8 md:gap-4">
@@ -533,7 +717,6 @@ export default function Page() {
         </div>
       </footer>
 
-      {/* Back to Top Navigation */}
       <AnimatePresence>
         {showBackToTop && (
           <motion.button 

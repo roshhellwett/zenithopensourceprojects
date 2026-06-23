@@ -31,7 +31,6 @@ export function CommitHeatmap() {
   const [tooltip, setTooltip] = useState<{ index: number; x: number; y: number } | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Stripped outer container to integrate seamlessly into Bento Tile
   return (
     <div className="relative w-full h-full flex flex-col justify-center">
       <div className="flex items-center justify-between mb-4">
@@ -47,55 +46,57 @@ export function CommitHeatmap() {
         </span>
       </div>
 
-      <div className="relative">
-        <div
-          ref={gridRef}
-          className="grid gap-1 md:gap-[5px]"
-          style={{
-            gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-            gridAutoFlow: "column",
-            gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
-          }}
-        >
-          {cells.map((c, i) => (
-            <motion.span
-              key={i}
-              initial={{ opacity: 0, scale: 0.5 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.2, delay: (i / cells.length) * 0.4 }}
-              className={`aspect-square rounded-[3px] cursor-default transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.8] hover:z-10 hover:shadow-[0_0_20px_rgba(45,212,191,1)] ${levelClass[c.level]}`}
-              onMouseEnter={(e) => {
-                const rect = (e.target as HTMLElement).getBoundingClientRect();
-                const parent = gridRef.current?.getBoundingClientRect();
-                if (parent) {
-                  setTooltip({
-                    index: i,
-                    x: rect.left - parent.left + rect.width / 2,
-                    y: rect.top - parent.top - 8,
-                  });
-                }
-              }}
-              onMouseLeave={() => setTooltip(null)}
-            />
-          ))}
-        </div>
+      <div className="relative w-full overflow-x-auto scrollbar-none">
+        <div className="min-w-[520px] md:min-w-0 relative">
+          <div
+            ref={gridRef}
+            className="grid gap-1 md:gap-[5px]"
+            style={{
+              gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+              gridAutoFlow: "column",
+              gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+            }}
+          >
+            {cells.map((c, i) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.2, delay: (i / cells.length) * 0.4 }}
+                className={`aspect-square rounded-[3px] cursor-default transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.8] hover:z-10 hover:shadow-[0_0_20px_rgba(45,212,191,1)] ${levelClass[c.level]}`}
+                onMouseEnter={(e) => {
+                  const rect = (e.target as HTMLElement).getBoundingClientRect();
+                  const parent = gridRef.current?.getBoundingClientRect();
+                  if (parent) {
+                    setTooltip({
+                      index: i,
+                      x: rect.left - parent.left + rect.width / 2,
+                      y: rect.top - parent.top - 8,
+                    });
+                  }
+                }}
+                onMouseLeave={() => setTooltip(null)}
+              />
+            ))}
+          </div>
 
-        <AnimatePresence>
-          {tooltip !== null && (
-            <motion.div
-              initial={{ opacity: 0, y: 6, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.15 }}
-              className="absolute pointer-events-none z-20 px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-white text-[10px] font-black tracking-widest uppercase shadow-[0_10px_20px_-5px_rgba(0,0,0,0.8)] whitespace-nowrap -translate-x-1/2 -translate-y-full"
-              style={{ left: tooltip.x, top: tooltip.y }}
-            >
-              <span className="text-accent-3">{cells[tooltip.index].commits}</span> commits
-              <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-transparent border-t-slate-800" />
-            </motion.div>
-          )}
-        </AnimatePresence>
+          <AnimatePresence>
+            {tooltip !== null && (
+              <motion.div
+                initial={{ opacity: 0, y: 6, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.15 }}
+                className="absolute pointer-events-none z-20 px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-white text-[10px] font-black tracking-widest uppercase shadow-[0_10px_20px_-5px_rgba(0,0,0,0.8)] whitespace-nowrap -translate-x-1/2 -translate-y-full"
+                style={{ left: tooltip.x, top: tooltip.y }}
+              >
+                <span className="text-accent-3">{cells[tooltip.index].commits}</span> commits
+                <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-transparent border-t-slate-800" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

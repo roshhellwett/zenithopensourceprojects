@@ -33,7 +33,7 @@ export function SectionHeading({
         variants={fadeUp}
         className={scriptTitle 
           ? "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-dancing font-normal tracking-normal pb-2" 
-          : "text-2xl sm:text-3xl md:text-4xl font-black tracking-[-0.02em] text-white leading-tight"
+          : "text-2xl sm:text-3xl md:text-4xl font-black tracking-[-0.02em] text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 leading-tight"
         }
       >
         {scriptTitle ? (
