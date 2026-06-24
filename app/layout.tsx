@@ -66,9 +66,16 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [{ url: "/favicon.ico" }],
+    apple: [{ url: "/favicon.ico" }],
   },
+  manifest: "/manifest.json",
   verification: {
     google: "CWEIddbWw_sSmzFyikcyLv3jLzWUYDb-0V5JUNUjmvw",
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
   },
   openGraph: {
     title: "Zenith Open Source Projects – Roshan Kr Singh",
@@ -92,6 +99,9 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#e1d7c2",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -104,6 +114,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${sacramento.variable} ${dancingScript.variable} antialiased`}
       >
+        {/* Skip to content — accessibility */}
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -130,7 +145,9 @@ export default function RootLayout({
           }}
         />
         <StructuredData />
-        {children}
+        <main id="main-content">
+          {children}
+        </main>
         <SpeedInsights />
       </body>
     </html>

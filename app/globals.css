@@ -46,6 +46,40 @@ html, body {
   letter-spacing: -0.025em;
   color: var(--color-dark-text);
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Skip to content (accessibility) ── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  background: var(--color-amber-button);
+  color: #000;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: top 0.2s ease;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ── Focus-visible styles (keyboard accessibility) ── */
+*:focus-visible {
+  outline: 2px solid var(--color-amber-button);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* ── Crisp background image rendering ── */
@@ -144,7 +178,63 @@ html, body {
   animation: float 3s ease-in-out infinite;
 }
 
-/* ── Warm-toned scrollbar ── */
+/* ── Skeleton shimmer loading ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-dark-border-subtle) 25%,
+    var(--color-dark-elevated) 50%,
+    var(--color-dark-border-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+/* ── Slide-in from bottom ── */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slide-in-up {
+  animation: slideInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Scale entrance ── */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Toast progress bar ── */
+@keyframes toast-progress {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+.toast-progress-bar {
+  animation: toast-progress 3.5s linear forwards;
+}
+
+/* ── Warm-toned scrollbar (WebKit) ── */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -160,6 +250,12 @@ html, body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-dark-text-faint);
+}
+
+/* ── Firefox scrollbar ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-dark-border) var(--color-dark-bg);
 }
 
 /* ── PostHog-style navbar ── */
@@ -243,9 +339,101 @@ html, body {
   gap: 1rem;
 }
 
-/* ── Responsive ── */
+/* ── Back to top button ── */
+.back-to-top {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: all 0.25s ease;
+}
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* ── Body scroll lock (for mobile menu) ── */
+body.scroll-locked {
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════ */
+
 @media (max-width: 768px) {
   .isometric-bg {
     object-position: right center;
+  }
+}
+
+/* ══════════════════════════════════════
+   REDUCED MOTION (Accessibility)
+   ══════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-pulse,
+  .animate-bounce,
+  .animate-spin,
+  .animate-ping,
+  .animate-pulse-signal,
+  .animate-float,
+  .animate-fade-in-up,
+  .animate-slide-in-up,
+  .animate-scale-in {
+    animation: none !important;
+  }
+
+  .tab-progress-bar,
+  .toast-progress-bar {
+    animation: none !important;
+  }
+}
+
+/* ══════════════════════════════════════
+   PRINT STYLES
+   ══════════════════════════════════════ */
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .crt-overlay,
+  .isometric-bg,
+  .crisp-bg,
+  .back-to-top,
+  nav,
+  header,
+  footer,
+  button,
+  .window-chrome {
+    display: none !important;
+  }
+
+  a {
+    color: black !important;
+    text-decoration: underline !important;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75em;
+    color: #666;
+  }
+
+  * {
+    box-shadow: none !important;
   }
 }

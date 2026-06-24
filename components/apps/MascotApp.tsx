@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Send } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
+import { SoundType } from '@/lib/audio';
 
 const parseMessage = (text: string) => {
   if (!text) return null;
@@ -63,8 +64,14 @@ const parseMessage = (text: string) => {
   });
 };
 
-export default function MascotApp({ playRetroSound }: { playRetroSound: (type: any) => void }) {
-  const [messages, setMessages] = useState<any[]>([
+export default function MascotApp({ playRetroSound }: { playRetroSound: (type: SoundType) => void }) {
+  interface Message {
+    id: string;
+    sender: string;
+    content: string;
+    timestamp: string;
+  }
+  const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       sender: "hogai",
@@ -74,6 +81,16 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: a
   ]);
   const [chatInput, setChatInput] = useState<string>("");
   const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isSendingMessage]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +124,8 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: a
       };
       setMessages((prev) => [...prev, botMsg]);
       playRetroSound("beep");
-    } catch (err) {
+    } catch {
+      playRetroSound("error");
       const botErrorMsg = {
         id: `msg_bot_err_${Date.now()}`,
         sender: "hogai",
@@ -120,11 +138,34 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: a
     }
   };
 
+  const handleClearChat = () => {
+    setMessages([
+      {
+        id: "welcome",
+        sender: "hogai",
+        content: "Hello, system builder! 🦥 I am Zenith AI, your retro helper sloth. I live inside this terminal workstation. Ask me anything about Zenith's open source projects like Project Sentinel or ZeroGapVote, or inspect our source code!",
+        timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+      }
+    ]);
+  };
+
   return (
     <div className="flex flex-col h-[400px]">
-      <div className="bg-dark-surface border border-dark-border p-2 rounded text-xs text-dark-text-muted mb-2 flex items-center justify-between">
+      <div className="bg-dark-surface border border-dark-border p-2 rounded text-xs text-dark-text-muted mb-2 flex items-center justify-between select-none">
         <span>Ask about compile paths, scraper setups, or project telemetry details.</span>
-        <span className="font-mono text-[9px] bg-dark-elevated px-1.5 py-0.5 rounded text-accent-teal">Groq · Llama 3.3</span>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              handleClearChat();
+              playRetroSound("toggle");
+            }}
+            className="px-2 py-0.5 border border-dark-border hover:border-dark-text-muted bg-dark-bg text-[10px] text-dark-text-muted hover:text-dark-text rounded font-bold transition-colors cursor-pointer"
+          >
+            Clear Chat
+          </button>
+          <span className="font-mono text-[9px] bg-dark-elevated px-1.5 py-0.5 rounded text-accent-teal">Groq · Llama 3.3</span>
+        </div>
       </div>
 
       {/* Chat bubbles container */}
@@ -144,12 +185,12 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: a
               <div
                 className={`p-3 rounded text-xs leading-relaxed border ${
                   isBot
-                    ? "bg-dark-surface border-dark-border text-dark-text rounded-tl-none"
-                    : "bg-cobalt/20 border-cobalt/30 text-dark-text rounded-tr-none"
+                    ? "bg-dark-surface border-dark-border text-dark-text rounded-tl-none select-text"
+                    : "bg-cobalt/20 border-cobalt/30 text-dark-text rounded-tr-none select-text"
                 }`}
               >
                 {parseMessage(m.content)}
-                <div className={`text-[9px] mt-1.5 font-mono ${isBot ? "text-dark-text-faint" : "text-cobalt/60"}`}>
+                <div className={`text-[9px] mt-1.5 font-mono select-none ${isBot ? "text-dark-text-faint" : "text-cobalt/60"}`}>
                   {m.timestamp}
                 </div>
               </div>
@@ -167,6 +208,9 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: a
             </div>
           </div>
         )}
+
+        {/* Scroll dummy */}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input box */}
@@ -205,6 +249,20 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: a
             className="px-2 py-0.5 border border-dark-border bg-dark-surface rounded hover:bg-dark-elevated hover:text-dark-text cursor-pointer"
           >
             &ldquo;ZeroGapVote Security&rdquo;
+          </button>
+          <button
+            type="button"
+            onClick={() => { setChatInput("What projects are built with Python in this registry?"); playRetroSound("click"); }}
+            className="px-2 py-0.5 border border-dark-border bg-dark-surface rounded hover:bg-dark-elevated hover:text-dark-text cursor-pointer"
+          >
+            &ldquo;Python Repos&rdquo;
+          </button>
+          <button
+            type="button"
+            onClick={() => { setChatInput("Can you tell me about Roshan's work philosophy?"); playRetroSound("click"); }}
+            className="px-2 py-0.5 border border-dark-border bg-dark-surface rounded hover:bg-dark-elevated hover:text-dark-text cursor-pointer"
+          >
+            &ldquo;Founder Philosophy&rdquo;
           </button>
         </div>
       </div>

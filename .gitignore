@@ -26,6 +26,9 @@ yarn-error.log*
 *.log
 
 # env files
+.env
+.env.local
+.env.production
 .env*
 !.env.example
 
@@ -42,3 +45,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+implementation_plan.md
+.implementation_plan.md

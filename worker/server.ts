@@ -8,6 +8,42 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
   : ["http://localhost:3000"];
 
+// ── Rate Limiter (sliding window, per-IP) ──
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 20; // 20 requests per minute
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+
+  entry.count++;
+  if (entry.count > RATE_LIMIT_MAX) {
+    return true;
+  }
+
+  return false;
+}
+
+// Clean up stale entries every 5 minutes
+if (typeof setInterval !== "undefined") {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (now > value.resetTime) rateLimitMap.delete(key);
+    }
+  }, 300_000);
+}
+
+// ── Input Validation Constants ──
+const MAX_MESSAGE_LENGTH = 2000;
+const MAX_HISTORY_DEPTH = 20;
+
 // ── Knowledge Base (same as lib/ai-prompt.ts) ──
 const SYSTEM_PROMPT = `You are Zenith AI — the official AI assistant for Zenith Open Source Projects.
 You are powered by Groq (Llama 3.3 70B) and built by Roshan Kr Singh (@roshhellwett).
@@ -116,7 +152,7 @@ PROJECT VENICE — Repo: https://github.com/roshhellwett/projectvenice — Pytho
 
 PROJECT BILLFORGE — Repo: https://github.com/roshhellwett/projectbillforge — TypeScript — Indian vendors billing web app for small businesses and local vendors.
 
-PROJECT PULSEWIRE — Repo: https://github.com/roshhellwett/projectpulsewire — Python — 21 stars (most starred). PulseWire and EasyEffects audio presets for Linux creators and engineers.
+PROJECT PULSEWIRE — Repo: https://github.com/roshhellwett/projectpulsewire — Python — 21 stars (most starred). PulseWire and EasyEffects audio presets for Linux creators and engineering.
 
 PROJECT WINACTIVATION — Repo: https://github.com/roshhellwett/projectwinactivation — Python — Windows OS activation and housekeeping utilities.
 
@@ -164,10 +200,19 @@ app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
-        return callback(null, true);
-      }
-      if (ALLOWED_ORIGINS.some((allowed) => origin.includes(allowed))) {
+      // Validate localhost or exact matches
+      const isLocalhost =
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:") ||
+        origin === "http://localhost" ||
+        origin === "http://127.0.0.1";
+      const isAllowed = ALLOWED_ORIGINS.some(
+        (allowed) =>
+          origin === allowed ||
+          (allowed.startsWith("https://") && origin.endsWith(allowed.replace("https://", "")))
+      );
+
+      if (isLocalhost || isAllowed) {
         return callback(null, true);
       }
       callback(new Error("Not allowed by CORS"));
@@ -196,10 +241,45 @@ app.get("/health", (_req, res) => {
 // ── Chat Endpoint ──
 app.post("/api/ai/chat", async (req, res) => {
   try {
+    // Rate limiting (by IP address)
+    const ip =
+      (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+      req.socket.remoteAddress ||
+      "unknown";
+
+    if (isRateLimited(ip)) {
+      return res.status(429).json({
+        text: "You're sending too many requests. Please wait a moment and try again.",
+      });
+    }
+
     const { messages } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ text: "Invalid request — messages array required." });
+    }
+
+    // Validate conversation history depth
+    if (messages.length > MAX_HISTORY_DEPTH) {
+      return res.status(400).json({ text: "Conversation too long. Please start a new chat." });
+    }
+
+    // Validate and sanitize each message
+    const sanitizedMessages = messages
+      .filter(
+        (m: unknown): m is { sender: string; content: string } =>
+          typeof m === "object" &&
+          m !== null &&
+          typeof (m as Record<string, unknown>).sender === "string" &&
+          typeof (m as Record<string, unknown>).content === "string"
+      )
+      .map((m) => ({
+        sender: m.sender,
+        content: m.content.slice(0, MAX_MESSAGE_LENGTH),
+      }));
+
+    if (sanitizedMessages.length === 0) {
+      return res.status(400).json({ text: "No valid messages provided." });
     }
 
     if (!GROQ_API_KEY || GROQ_API_KEY === "gsk_your_groq_api_key_here" || GROQ_API_KEY.trim() === "") {
@@ -210,43 +290,60 @@ app.post("/api/ai/chat", async (req, res) => {
 
     const chatMessages = [
       { role: "system" as const, content: SYSTEM_PROMPT },
-      ...messages.map((m: { sender: string; content: string }) => ({
+      ...sanitizedMessages.map((m) => ({
         role: m.sender === "user" ? ("user" as const) : ("assistant" as const),
         content: m.content,
       })),
     ];
 
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: chatMessages,
-        temperature: 0.7,
-        max_tokens: 1024,
-      }),
-    });
+    // Call Groq with AbortController timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10_000);
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("Groq API error:", response.status, errText);
-      return res.json({
-        text: "The AI service encountered an error. Please try again in a moment.",
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: chatMessages,
+          temperature: 0.7,
+          max_tokens: 1024,
+        }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error("Groq API error:", response.status, errText);
+        return res.status(500).json({
+          text: "The AI service encountered an error. Please try again in a moment.",
+        });
+      }
+
+      const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
+      const botText =
+        data.choices?.[0]?.message?.content ||
+        "I couldn't process that request. Could you rephrase?";
+
+      return res.json({ text: botText });
+    } catch (fetchError: unknown) {
+      clearTimeout(timeoutId);
+      if (fetchError instanceof Error && fetchError.name === "AbortError") {
+        return res.status(408).json({
+          text: "The AI is taking too long to respond. Please try again.",
+        });
+      }
+      throw fetchError;
     }
-
-    const data: any = await response.json();
-    const botText =
-      data.choices?.[0]?.message?.content ||
-      "I couldn't process that request. Could you rephrase?";
-
-    return res.json({ text: botText });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Worker error:", error);
-    return res.json({
+    return res.status(500).json({
       text: "A network error occurred. Please check your connection and try again.",
     });
   }

@@ -3,7 +3,7 @@ import { useState, useCallback, useRef } from "react";
 export function useMouseSpotlight() {
   const [coords, setCoords] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const elementRef = useRef<any>(null);
+  const elementRef = useRef<HTMLAnchorElement | null>(null);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!elementRef.current) return;

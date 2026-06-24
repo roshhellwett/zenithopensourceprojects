@@ -1,8 +1,9 @@
 import React from 'react';
 import { Sliders } from 'lucide-react';
 import { STACK } from "@/data/stack";
+import { SoundType } from '@/lib/audio';
 
-export default function StackApp({ playRetroSound, addToast }: { playRetroSound: (type: any) => void, addToast: (msg: string) => void }) {
+export default function StackApp({ playRetroSound, addToast }: { playRetroSound: (type: SoundType) => void, addToast: (msg: string) => void }) {
   return (
     <div className="space-y-6">
       <div className="bg-dark-surface border-l-4 border-amber-button p-4 rounded-r flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-dark-border">

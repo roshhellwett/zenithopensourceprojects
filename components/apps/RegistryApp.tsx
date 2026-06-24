@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { ExternalLink, ArrowUpRight } from 'lucide-react';
 import { CATEGORIES } from "@/data/categories";
 import { FEATURED_FALLBACK, FALLBACK_REPOS } from "@/data/repos";
+import { SoundType } from '@/lib/audio';
 
-export default function RegistryApp({ playRetroSound }: { playRetroSound: (type: any) => void }) {
+export default function RegistryApp({ playRetroSound }: { playRetroSound: (type: SoundType) => void }) {
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
   const filteredRepos = activeCategory === "all"

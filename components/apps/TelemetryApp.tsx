@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Play, Pause } from 'lucide-react';
+import { SoundType } from '@/lib/audio';
 
-export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSound: (type: any) => void, addToast: (msg: string) => void }) {
+export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSound: (type: SoundType) => void, addToast: (msg: string) => void }) {
   const [isPlayingRecording, setIsPlayingRecording] = useState<boolean>(false);
   const [playbackTime, setPlaybackTime] = useState<number>(0);
   const [playbackCursor, setPlaybackCursor] = useState<{ x: number; y: number }>({ x: 120, y: 150 });
   const [playbackAction, setPlaybackAction] = useState<string>("Sentinel compilation loop initialized...");
 
   useEffect(() => {
-    let interval: any;
+    let interval: NodeJS.Timeout | undefined;
     if (isPlayingRecording) {
       interval = setInterval(() => {
         setPlaybackTime((prev) => {

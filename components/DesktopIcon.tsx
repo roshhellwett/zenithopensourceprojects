@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 interface DesktopIconProps {
   id: string;
@@ -9,17 +9,60 @@ interface DesktopIconProps {
   onClick: () => void;
 }
 
-export default function DesktopIcon({ id, label, iconKey, onClick }: DesktopIconProps) {
+export default function DesktopIcon({ label, iconKey, onClick }: DesktopIconProps) {
+  const [selected, setSelected] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Click outside to deselect icon highlight
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
+        setSelected(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Check if it's already selected
+    if (selected) {
+      onClick();
+      setSelected(false);
+    } else {
+      setSelected(true);
+    }
+  };
+
   return (
     <button
-      onClick={onClick}
-      className="desktop-icon flex flex-col items-center gap-1 p-2 w-[76px] cursor-pointer focus:outline-none group"
-      title={label}
+      ref={buttonRef}
+      onClick={handleClick}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        onClick();
+        setSelected(false);
+      }}
+      className={`desktop-icon flex flex-col items-center gap-1.5 p-2 w-[78px] cursor-pointer focus:outline-none group relative transition-all rounded-lg select-none ${
+        selected
+          ? "bg-amber-button/20 border border-amber-button/40 shadow-inner scale-[0.98]"
+          : "border border-transparent hover:bg-dark-border/20"
+      }`}
+      title={label.replace("\n", " ")}
+      aria-label={label.replace("\n", " ")}
+      aria-pressed={selected}
     >
-      <div className="w-12 h-12 flex items-center justify-center">
+      {/* Subtle hover glow behind icon */}
+      <div className="absolute inset-0 bg-amber-button/10 opacity-0 group-hover:opacity-100 rounded-lg filter blur-md transition-opacity pointer-events-none" />
+
+      <div className="w-12 h-12 flex items-center justify-center relative z-10 drop-shadow-sm group-hover:scale-105 transition-transform duration-250">
         {renderDesktopIcon(iconKey)}
       </div>
-      <span className="text-[11px] text-center leading-tight text-dark-text/80 group-hover:text-dark-text font-medium whitespace-pre-line">
+      <span className={`text-[10px] text-center font-bold tracking-tight leading-tight select-none z-10 break-words w-full ${
+        selected ? "text-dark-text" : "text-dark-text/80 group-hover:text-dark-text"
+      }`}>
         {label}
       </span>
     </button>
@@ -30,7 +73,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
   switch (key) {
     case "file-text":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <path d="M10 6h20l8 8v28H10V6z" fill="#fdfdf8" stroke="#23251d" strokeWidth="2.5" strokeLinejoin="round" />
           <path d="M30 6v8h8" fill="none" stroke="#23251d" strokeWidth="2.5" strokeLinejoin="round" />
           <line x1="15" y1="18" x2="33" y2="18" stroke="#9ea096" strokeWidth="2" strokeLinecap="round" />
@@ -41,7 +84,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "folder-project":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <path d="M6 12h14l4 4h18v24H6V12z" fill="#2f80fa" stroke="#23251d" strokeWidth="2.5" strokeLinejoin="round" />
           <rect x="10" y="22" width="28" height="16" rx="1" fill="#fdfdf8" stroke="#23251d" strokeWidth="2" />
           <rect x="30" y="14" width="4" height="4" fill="#23251d" />
@@ -51,7 +94,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "stack":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <path d="M8 14c0-3 7.2-5.5 16-5.5S40 11 40 14s-7.2 5.5-16 5.5S8 17 8 14z" fill="#f1a82c" stroke="#23251d" strokeWidth="2.5" />
           <path d="M8 14v7c0 3 7.2 5.5 16 5.5S40 24 40 21v-7" stroke="#23251d" strokeWidth="2.5" />
           <path d="M8 21v7c0 3 7.2 5.5 16 5.5S40 31 40 28v-7" stroke="#23251d" strokeWidth="2.5" />
@@ -60,7 +103,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "file-mdx":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <path d="M10 6h20l8 8v28H10V6z" fill="#eeefe9" stroke="#23251d" strokeWidth="2.5" strokeLinejoin="round" />
           <path d="M30 6v8h8" fill="none" stroke="#23251d" strokeWidth="2.5" strokeLinejoin="round" />
           <rect x="14" y="17" width="20" height="6" rx="1" fill="#2CB67D" />
@@ -71,7 +114,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "video":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <rect x="6" y="10" width="36" height="28" rx="3" fill="#1d1f27" stroke="#23251d" strokeWidth="2.5" />
           <rect x="10" y="14" width="28" height="20" rx="2" fill="#2C2E3A" />
           <path d="M20 18v12l10-6z" fill="#f1a82c" />
@@ -80,7 +123,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "docs":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <path d="M10 6h20l8 8v28H10V6z" fill="#EE6E5E" stroke="#23251d" strokeWidth="2.5" strokeLinejoin="round" />
           <path d="M30 6v8h8" fill="none" stroke="#23251d" strokeWidth="2.5" strokeLinejoin="round" />
           <rect x="14" y="18" width="8" height="8" rx="1" fill="#fdfdf8" />
@@ -93,7 +136,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "chat-bubble":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <path d="M8 8h32v24H22l-10 8V32H8V8z" fill="#fdfdf8" stroke="#23251d" strokeWidth="2.5" strokeLinejoin="round" />
           <circle cx="17" cy="19" r="2" fill="#23251d" />
           <circle cx="24" cy="19" r="2" fill="#23251d" />
@@ -102,7 +145,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "question":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <path d="M8 8h32v24H22l-10 8V32H8V8z" fill="#fdfdf8" stroke="#23251d" strokeWidth="2.5" strokeLinejoin="round" />
           <rect x="12" y="13" width="7" height="7" rx="2" fill="#bfc1b7" />
           <rect x="27" y="13" width="7" height="7" rx="2" fill="#bfc1b7" />
@@ -114,7 +157,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "signup":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <circle cx="24" cy="24" r="18" fill="#eeefe9" stroke="#23251d" strokeWidth="2.5" />
           <circle cx="24" cy="18" r="5" fill="#2f80fa" stroke="#23251d" strokeWidth="1.5" />
           <path d="M14 34c0-5 5-7 10-7s10 2 10 7" fill="#2f80fa" stroke="#23251d" strokeWidth="1.5" />
@@ -123,7 +166,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "switch":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <rect x="6" y="8" width="36" height="32" rx="4" fill="#e1d7c2" stroke="#23251d" strokeWidth="2.5" />
           <rect x="10" y="12" width="28" height="24" rx="2" fill="#23251d" />
           <circle cx="36" cy="34" r="1.5" fill="#6aa84f" />
@@ -134,7 +177,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "why":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <rect x="8" y="4" width="32" height="40" rx="3" fill="#eeefe9" stroke="#23251d" strokeWidth="2.5" />
           <rect x="12" y="8" width="24" height="32" fill="#fdfdf8" stroke="#23251d" strokeWidth="2" />
           <text x="18" y="29" fontSize="18" fontFamily="serif" fill="#23251d" fontWeight="bold">?</text>
@@ -143,7 +186,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "changelog":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <rect x="8" y="4" width="32" height="40" rx="3" fill="#EE6E5E" stroke="#23251d" strokeWidth="2.5" />
           <rect x="12" y="10" width="24" height="4" rx="1" fill="#fdfdf8" />
           <rect x="12" y="18" width="24" height="4" rx="1" fill="#fdfdf8" opacity="0.7" />
@@ -153,7 +196,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "handbook":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <rect x="8" y="4" width="32" height="40" rx="3" fill="#B392F0" stroke="#23251d" strokeWidth="2.5" />
           <rect x="14" y="8" width="20" height="32" fill="#fdfdf8" stroke="#23251d" strokeWidth="1.5" />
           <line x1="18" y1="14" x2="30" y2="14" stroke="#9ea096" strokeWidth="1.5" />
@@ -164,7 +207,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "store":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <rect x="6" y="14" width="36" height="28" rx="3" fill="#eeefe9" stroke="#23251d" strokeWidth="2.5" />
           <path d="M6 14h36v8H6z" fill="#f54e00" stroke="#23251d" strokeWidth="2.5" />
           <rect x="18" y="28" width="12" height="14" rx="1" fill="#fdfdf8" stroke="#23251d" strokeWidth="1.5" />
@@ -174,7 +217,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "work":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <rect x="8" y="14" width="32" height="24" rx="3" fill="#2f80fa" stroke="#23251d" strokeWidth="2.5" />
           <path d="M16 14V10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4" stroke="#23251d" strokeWidth="2.5" />
           <rect x="20" y="22" width="8" height="6" rx="1" fill="#fdfdf8" stroke="#23251d" strokeWidth="1.5" />
@@ -184,7 +227,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     case "trash":
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <path d="M14 16h20v22a4 4 0 0 1-4 4H18a4 4 0 0 1-4-4V16z" fill="#eeefe9" stroke="#23251d" strokeWidth="2.5" />
           <path d="M10 16h28" stroke="#23251d" strokeWidth="2.5" strokeLinecap="round" />
           <path d="M18 16V12a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4" stroke="#23251d" strokeWidth="2.5" />
@@ -195,7 +238,7 @@ export function renderDesktopIcon(key: string, className: string = "w-10 h-10") 
       );
     default:
       return (
-        <svg className={className} viewBox="0 0 48 48" fill="none">
+        <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <rect x="8" y="8" width="32" height="32" rx="4" fill="#eeefe9" stroke="#23251d" strokeWidth="2.5" />
           <line x1="16" y1="18" x2="32" y2="18" stroke="#9ea096" strokeWidth="2" />
           <line x1="16" y1="24" x2="32" y2="24" stroke="#9ea096" strokeWidth="2" />
