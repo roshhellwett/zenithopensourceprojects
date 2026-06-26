@@ -6,7 +6,6 @@
   "license": "MIT",
   "main": "dist/server.js",
   "scripts": {
-    "prebuild": "node -e \"const fs=require('fs');fs.mkdirSync('./lib',{recursive:true});fs.cpSync('../lib/ai-prompt.ts','./lib/ai-prompt.ts');fs.cpSync('../lib/rate-limit.ts','./lib/rate-limit.ts')\"",
     "dev": "tsx watch server.ts",
     "build": "tsc",
     "lint": "eslint .",
