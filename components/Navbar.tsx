@@ -3,8 +3,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NAV_ITEMS } from "@/data/nav";
 import { Search, ChevronDown, Github, Globe, Laptop } from "lucide-react";
+import { STORE_URL } from "@/lib/site";
+import { ZenithLogo } from "@/components/ZenithLogo";
 import { renderDesktopIcon } from "@/components/DesktopIcon";
-import SearchModal from "@/components/SearchModal";
+import dynamic from "next/dynamic";
+
+const SearchModal = dynamic(() => import("@/components/SearchModal"), { ssr: false });
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { playRetroSound } from "@/lib/audio";
@@ -19,6 +23,8 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   // Active section observer for smooth website navigation highlighting
   useEffect(() => {
@@ -56,11 +62,24 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setSearchOpen((prev) => !prev);
+        setSearchOpen((prev) => {
+          if (!prev) previousFocusRef.current = document.activeElement as HTMLElement;
+          return !prev;
+        });
       }
     };
     window.addEventListener("keydown", handleGlobalKeyDown);
     return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, []);
+
+  // Listen for custom open-search event (from desktop window toolbar)
+  useEffect(() => {
+    const handleOpenSearch = () => {
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      setSearchOpen(true);
+    };
+    window.addEventListener("zenith_open_search", handleOpenSearch);
+    return () => window.removeEventListener("zenith_open_search", handleOpenSearch);
   }, []);
 
   // Escape key to close mobile menu & scroll lock management
@@ -139,23 +158,12 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
   return (
     <>
       <header className="sticky top-0 z-50 bg-dark-surface/95 border-b border-dark-border backdrop-blur-md">
-        {/* Skip Link */}
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 h-12 flex items-center justify-between">
           {/* Left: Logo + Nav */}
           <div className="flex items-center gap-6">
             {/* Logo */}
             <Link href="/" onClick={() => playRetroSound("click")} className="flex items-center gap-2 shrink-0 group">
-              <svg className="w-7 h-7" viewBox="0 0 32 32" fill="none">
-                <rect x="2" y="6" width="28" height="20" rx="3" fill="#1d1f27" stroke="#F1A82C" strokeWidth="2"/>
-                <path d="M6 10h4v2H6zM12 10h4v2h-4zM20 10h6v2h-6z" fill="#F1A82C" opacity="0.8"/>
-                <path d="M6 15h20v1H6z" fill="#65675e"/>
-                <path d="M6 18h14v1H6z" fill="#65675e"/>
-                <path d="M6 21h8v1H6z" fill="#65675e"/>
-              </svg>
+                <ZenithLogo animate={false} />
               <span className="font-extrabold text-[15px] tracking-tight text-dark-text hidden sm:inline">
                 Zenith
               </span>
@@ -165,7 +173,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
             <nav className="hidden lg:flex items-center gap-1">
               {NAV_ITEMS.map((item) => (
                 <div key={item.label} className="relative navbar-item group">
-                  <button onClick={() => playRetroSound("click")} className="flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium text-dark-text-muted hover:text-dark-text transition-colors rounded-md hover:bg-dark-surface cursor-pointer">
+                  <button type="button" onClick={() => playRetroSound("click")} className="flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium text-dark-text-muted hover:text-dark-text transition-colors rounded-md hover:bg-dark-surface cursor-pointer">
                     {item.label}
                     {item.children && <ChevronDown className="w-3 h-3 opacity-50" />}
                   </button>
@@ -219,7 +227,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
             <a
-              href="https://github.com/roshhellwett/zenithopensourceprojects"
+              href={STORE_URL}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => playRetroSound("click")}
@@ -232,6 +240,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
             <button
               onClick={() => {
                 playRetroSound("click");
+                previousFocusRef.current = document.activeElement as HTMLElement;
                 setSearchOpen(true);
               }}
               className="p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-colors flex items-center gap-1"
@@ -247,6 +256,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
             {/* Mode Switcher */}
             {onToggleMode && (
               <button
+                type="button"
                 onClick={() => {
                   playRetroSound("toggle");
                   onToggleMode();
@@ -283,6 +293,8 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
 
             {/* Mobile menu toggle */}
             <button
+              ref={menuButtonRef}
+              type="button"
               onClick={() => {
                 playRetroSound("click");
                 setMobileOpen(!mobileOpen);
@@ -312,7 +324,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 top-12 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
-                onClick={() => setMobileOpen(false)}
+                onClick={() => { setMobileOpen(false); menuButtonRef.current?.focus(); }}
               />
 
               {/* Menu Panel */}
@@ -355,7 +367,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                 ))}
                 <div className="pt-3 border-t border-dark-border-subtle">
                   <a
-                    href="https://github.com/roshhellwett/zenithopensourceprojects"
+                          href={STORE_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => playRetroSound("click")}
@@ -373,7 +385,11 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
       {/* Global Search Modal */}
       <SearchModal
         isOpen={searchOpen}
-        onClose={() => setSearchOpen(false)}
+        onClose={() => {
+          setSearchOpen(false);
+          previousFocusRef.current?.focus();
+          previousFocusRef.current = null;
+        }}
         onSwitchMode={onToggleMode}
       />
     </>

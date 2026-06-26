@@ -1,6 +1,27 @@
 import { SITE_URL } from "@/data/site";
 
 export function StructuredData() {
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Zenith Open Source Projects",
+    url: SITE_URL,
+    description:
+      "A curated collection of open source tools, bots, and system experiments by Roshan Kr Singh.",
+    author: {
+      "@type": "Person",
+      name: "Roshan Kr Singh",
+      url: "https://github.com/roshhellwett",
+      sameAs: [
+        "https://github.com/roshhellwett",
+        "https://x.com/roshhellwett",
+      ],
+    },
+    inLanguage: "en-IN",
+    isAccessibleForFree: true,
+    license: "https://opensource.org/licenses/MIT",
+  };
+
   const collectionSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -139,6 +160,10 @@ export function StructuredData() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}

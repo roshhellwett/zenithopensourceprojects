@@ -3,8 +3,24 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
-import DesktopMode from "@/components/DesktopMode";
-import WebsiteMode from "@/components/WebsiteMode";
+import dynamic from "next/dynamic";
+
+const DesktopMode = dynamic(() => import("@/components/DesktopMode"), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 bg-dark-bg flex items-center justify-center">
+      <div className="animate-pulse text-dark-text-muted text-sm">Loading desktop...</div>
+    </div>
+  ),
+});
+
+const WebsiteMode = dynamic(() => import("@/components/WebsiteMode"), {
+  loading: () => (
+    <div className="fixed inset-0 bg-dark-bg flex items-center justify-center">
+      <div className="animate-pulse text-dark-text-muted text-sm">Loading website...</div>
+    </div>
+  ),
+});
 
 export default function Page() {
   const [mode, setMode] = useState<"desktop" | "website">("desktop");

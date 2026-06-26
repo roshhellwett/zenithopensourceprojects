@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { ExternalLink, ArrowUpRight } from 'lucide-react';
 import { CATEGORIES } from "@/data/categories";
@@ -65,7 +67,7 @@ export default function RegistryApp({ playRetroSound }: { playRetroSound: (type:
                   <a
                     href={repo.homepage}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="text-accent-teal hover:underline font-bold flex items-center gap-0.5"
                   >
                     <span>Demo</span>
@@ -75,7 +77,7 @@ export default function RegistryApp({ playRetroSound }: { playRetroSound: (type:
                 <a
                   href={repo.link}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="text-cobalt hover:underline font-bold flex items-center gap-0.5"
                 >
                   <span>Code</span>
@@ -93,7 +95,7 @@ export default function RegistryApp({ playRetroSound }: { playRetroSound: (type:
           <a
             href="https://github.com/roshhellwett?tab=repositories"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="bg-amber-button hover:bg-saffron-deep text-black px-6 py-2.5 border border-amber-shadow rounded text-xs font-bold flex items-center gap-2 transition-transform active:translate-y-0.5"
           >
             Visit Zenith Registry Page <ArrowUpRight className="w-3.5 h-3.5" />

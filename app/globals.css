@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -31,12 +30,15 @@
   --color-tab-salmon: #d95843;
   --color-tab-purple: #7b5fb5;
 
-  /* ── Typography ── */
-  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: 'Source Code Pro', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* ── Typography (variables set by next/font in layout.tsx) ── */
 
   /* Shadows */
   --shadow-xl: rgba(0, 0, 0, 0.12) 0px 25px 50px -12px;
+}
+
+/* ── Layout Constants ── */
+:root {
+  --navbar-height: 48px;
 }
 
 /* ── Base Resets ── */
@@ -86,7 +88,6 @@ html, body {
 .crisp-bg {
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
-  -ms-interpolation-mode: nearest-neighbor;
   backface-visibility: hidden;
   transform: translateZ(0);
 }
@@ -252,6 +253,16 @@ html, body {
   animation: toast-progress 3.5s linear forwards;
 }
 
+/* ── Loading screen progress bar ── */
+@keyframes loading-progress {
+  0% { width: 0%; transform: translateX(0); }
+  50% { width: 70%; }
+  100% { width: 100%; transform: translateX(0); }
+}
+.loading-progress {
+  animation: loading-progress 1.8s ease-in-out infinite;
+}
+
 /* ── Warm-toned scrollbar (WebKit) ── */
 ::-webkit-scrollbar {
   width: 8px;
@@ -413,7 +424,8 @@ body.scroll-locked {
   }
 
   .tab-progress-bar,
-  .toast-progress-bar {
+  .toast-progress-bar,
+  .loading-progress {
     animation: none !important;
   }
 }

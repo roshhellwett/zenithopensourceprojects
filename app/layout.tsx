@@ -1,33 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Outfit, Sacramento, Dancing_Script } from "next/font/google";
+import { IBM_Plex_Sans, Source_Code_Pro } from "next/font/google";
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/data/site";
 import { StructuredData } from "@/components/StructuredData";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const ibmPlexSans = IBM_Plex_Sans({
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-});
-
-const sacramento = Sacramento({
-  weight: "400",
-  variable: "--font-sacramento",
-  subsets: ["latin"],
-});
-
-const dancingScript = Dancing_Script({
-  variable: "--font-dancing-script",
+const sourceCodePro = Source_Code_Pro({
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
@@ -66,7 +52,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [{ url: "/favicon.ico" }],
-    apple: [{ url: "/favicon.ico" }],
+    // apple icon not bundled — uncomment and add the file to public/ to enable
   },
   manifest: "/manifest.json",
   verification: {
@@ -86,6 +72,7 @@ export const metadata: Metadata = {
     locale: "en_IN",
     type: "website",
     countryName: "India",
+    // images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: "Zenith Open Source Projects" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -94,6 +81,7 @@ export const metadata: Metadata = {
       "Open source Telegram bots, Windows tools, GRUB themes, and more by @roshhellwett.",
     creator: "@roshhellwett",
     creatorId: "roshhellwett",
+    // images: [`${SITE_URL}/og-image.png`],
   },
 };
 
@@ -101,7 +89,6 @@ export const viewport: Viewport = {
   themeColor: "#e1d7c2",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -110,40 +97,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en-IN">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${sacramento.variable} ${dancingScript.variable} antialiased`}
+        className={`${ibmPlexSans.variable} ${sourceCodePro.variable} antialiased`}
       >
         {/* Skip to content — accessibility */}
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
 
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "Zenith Open Source Projects",
-              url: SITE_URL,
-              description:
-                "A curated collection of open source tools, bots, and system experiments by Roshan Kr Singh.",
-              author: {
-                "@type": "Person",
-                name: "Roshan Kr Singh",
-                url: "https://github.com/roshhellwett",
-                sameAs: [
-                  "https://github.com/roshhellwett",
-                  "https://x.com/roshhellwett",
-                ],
-              },
-              inLanguage: "en-IN",
-              isAccessibleForFree: true,
-              license: "https://opensource.org/licenses/MIT",
-            }),
-          }}
-        />
         <StructuredData />
         <main id="main-content">
           {children}

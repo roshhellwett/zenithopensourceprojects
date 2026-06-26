@@ -19,8 +19,4 @@ export interface Repo {
   topics?: string[];
 }
 
-export interface PanelProps {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}
+

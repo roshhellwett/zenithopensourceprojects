@@ -6,9 +6,13 @@ import { FEATURED_FALLBACK, FALLBACK_REPOS } from "@/data/repos";
 import { STACK } from "@/data/stack";
 import { SOCIALS } from "@/data/socials";
 import { useMouseSpotlight } from "@/lib/useMouseSpotlight";
+import { STORE_URL } from "@/lib/site";
+import { ZenithLogo } from "@/components/ZenithLogo";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Repo } from "@/types";
 import { playRetroSound } from "@/lib/audio";
+
+const ALL_REPOS = [FEATURED_FALLBACK, ...FALLBACK_REPOS];
 
 const FEATURE_TABS = [
   {
@@ -145,7 +149,7 @@ interface WebsiteModeProps {
 }
 
 // Sub-component for project cards using the useMouseSpotlight hook
-function ProjectCard({ repo }: { repo: Repo }) {
+const ProjectCard = React.memo(function ProjectCard({ repo }: { repo: Repo }) {
   const { ref, x, y, bind } = useMouseSpotlight();
 
   return (
@@ -193,7 +197,7 @@ function ProjectCard({ repo }: { repo: Repo }) {
       </div>
     </a>
   );
-}
+});
 
 export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
   const [activeTab, setActiveTab] = useState(0);
@@ -202,8 +206,6 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
   const [showConsent, setShowConsent] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  const allRepos = [FEATURED_FALLBACK, ...FALLBACK_REPOS];
 
   // Auto-cycle feature tabs
   useEffect(() => {
@@ -252,22 +254,31 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
 
   // Cookie/Privacy Consent Banner
   useEffect(() => {
-    if (!localStorage.getItem("zenith_cookie_consent")) {
+    let hasConsent = false;
+    try { hasConsent = !!localStorage.getItem("zenith_cookie_consent"); } catch {}
+    if (!hasConsent) {
       const timer = setTimeout(() => setShowConsent(true), 2500);
       return () => clearTimeout(timer);
     }
   }, []);
 
-  // Subtle hero card parallax
+  // Subtle hero card parallax (throttled)
   useEffect(() => {
+    let rafId: number;
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({
-        x: (e.clientX - window.innerWidth / 2) * 0.012,
-        y: (e.clientY - window.innerHeight / 2) * 0.012,
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        setMousePos({
+          x: (e.clientX - window.innerWidth / 2) * 0.012,
+          y: (e.clientY - window.innerHeight / 2) * 0.012,
+        });
       });
     };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const currentTab = FEATURE_TABS[activeTab];
@@ -279,12 +290,12 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
 
   const handleAcceptConsent = () => {
     playRetroSound("success");
-    localStorage.setItem("zenith_cookie_consent", "true");
+    try { localStorage.setItem("zenith_cookie_consent", "true"); } catch {}
     setShowConsent(false);
   };
 
   return (
-    <div className="min-h-screen text-dark-text relative z-10 selection:bg-amber-button/30 select-none md:select-text">
+    <div className="min-h-screen text-dark-text relative z-10 selection:bg-amber-button/30">
       
       {/* ── SIDE DOTS NAVIGATION ── */}
       <div className="fixed right-6 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-3 z-50 select-none">
@@ -328,12 +339,7 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
           className="bg-dark-surface/90 rounded-2xl p-6 sm:p-10 border border-dark-border/50 shadow-xl"
         >
           <div className="flex items-center gap-3 mb-6 select-none">
-            <svg className="w-9 h-9 animate-pulse" viewBox="0 0 32 32" fill="none">
-              <rect x="2" y="6" width="28" height="20" rx="3" fill="#1d1f27" stroke="#F1A82C" strokeWidth="2"/>
-              <path d="M6 10h4v2H6zM12 10h4v2h-4zM20 10h6v2h-6z" fill="#F1A82C" opacity="0.8"/>
-              <path d="M6 15h20v1H6z" fill="#65675e"/>
-              <path d="M6 18h14v1H6z" fill="#65675e"/>
-            </svg>
+              <ZenithLogo className="w-9 h-9" />
             <span className="font-extrabold text-2xl tracking-tight">Zenith</span>
           </div>
 
@@ -351,7 +357,7 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
           {/* CTA Buttons - Responsive Stacked layout */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6 select-none">
             <a
-              href="https://github.com/roshhellwett/zenithopensourceprojects"
+              href={STORE_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-amber-button hover:bg-saffron-deep text-black px-6 py-2.5 rounded-md text-sm font-bold transition-all active:scale-95 border border-amber-shadow text-center"
@@ -417,14 +423,14 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
                   {i === activeTab && (
                     <motion.div
                       layoutId="activeTabBorder"
-                      className={`absolute bottom-0 left-0 right-0 h-0.5 bg-${
+                      className={`absolute bottom-0 left-0 right-0 h-0.5 ${
                         tab.color === "teal"
-                          ? "accent-teal"
+                          ? "bg-accent-teal"
                           : tab.color === "orange"
-                          ? "amber-button"
+                          ? "bg-amber-button"
                           : tab.color === "salmon"
-                          ? "accent-salmon"
-                          : "accent-purple"
+                          ? "bg-accent-salmon"
+                          : "bg-accent-purple"
                       }`}
                     >
                       {autoCycle && <div className="h-full bg-dark-text/30 tab-progress-bar" />}
@@ -537,7 +543,7 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
 
           {/* Grid layout with single column on mobile */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
-            {allRepos.slice(0, 6).map((repo) => (
+            {ALL_REPOS.slice(0, 6).map((repo) => (
               <ProjectCard key={repo.name} repo={repo} />
             ))}
           </div>
@@ -629,7 +635,7 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
                 </tr>
               </thead>
               <tbody className="select-text">
-                {allRepos.slice(0, 5).map((repo, i) => (
+                {ALL_REPOS.slice(0, 5).map((repo, i) => (
                   <tr key={repo.name} className="border-t border-dark-border-subtle hover:bg-dark-surface/50 transition-colors">
                     <td className="py-3 px-4 text-dark-text-muted">{i + 1}</td>
                     <td className="py-3 px-4">
@@ -704,7 +710,7 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
               </div>
 
               <a
-                href="https://github.com/roshhellwett/zenithopensourceprojects"
+                href={STORE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center bg-amber-button hover:bg-saffron-deep text-black px-6 py-2.5 rounded-md font-bold text-sm transition-all active:scale-95 border border-amber-shadow shadow"
@@ -811,14 +817,14 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
             initial={{ y: 60, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 60, opacity: 0 }}
-            className="fixed bottom-6 left-6 right-6 sm:left-auto sm:right-6 sm:max-w-sm bg-dark-surface border border-dark-border rounded-xl shadow-2xl p-4.5 z-[70] flex flex-col gap-3.5 backdrop-blur-md"
+            className="fixed bottom-6 left-6 right-6 sm:left-auto sm:right-6 sm:max-w-sm bg-dark-surface border border-dark-border rounded-xl shadow-2xl p-4 z-[70] flex flex-col gap-3 backdrop-blur-md"
           >
             <div className="text-xs text-dark-text leading-relaxed font-medium">
               🍪 <strong>Cookie & Privacy Policy:</strong> Zenith does not use tracking cookies. All user configuration settings (OS mode preferences, sound toggle, search logs) are stored directly on your machine.
             </div>
             <button
               onClick={handleAcceptConsent}
-              className="bg-amber-button hover:bg-saffron-deep text-black px-4.5 py-1.5 rounded-md text-xs font-bold transition-all active:scale-95 border border-amber-shadow self-end cursor-pointer"
+              className="bg-amber-button hover:bg-saffron-deep text-black px-4 py-1.5 rounded-md text-xs font-bold transition-all active:scale-95 border border-amber-shadow self-end cursor-pointer"
             >
               Accept
             </button>

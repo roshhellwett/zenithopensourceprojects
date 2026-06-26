@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+"use client";
+/* eslint-disable react-hooks/refs -- useAiChat returns state not refs */
+
+import React from 'react';
 import { Send } from 'lucide-react';
-import { getApiUrl } from '@/lib/api';
 import { SoundType } from '@/lib/audio';
+import { useAiChat } from '@/hooks/useAiChat';
 
 const parseMessage = (text: string) => {
   if (!text) return null;
@@ -24,7 +27,7 @@ const parseMessage = (text: string) => {
           rel="noopener noreferrer" 
           className="inline-block px-3 py-1.5 mt-1 mr-2 bg-dark-surface hover:bg-amber-button text-dark-text hover:text-black border border-dark-border shadow-sm rounded-md text-[11px] font-bold tracking-wide transition-all active:scale-95 no-underline"
         >
-          {match[1].replace('https://', '')}
+          {match[2].replace(/^https?:\/\//, '')}
         </a>
       );
       lastIndex = linkRegex.lastIndex;
@@ -65,89 +68,14 @@ const parseMessage = (text: string) => {
 };
 
 export default function MascotApp({ playRetroSound }: { playRetroSound: (type: SoundType) => void }) {
-  interface Message {
-    id: string;
-    sender: string;
-    content: string;
-    timestamp: string;
-  }
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      sender: "hogai",
-      content: "Hello, system builder! 🦥 I am Zenith AI, your retro helper sloth. I live inside this terminal workstation. Ask me anything about Zenith's open source projects like Project Sentinel or ZeroGapVote, or inspect our source code!",
-      timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
-    }
-  ]);
-  const [chatInput, setChatInput] = useState<string>("");
-  const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  // Scroll to bottom on new messages
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isSendingMessage]);
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatInput.trim()) return;
-
-    const userMsg = {
-      id: `msg_${Date.now()}`,
-      sender: "user",
-      content: chatInput,
-      timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
-    setChatInput("");
-    setIsSendingMessage(true);
-    playRetroSound("click");
-
-    try {
-      const response = await fetch(`${getApiUrl()}/api/ai/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...messages, userMsg] })
-      });
-      const data = await response.json();
-
-      const botMsg = {
-        id: `msg_bot_${Date.now()}`,
-        sender: "hogai",
-        content: data.text || "I was taking a short nap. What were we compiling?",
-        timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
-      };
-      setMessages((prev) => [...prev, botMsg]);
-      playRetroSound("beep");
-    } catch {
-      playRetroSound("error");
-      const botErrorMsg = {
-        id: `msg_bot_err_${Date.now()}`,
-        sender: "hogai",
-        content: "Oops, my hammock strings broke! Network timeout. Ensure GROQ_API_KEY is configured or continue playing in local demo mode.",
-        timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
-      };
-      setMessages((prev) => [...prev, botErrorMsg]);
-    } finally {
-      setIsSendingMessage(false);
-    }
-  };
-
-  const handleClearChat = () => {
-    setMessages([
-      {
-        id: "welcome",
-        sender: "hogai",
-        content: "Hello, system builder! 🦥 I am Zenith AI, your retro helper sloth. I live inside this terminal workstation. Ask me anything about Zenith's open source projects like Project Sentinel or ZeroGapVote, or inspect our source code!",
-        timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
-      }
-    ]);
-  };
+  const chat = useAiChat({
+    botSender: "hogai",
+    welcomeMessage: "Hello, system builder! 🦥 I am Zenith AI, your retro helper sloth. I live inside this terminal workstation. Ask me anything about Zenith's open source projects like Project Sentinel or ZeroGapVote, or inspect our source code!",
+    fallbackMessage: "I was taking a short nap. What were we compiling?",
+    errorMessage: "Oops, I'm having trouble connecting. Please try again later.",
+    idPrefix: { user: "msg_", bot: "msg_bot_", error: "msg_bot_err_" },
+    playRetroSound,
+  });
 
   return (
     <div className="flex flex-col h-[400px]">
@@ -156,10 +84,7 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: S
         <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
-            onClick={() => {
-              handleClearChat();
-              playRetroSound("toggle");
-            }}
+            onClick={chat.clearChat}
             className="px-2 py-0.5 border border-dark-border hover:border-dark-text-muted bg-dark-bg text-[10px] text-dark-text-muted hover:text-dark-text rounded font-bold transition-colors cursor-pointer"
           >
             Clear Chat
@@ -170,7 +95,7 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: S
 
       {/* Chat bubbles container */}
       <div className="flex-1 bg-dark-bg border border-dark-border rounded p-3 overflow-y-auto space-y-3 font-sans relative">
-        {messages.map((m) => {
+        {chat.messages.map((m) => {
           const isBot = m.sender === "hogai";
           return (
             <div
@@ -198,7 +123,7 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: S
           );
         })}
 
-        {isSendingMessage && (
+        {chat.loading && (
           <div className="flex gap-2.5 max-w-[85%] mr-auto">
             <div className="w-8 h-8 rounded bg-dark-surface flex items-center justify-center p-1 border border-dark-border shrink-0">🦥</div>
             <div className="p-3 bg-dark-surface border border-dark-border rounded rounded-tl-none flex gap-1 items-center">
@@ -210,23 +135,23 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: S
         )}
 
         {/* Scroll dummy */}
-        <div ref={messagesEndRef} />
+        <div ref={chat.messagesEndRef} />
       </div>
 
       {/* Input box */}
       <div className="mt-3">
-        <form onSubmit={handleSendMessage} className="relative flex items-center">
+        <form onSubmit={(e) => { e.preventDefault(); chat.sendMessage(); }} className="relative flex items-center">
           <input
             type="text"
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            disabled={isSendingMessage}
+            value={chat.input}
+            onChange={(e) => chat.setInput(e.target.value)}
+            disabled={chat.loading}
             placeholder="Type your prompt..."
             className="w-full bg-dark-bg border border-dark-border rounded p-2.5 pr-20 text-xs text-dark-text focus:outline-none focus:ring-1 focus:ring-cobalt font-mono"
           />
           <button
             type="submit"
-            disabled={!chatInput.trim() || isSendingMessage}
+            disabled={!chat.input.trim() || chat.loading}
             className="absolute right-1 top-1 bottom-1 bg-amber-button hover:bg-saffron-deep disabled:opacity-50 disabled:cursor-not-allowed border border-amber-shadow px-3 rounded text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer text-black"
           >
             <span>Send</span>
@@ -238,28 +163,28 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: S
           <span className="font-bold uppercase">Quick prompts:</span>
           <button
             type="button"
-            onClick={() => { setChatInput("Tell me more about Project Sentinel scraper capabilities."); playRetroSound("click"); }}
+            onClick={() => { chat.sendMessage("Tell me more about Project Sentinel scraper capabilities."); playRetroSound("click"); }}
             className="px-2 py-0.5 border border-dark-border bg-dark-surface rounded hover:bg-dark-elevated hover:text-dark-text cursor-pointer"
           >
             &ldquo;About Sentinel Scraper&rdquo;
           </button>
           <button
             type="button"
-            onClick={() => { setChatInput("How does Project ZeroGapVote secure digital voting proposals?"); playRetroSound("click"); }}
+            onClick={() => { chat.sendMessage("How does Project ZeroGapVote secure digital voting proposals?"); playRetroSound("click"); }}
             className="px-2 py-0.5 border border-dark-border bg-dark-surface rounded hover:bg-dark-elevated hover:text-dark-text cursor-pointer"
           >
             &ldquo;ZeroGapVote Security&rdquo;
           </button>
           <button
             type="button"
-            onClick={() => { setChatInput("What projects are built with Python in this registry?"); playRetroSound("click"); }}
+            onClick={() => { chat.sendMessage("What projects are built with Python in this registry?"); playRetroSound("click"); }}
             className="px-2 py-0.5 border border-dark-border bg-dark-surface rounded hover:bg-dark-elevated hover:text-dark-text cursor-pointer"
           >
             &ldquo;Python Repos&rdquo;
           </button>
           <button
             type="button"
-            onClick={() => { setChatInput("Can you tell me about Roshan's work philosophy?"); playRetroSound("click"); }}
+            onClick={() => { chat.sendMessage("Can you tell me about Roshan's work philosophy?"); playRetroSound("click"); }}
             className="px-2 py-0.5 border border-dark-border bg-dark-surface rounded hover:bg-dark-elevated hover:text-dark-text cursor-pointer"
           >
             &ldquo;Founder Philosophy&rdquo;

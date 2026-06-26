@@ -48,7 +48,7 @@ The website features a unique **dual-mode interface** — a retro CRT Desktop OS
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) v18.x or later
+- [Node.js](https://nodejs.org/) v20.x or later
 - `npm` (comes with Node.js)
 - A [Groq API key](https://console.groq.com/keys) (free — optional, for AI chat)
 
@@ -63,8 +63,11 @@ cd zenithopensourceprojects
 npm install
 
 # 3. Set up your environment variables
-cp .env.example .env.local
+cp .env.example .env.local   # Unix/macOS
+copy .env.example .env.local  # Windows
 ```
+
+> **Note:** Use the appropriate command for your OS — **Unix/macOS:** `cp .env.example .env.local` · **Windows:** `copy .env.example .env.local`
 
 ### Setting up the Groq API Key
 
@@ -91,6 +94,18 @@ npm start
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Worker Setup (AI Backend)
+
+The `worker/` subdirectory is a standalone Express server that handles AI chat requests to Groq.
+
+1. `cd worker`
+2. `cp .env.example .env.local` (or `copy .env.example .env.local` on Windows)
+3. Set your `GROQ_API_KEY` in `worker/.env.local`
+4. `npm install`
+5. `npm run dev` (hot-reloads with tsx)
+
+See [worker/README.md](worker/README.md) for deployment instructions.
 
 ## ✦ Project Structure
 
@@ -139,6 +154,12 @@ Any platform that supports Next.js works — Netlify, Railway, Render, etc. Just
 - `GROQ_API_KEY` environment variable is set
 - Build command: `npm run build`
 - Start command: `npm start`
+
+## ✦ Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md) code of conduct.
 
 ## ✦ Design Credits
 

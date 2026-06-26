@@ -49,7 +49,7 @@ export default function HomeApp() {
           <a
             href="https://github.com/roshhellwett/projectsentinel"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="text-amber-button hover:underline flex items-center gap-0.5 font-sans font-bold ml-auto"
           >
             <span>Inspect Repo</span>

@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import DesktopIcon, { renderDesktopIcon } from "./DesktopIcon";
 import DesktopWindow from "./DesktopWindow";
 import ChatPanel from "./ChatPanel";
+import { STORE_URL } from "@/lib/site";
 import { LEFT_DESKTOP_ICONS, RIGHT_DESKTOP_ICONS } from "@/data/desktop-icons";
 import { motion } from "framer-motion";
 import { playRetroSound, getSoundEnabled, setSoundEnabled } from "@/lib/audio";
 
+import { ZenithLogo } from "@/components/ZenithLogo";
 import HomeApp from "@/components/apps/HomeApp";
 import RegistryApp from "@/components/apps/RegistryApp";
 import TelemetryApp from "@/components/apps/TelemetryApp";
@@ -26,7 +28,30 @@ const TAB_LABELS: Record<string, string> = {
   stack: "stack.sys",
   founder: "founder.md",
   "ask-ai": "zenith-ai.chat",
-  customers: "customers.mdx",
+};
+
+// Stagger entrance animations for desktop icons
+const iconContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.04,
+    },
+  },
+};
+
+const iconItemVariants = {
+  hidden: { y: 15, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 350,
+      damping: 24,
+    },
+  },
 };
 
 // Clock Widget for the Taskbar
@@ -61,11 +86,10 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
   const [isBooting, setIsBooting] = useState(true);
   const [bootLog, setBootLog] = useState<string[]>([]);
 
-  const [soundEnabled, setSoundEnabledState] = useState(true);
+  const [soundEnabled, setSoundEnabledState] = useState(() => getSoundEnabled());
 
   // Sync sound settings local state
   useEffect(() => {
-    setSoundEnabledState(getSoundEnabled());
     const handleToggle = (e: Event) => {
       setSoundEnabledState((e as CustomEvent).detail);
     };
@@ -82,20 +106,35 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
 
   // Toast system
   const [toasts, setToasts] = useState<{ id: string; message: string }[]>([]);
-  const addToast = (message: string) => {
-    const id = Date.now().toString();
+  const toastTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const toastIdCounterRef = useRef(0);
+  const addToast = useCallback((message: string) => {
+    const id = `${++toastIdCounterRef.current}_${Date.now()}`;
     setToasts((prev) => [...prev, { id, message }]);
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500);
-  };
+    const timer = setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+      toastTimersRef.current.delete(id);
+    }, 3500);
+    toastTimersRef.current.set(id, timer);
+  }, []);
+
+  // Clean up all toast timers on unmount
+  useEffect(() => {
+    const timers = toastTimersRef.current;
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      timers.clear();
+    };
+  }, []);
 
   // playRetroSound is imported from @/lib/audio
 
   // Boot loader execution
+  const bootTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (sessionStorage.getItem("zenith_booted")) {
-      setIsBooting(false);
-      return;
-    }
+    let booted = false;
+    try { booted = !!sessionStorage.getItem("zenith_booted"); } catch {}
+    if (booted) { setIsBooting(false); return; } // eslint-disable-line react-hooks/set-state-in-effect
 
     const lines = [
       "ZENITH REGISTRY BOOTLOADER v1.0.4",
@@ -109,31 +148,45 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       "SUCCESS: Boot sequence complete. Entering shell.",
     ];
 
-    let currentLine = 0;
+    const lineRef = { current: 0 };
     const interval = setInterval(() => {
-      if (currentLine < lines.length) {
-        setBootLog((prev) => [...prev, lines[currentLine]]);
-        currentLine++;
+      if (lineRef.current < lines.length) {
+        setBootLog((prev) => [...prev, lines[lineRef.current]]);
+        lineRef.current++;
       } else {
         clearInterval(interval);
-        setTimeout(() => {
+        bootTimeoutRef.current = setTimeout(() => {
           setIsBooting(false);
-          sessionStorage.setItem("zenith_booted", "true");
+          try { sessionStorage.setItem("zenith_booted", "true"); } catch {}
           addToast("Zenith Workspace initialized successfully.");
           playRetroSound("success");
         }, 500);
       }
     }, 180);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearInterval(interval);
+      if (bootTimeoutRef.current) clearTimeout(bootTimeoutRef.current);
+    };
+  }, [addToast]);
 
-  // Keyboard Shortcuts Hook
+  // Keyboard Shortcuts Hook (refs to avoid re-registering listener)
+  const windowOpenRef = useRef(windowOpen);
+  const isMinimizedRef = useRef(isMinimized);
+  const crtActiveRef = useRef(crtActive);
+  const isBootingRef = useRef(isBooting);
+
+  useEffect(() => { windowOpenRef.current = windowOpen; }, [windowOpen]);
+  useEffect(() => { isMinimizedRef.current = isMinimized; }, [isMinimized]);
+  useEffect(() => { crtActiveRef.current = crtActive; }, [crtActive]);
+  useEffect(() => { isBootingRef.current = isBooting; }, [isBooting]);
+
   useEffect(() => {
-    if (isBooting) return;
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isBootingRef.current) return;
+
       // Esc to minimize/close active window
-      if (e.key === "Escape" && windowOpen && !isMinimized) {
+      if (e.key === "Escape" && windowOpenRef.current && !isMinimizedRef.current) {
         setIsMinimized(true);
         addToast("Window minimized. Toggle via bottom taskbar.");
         playRetroSound("toggle");
@@ -142,9 +195,12 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       // Ctrl+Shift+T to toggle CRT filter
       if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "T") {
         e.preventDefault();
-        setCrtActive((prev) => !prev);
-        playRetroSound("crt");
-        addToast(`CRT Filter ${!crtActive ? "enabled" : "disabled"}`);
+        setCrtActive((prev) => {
+          const next = !prev;
+          playRetroSound("crt");
+          addToast(`CRT Filter ${next ? "enabled" : "disabled"}`);
+          return next;
+        });
       }
 
       // Ctrl + 1-4 to switch active tabs
@@ -164,7 +220,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [windowOpen, isMinimized, crtActive, isBooting]);
+  }, [addToast]);
 
   // Context Menu handlers
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -172,16 +228,16 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
     setContextMenu({ x: e.clientX, y: e.clientY, visible: true });
   };
 
-  const closeContextMenu = () => {
+  const closeContextMenu = useCallback(() => {
     setContextMenu((prev) => ({ ...prev, visible: false }));
-  };
+  }, []);
 
   useEffect(() => {
     window.addEventListener("click", closeContextMenu);
     return () => window.removeEventListener("click", closeContextMenu);
-  }, []);
+  }, [closeContextMenu]);
 
-  const handleIconClick = (id: string, action?: string, tabId?: string, link?: string) => {
+  const handleIconClick = useCallback((id: string, action?: string, tabId?: string, link?: string) => {
     playRetroSound("click");
 
     if (action === "link" && link) {
@@ -205,7 +261,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       setIsMinimized(false);
       addToast(`Opening ${TAB_LABELS[tabId] || tabId}...`);
     }
-  };
+  }, [onSwitchToWebsite, addToast]);
 
   const handleRefresh = () => {
     playRetroSound("success");
@@ -213,29 +269,51 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
     setRefreshKey((prev) => prev + 1);
   };
 
-  // Stagger entrance animations for desktop icons
-  const iconContainerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.04,
-      },
-    },
-  };
+  // Context menu handlers
+  const handleContextOpenHome = useCallback(() => {
+    setWindowOpen(true);
+    setIsMinimized(false);
+    setActiveTab("home");
+    closeContextMenu();
+  }, [closeContextMenu]);
 
-  const iconItemVariants = {
-    hidden: { y: 15, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring" as const,
-        stiffness: 350,
-        damping: 24,
-      },
-    },
-  };
+  const handleContextOpenAssistant = useCallback(() => {
+    setChatOpen(true);
+    closeContextMenu();
+  }, [closeContextMenu]);
+
+  const handleContextToggleCrt = useCallback(() => {
+    const next = !crtActive;
+    setCrtActive(next);
+    playRetroSound("crt");
+    addToast(next ? "CRT Filter ON" : "CRT Filter OFF");
+    closeContextMenu();
+  }, [crtActive, addToast, closeContextMenu]);
+
+  const handleContextToggleSound = useCallback(() => {
+    const nextSound = !soundEnabled;
+    setSoundEnabled(nextSound);
+    setSoundEnabledState(nextSound);
+    addToast(`Retro Sounds: ${nextSound ? "ON" : "OFF"}`);
+    closeContextMenu();
+  }, [soundEnabled, addToast, closeContextMenu]);
+
+  const handleContextGoToWebsite = useCallback(() => {
+    onSwitchToWebsite();
+    closeContextMenu();
+  }, [onSwitchToWebsite, closeContextMenu]);
+
+  const handleTabClick = useCallback((tabId: string) => {
+    setActiveTab(tabId);
+    playRetroSound("click");
+  }, []);
+
+  const handleTaskbarClick = useCallback((appId: string, isRunning: boolean) => {
+    setActiveTab(appId);
+    setWindowOpen(true);
+    setIsMinimized(isRunning);
+    playRetroSound("click");
+  }, []);
 
   if (isBooting) {
     return (
@@ -267,14 +345,14 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
 
   return (
     <div
-      className="relative h-[calc(100vh-48px)] overflow-hidden"
+      className="relative h-[calc(100vh-var(--navbar-height))] overflow-hidden"
       onContextMenu={handleContextMenu}
     >
       {/* CRT scanline overlay */}
       {crtActive && <div className="crt-overlay" />}
 
       {/* Toast notifications */}
-      <div className="fixed bottom-14 left-4 z-[60] flex flex-col gap-2 max-w-sm">
+      <div className="fixed bottom-14 left-4 z-[60] flex flex-col gap-2 max-w-sm" role="status" aria-live="polite" aria-label="Notifications">
         {toasts.map((t) => (
           <div
             key={t.id}
@@ -295,53 +373,32 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={() => {
-              setWindowOpen(true);
-              setIsMinimized(false);
-              setActiveTab("home");
-              closeContextMenu();
-            }}
+            onClick={handleContextOpenHome}
             className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
           >
             📂 Open home.md
           </button>
           <button
-            onClick={() => {
-              setChatOpen(true);
-              closeContextMenu();
-            }}
+            onClick={handleContextOpenAssistant}
             className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
           >
             💬 Open AI Assistant
           </button>
           <button
-            onClick={() => {
-              setCrtActive((prev) => !prev);
-              playRetroSound("crt");
-              addToast(crtActive ? "CRT Filter OFF" : "CRT Filter ON");
-              closeContextMenu();
-            }}
+            onClick={handleContextToggleCrt}
             className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
           >
             📺 Toggle CRT overlay
           </button>
           <button
-            onClick={() => {
-              const nextSound = !soundEnabled;
-              setSoundEnabled(nextSound);
-              addToast(`Retro Sounds: ${nextSound ? "ON" : "OFF"}`);
-              closeContextMenu();
-            }}
+            onClick={handleContextToggleSound}
             className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
           >
             🔊 {soundEnabled ? "Mute retro sounds" : "Enable retro sounds"}
           </button>
           <div className="h-px bg-dark-border-subtle my-1" />
           <button
-            onClick={() => {
-              onSwitchToWebsite();
-              closeContextMenu();
-            }}
+            onClick={handleContextGoToWebsite}
             className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
           >
             🌐 Go to Website Mode
@@ -425,11 +482,12 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
             }}
             onRefresh={handleRefresh}
             onSearch={() => {
-              window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }));
+              window.dispatchEvent(new CustomEvent("zenith_open_search"));
             }}
             onToggleSettings={() => {
               const nextSound = !soundEnabled;
               setSoundEnabled(nextSound);
+              setSoundEnabledState(nextSound);
               addToast(`Retro Sounds: ${nextSound ? "ON" : "OFF"}`);
             }}
           >
@@ -438,12 +496,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
               {/* Hero header */}
               <div className="px-6 md:px-10 pt-8 pb-6 border-b border-dark-border-subtle">
                 <div className="flex items-center gap-3 mb-4">
-                  <svg className="w-7 h-7 animate-pulse" viewBox="0 0 32 32" fill="none">
-                    <rect x="2" y="6" width="28" height="20" rx="3" fill="#1d1f27" stroke="#F1A82C" strokeWidth="2"/>
-                    <path d="M6 10h4v2H6zM12 10h4v2h-4zM20 10h6v2h-6z" fill="#F1A82C" opacity="0.8"/>
-                    <path d="M6 15h20v1H6z" fill="#65675e"/>
-                    <path d="M6 18h14v1H6z" fill="#65675e"/>
-                  </svg>
+                  <ZenithLogo />
                   <span className="font-extrabold text-xl tracking-tight text-dark-text">Zenith</span>
                 </div>
 
@@ -457,7 +510,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
 
                 <div className="flex items-center gap-3 mb-4">
                   <a
-                    href="https://github.com/roshhellwett/zenithopensourceprojects"
+                    href={STORE_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-amber-button hover:bg-saffron-deep text-black px-4 py-2 rounded-md text-xs font-bold transition-all active:scale-95 border border-amber-shadow"
@@ -513,10 +566,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
                 ].map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                      playRetroSound("click");
-                    }}
+                    onClick={() => handleTabClick(tab.id)}
                     className={`px-5 py-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 cursor-pointer ${
                       activeTab === tab.id
                         ? "text-dark-text border-amber-button bg-dark-surface/60 font-bold"
@@ -536,7 +586,6 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
                 {activeTab === "stack" && <StackApp playRetroSound={playRetroSound} addToast={addToast} />}
                 {activeTab === "founder" && <FounderApp />}
                 {activeTab === "ask-ai" && <MascotApp playRetroSound={playRetroSound} />}
-                {activeTab === "customers" && <RegistryApp playRetroSound={playRetroSound} />}
               </div>
             </div>
           </DesktopWindow>
@@ -571,7 +620,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       <div className="absolute bottom-0 left-0 right-0 h-10 bg-dark-surface/90 border-t border-dark-border backdrop-blur-md z-30 px-4 flex items-center justify-between select-none">
         {/* Left status info */}
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-accent-teal animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-accent-teal animate-pulse" role="status" aria-label="System online" />
           <span className="text-[9px] font-extrabold tracking-wider uppercase text-dark-text-muted">
             zenith_os
           </span>
@@ -590,12 +639,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
             return (
               <button
                 key={app.id}
-                onClick={() => {
-                  setActiveTab(app.id);
-                  setWindowOpen(true);
-                  setIsMinimized(isRunning ? true : false);
-                  playRetroSound("click");
-                }}
+                onClick={() => handleTaskbarClick(app.id, isRunning)}
                 className={`h-7 px-2.5 rounded flex items-center gap-1.5 text-[10px] font-bold transition-all border cursor-pointer ${
                   isRunning
                     ? "bg-amber-button/15 border-amber-button/40 text-dark-text shadow-sm scale-95"

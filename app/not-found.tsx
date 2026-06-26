@@ -1,3 +1,4 @@
+import { TrafficLights } from "@/components/TrafficLights";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -8,11 +9,7 @@ export default function NotFound() {
         <div className="bg-dark-surface border border-dark-border rounded-xl overflow-hidden shadow-2xl mb-8">
           {/* Title bar */}
           <div className="bg-dark-elevated px-4 py-2.5 flex items-center gap-2 border-b border-dark-border">
-            <div className="flex gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-              <span className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-              <span className="w-3 h-3 rounded-full bg-[#28C840]" />
-            </div>
+          <TrafficLights />
             <span className="text-xs text-dark-text-muted font-mono ml-2">
               error_404.log
             </span>

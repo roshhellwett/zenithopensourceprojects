@@ -1,62 +1,86 @@
 import { ExternalLink } from "lucide-react";
 
-const boldItalicRegex = /\*\*\*(.+?)\*\*\*/g;
-const boldRegex = /\*\*(.+?)\*\*/g;
-const italicRegex = /(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g;
-const inlineCodeRegex = /`([^`]+)`/g;
-const urlRegex = /https?:\/\/[^\s)]+/g;
-const markdownLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+
+
+type InlinePattern = { regex: RegExp; render: (m: RegExpExecArray, idx: number) => React.ReactNode };
+
+const INLINE_PATTERNS: InlinePattern[] = [
+  {
+    regex: /\[([^\]]+)\]\(([^)]+)\)/g,
+    render: (m, idx) => (
+      <a key={idx} href={m[2]} target="_blank" rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 rounded-md bg-amber-button/10 px-2 py-0.5 text-[10px] font-medium text-amber-button hover:bg-amber-button/20 transition-colors"
+      >
+        <ExternalLink size={10} />
+        {m[1]}
+      </a>
+    ),
+  },
+  {
+    regex: /https?:\/\/[^\s)]+/g,
+    render: (m, idx) => (
+      <a key={idx} href={m[0]} target="_blank" rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 rounded-md bg-amber-button/10 px-2 py-0.5 text-[10px] font-medium text-amber-button hover:bg-amber-button/20 transition-colors"
+      >
+        <ExternalLink size={10} />
+        {m[0].replace(/^https?:\/\//, '').replace(/\/$/, '').split('/')[0]}
+      </a>
+    ),
+  },
+  {
+    regex: /\*\*\*(.+?)\*\*\*/g,
+    render: (m, idx) => <strong key={idx} className="font-bold italic">{m[1]}</strong>,
+  },
+  {
+    regex: /\*\*(.+?)\*\*/g,
+    render: (m, idx) => <strong key={idx} className="font-bold">{m[1]}</strong>,
+  },
+  {
+    regex: /(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g,
+    render: (m, idx) => <em key={idx} className="italic">{m[1]}</em>,
+  },
+  {
+    regex: /`([^`]+)`/g,
+    render: (m, idx) => (
+      <code key={idx} className="font-mono text-[10px] bg-black/8 rounded px-1 py-0.5">
+        {m[1]}
+      </code>
+    ),
+  },
+];
 
 function renderInline(text: string, keyPrefix: string) {
   const parts: React.ReactNode[] = [];
-  const combined = new RegExp(
-    `(${markdownLinkRegex.source})|(${urlRegex.source.replace(/^\//, '').replace(/\/$/, '')})|(${boldItalicRegex.source.replace(/^\//, '').replace(/\/$/, '')})|(${boldRegex.source.replace(/^\//, '').replace(/\/$/, '')})|(${italicRegex.source.replace(/^\//, '').replace(/\/$/, '')})|(${inlineCodeRegex.source.replace(/^\//, '').replace(/\/$/, '')})`,
-    'g'
-  );
-  let last = 0;
-  let match: RegExpExecArray | null;
-  let idx = 0;
+  let remaining = text;
+  let globalIdx = 0;
 
-  while ((match = combined.exec(text)) !== null) {
-    if (match.index > last) {
-      parts.push(<span key={`${keyPrefix}-t-${idx++}`}>{text.slice(last, match.index)}</span>);
+  while (remaining.length > 0) {
+    let earliest: { index: number; match: RegExpExecArray; patternIdx: number } | null = null;
+
+    for (let pi = 0; pi < INLINE_PATTERNS.length; pi++) {
+      INLINE_PATTERNS[pi].regex.lastIndex = 0;
+      const m = INLINE_PATTERNS[pi].regex.exec(remaining);
+      if (m && (earliest === null || m.index < earliest.index)) {
+        earliest = { index: m.index, match: m, patternIdx: pi };
+      }
     }
-    if (match[1] !== undefined) {
-      parts.push(
-        <a key={`${keyPrefix}-ml-${idx++}`} href={match[3]} target="_blank" rel="noreferrer"
-          className="inline-flex items-center gap-1 rounded-md bg-amber-button/10 px-2 py-0.5 text-[10px] font-medium text-amber-button hover:bg-amber-button/20 transition-colors"
-        >
-          <ExternalLink size={10} />
-          {match[2]}
-        </a>
-      );
-    } else if (match[4] !== undefined) {
-      parts.push(
-        <a key={`${keyPrefix}-u-${idx++}`} href={match[4]} target="_blank" rel="noreferrer"
-          className="inline-flex items-center gap-1 rounded-md bg-amber-button/10 px-2 py-0.5 text-[10px] font-medium text-amber-button hover:bg-amber-button/20 transition-colors"
-        >
-          <ExternalLink size={10} />
-          {match[4].replace(/^https?:\/\//, '').replace(/\/$/, '').split('/')[0]}
-        </a>
-      );
-    } else if (match[5] !== undefined) {
-      parts.push(<strong key={`${keyPrefix}-bi-${idx++}`} className="font-bold italic">{match[6]}</strong>);
-    } else if (match[7] !== undefined) {
-      parts.push(<strong key={`${keyPrefix}-b-${idx++}`} className="font-bold">{match[8]}</strong>);
-    } else if (match[9] !== undefined) {
-      parts.push(<em key={`${keyPrefix}-i-${idx++}`} className="italic">{match[10]}</em>);
-    } else if (match[11] !== undefined) {
-      parts.push(
-        <code key={`${keyPrefix}-c-${idx++}`} className="font-mono text-[10px] bg-black/8 rounded px-1 py-0.5">
-          {match[12]}
-        </code>
-      );
+
+    if (earliest === null) {
+      parts.push(<span key={`${keyPrefix}-t-${globalIdx++}`}>{remaining}</span>);
+      break;
     }
-    last = match.index + match[0].length;
+
+    const { match, patternIdx } = earliest;
+
+    if (match.index > 0) {
+      parts.push(<span key={`${keyPrefix}-t-${globalIdx++}`}>{remaining.slice(0, match.index)}</span>);
+    }
+
+    parts.push(INLINE_PATTERNS[patternIdx].render(match, globalIdx++));
+
+    remaining = remaining.slice(match.index + match[0].length);
   }
-  if (last < text.length) {
-    parts.push(<span key={`${keyPrefix}-t-${idx++}`}>{text.slice(last)}</span>);
-  }
+
   return parts;
 }
 

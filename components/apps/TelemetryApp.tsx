@@ -1,42 +1,52 @@
-import React, { useState, useEffect } from 'react';
+"use client";
+
+import React, { useState, useEffect, useRef } from 'react';
 import { Activity, Play, Pause } from 'lucide-react';
 import { SoundType } from '@/lib/audio';
+
+const CURSOR_COORDS = [
+  { x: 80, y: 70, act: "Compiling news classification tree..." },
+  { x: 190, y: 120, act: "Verifying ZKP ballot zero-leak signatures..." },
+  { x: 310, y: 180, act: "Loading PulseWire DSP audio channels..." },
+  { x: 110, y: 220, act: "Polling database indices..." },
+  { x: 260, y: 90, act: "Linting Python registry bot files..." },
+  { x: 140, y: 160, act: "Pipeline audit validated successfully." }
+];
 
 export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSound: (type: SoundType) => void, addToast: (msg: string) => void }) {
   const [isPlayingRecording, setIsPlayingRecording] = useState<boolean>(false);
   const [playbackTime, setPlaybackTime] = useState<number>(0);
   const [playbackCursor, setPlaybackCursor] = useState<{ x: number; y: number }>({ x: 120, y: 150 });
   const [playbackAction, setPlaybackAction] = useState<string>("Sentinel compilation loop initialized...");
+  const timeRef = useRef(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | undefined;
-    if (isPlayingRecording) {
-      interval = setInterval(() => {
-        setPlaybackTime((prev) => {
-          if (prev >= 60) {
-            setIsPlayingRecording(false);
-            addToast("Build verification pipeline completed!");
-            playRetroSound("success");
-            return 0;
-          }
-          const cursorCoords = [
-            { x: 80, y: 70, act: "Compiling news classification tree..." },
-            { x: 190, y: 120, act: "Verifying ZKP ballot zero-leak signatures..." },
-            { x: 310, y: 180, act: "Loading PulseWire DSP audio channels..." },
-            { x: 110, y: 220, act: "Polling database indices..." },
-            { x: 260, y: 90, act: "Linting Python registry bot files..." },
-            { x: 140, y: 160, act: "Pipeline audit validated successfully." }
-          ];
-          const step = Math.floor(prev / 10) % cursorCoords.length;
-          setPlaybackCursor({
-            x: cursorCoords[step].x + (Math.random() * 10 - 5),
-            y: cursorCoords[step].y + (Math.random() * 10 - 5),
-          });
-          setPlaybackAction(cursorCoords[step].act);
-          return prev + 1;
-        });
-      }, 100);
+    if (!isPlayingRecording) {
+      timeRef.current = 0;
+      return;
     }
+
+    const interval = setInterval(() => {
+      timeRef.current += 1;
+
+      if (timeRef.current >= 60) {
+        setIsPlayingRecording(false);
+        setPlaybackTime(0);
+        addToast("Build verification pipeline completed!");
+        playRetroSound("success");
+        return;
+      }
+
+      setPlaybackTime(timeRef.current);
+
+      const step = Math.floor(timeRef.current / 10) % CURSOR_COORDS.length;
+      setPlaybackCursor({
+        x: CURSOR_COORDS[step].x + (Math.random() * 10 - 5),
+        y: CURSOR_COORDS[step].y + (Math.random() * 10 - 5),
+      });
+      setPlaybackAction(CURSOR_COORDS[step].act);
+    }, 100);
+
     return () => clearInterval(interval);
   }, [isPlayingRecording, addToast, playRetroSound]);
 

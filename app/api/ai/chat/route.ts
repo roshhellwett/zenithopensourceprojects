@@ -1,41 +1,6 @@
 import { NextResponse } from "next/server";
 import { ZENITH_SYSTEM_PROMPT, OFFLINE_RESPONSES } from "@/lib/ai-prompt";
-
-// ── Rate Limiter (sliding window, per-IP) ──
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
-const RATE_LIMIT_MAX = 20; // 20 requests per minute
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-
-  if (!entry || now > entry.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
-    return false;
-  }
-
-  entry.count++;
-  if (entry.count > RATE_LIMIT_MAX) {
-    return true;
-  }
-
-  return false;
-}
-
-// Clean up stale entries every 5 minutes
-if (typeof setInterval !== "undefined") {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, value] of rateLimitMap.entries()) {
-      if (now > value.resetTime) rateLimitMap.delete(key);
-    }
-  }, 300_000);
-}
-
-// ── Input Validation Constants ──
-const MAX_MESSAGE_LENGTH = 2000;
-const MAX_HISTORY_DEPTH = 20;
+import { isRateLimited, MAX_MESSAGE_LENGTH, MAX_HISTORY_DEPTH } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
@@ -72,21 +37,16 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validate message count
-    if (messages.length > MAX_HISTORY_DEPTH) {
-      return NextResponse.json(
-        { text: "Conversation too long. Please start a new chat." },
-        { status: 400 }
-      );
-    }
-
     // Validate and sanitize each message
-    const sanitizedMessages = messages
+    const validSenders = new Set(["user", "bot", "assistant"]);
+    const truncated = messages.length > MAX_HISTORY_DEPTH ? messages.slice(-MAX_HISTORY_DEPTH) : messages;
+    const sanitizedMessages = truncated
       .filter(
         (m: unknown): m is { sender: string; content: string } =>
           typeof m === "object" &&
           m !== null &&
           typeof (m as Record<string, unknown>).sender === "string" &&
+          validSenders.has((m as Record<string, unknown>).sender as string) &&
           typeof (m as Record<string, unknown>).content === "string"
       )
       .map((m) => ({
@@ -118,53 +78,74 @@ export async function POST(req: Request) {
       })),
     ];
 
-    // Call Groq with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10_000);
+    // Retry loop with backoff
+    const MAX_RETRIES = 2;
+    let lastError: unknown;
 
-    try {
-      const response = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${key}`,
-          },
-          body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            messages: chatMessages,
-            temperature: 0.7,
-            max_tokens: 1024,
-          }),
-          signal: controller.signal,
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10_000);
+
+      try {
+        const response = await fetch(
+          "https://api.groq.com/openai/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${key}`,
+            },
+            body: JSON.stringify({
+              model: "llama-3.3-70b-versatile",
+              messages: chatMessages,
+              temperature: 0.7,
+              max_tokens: 1024,
+            }),
+            signal: controller.signal,
+          }
+        );
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const data = await response.json();
+          const botText =
+            data.choices?.[0]?.message?.content ||
+            "I couldn't process that request. Could you rephrase?";
+          return NextResponse.json({ text: botText });
         }
-      );
 
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
+        // Non-200 — log and retry unless it's a 4xx (client error)
         const errText = await response.text();
         console.error("Groq API error:", response.status, errText);
-        return NextResponse.json({
-          text: "The AI service encountered an error. Please try again in a moment.",
-        });
-      }
 
-      const data = await response.json();
-      const botText =
-        data.choices?.[0]?.message?.content ||
-        "I couldn't process that request. Could you rephrase?";
-      return NextResponse.json({ text: botText });
-    } catch (fetchError: unknown) {
-      clearTimeout(timeoutId);
-      if (fetchError instanceof Error && fetchError.name === "AbortError") {
-        return NextResponse.json({
-          text: "The AI is taking too long to respond. Please try again.",
-        });
+        if (response.status < 500) {
+          return NextResponse.json({
+            text: "The AI service encountered an error. Please try again in a moment.",
+          });
+        }
+
+        // 5xx — fall through to retry
+        lastError = new Error(`Groq ${response.status}: ${errText}`);
+      } catch (fetchError: unknown) {
+        clearTimeout(timeoutId);
+        lastError = fetchError;
+
+        if (fetchError instanceof Error && fetchError.name === "AbortError") {
+          return NextResponse.json({
+            text: "The AI is taking too long to respond. Please try again.",
+          });
+        }
+
+        // Network error — retry after backoff
+        if (attempt < MAX_RETRIES) {
+          await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
       }
-      throw fetchError;
     }
+
+    throw lastError;
   } catch (error: unknown) {
     console.error("API route error:", error);
     return NextResponse.json({

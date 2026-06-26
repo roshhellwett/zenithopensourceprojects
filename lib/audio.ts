@@ -22,19 +22,27 @@ export type SoundType =
   | "minimize"
   | "maximize"
   | "close"
-  | "error";
+  | "error"
+  | "message";
 
 export const getSoundEnabled = (): boolean => {
   if (typeof window === "undefined") return true;
-  const val = localStorage.getItem("zenith_sound_enabled");
-  return val !== "false"; // default is true
+  try {
+    const val = localStorage.getItem("zenith_sound_enabled");
+    return val !== "false";
+  } catch {
+    return true;
+  }
 };
 
 export const setSoundEnabled = (enabled: boolean) => {
   if (typeof window === "undefined") return;
-  localStorage.setItem("zenith_sound_enabled", String(enabled));
-  // Dispatch custom event to notify other parts of the app
-  window.dispatchEvent(new CustomEvent("zenith_sound_toggle", { detail: enabled }));
+  try {
+    localStorage.setItem("zenith_sound_enabled", String(enabled));
+    window.dispatchEvent(new CustomEvent("zenith_sound_toggle", { detail: enabled }));
+  } catch {
+    // Storage unavailable (e.g. Safari private browsing)
+  }
 };
 
 export const playRetroSound = (type: SoundType) => {
@@ -258,6 +266,19 @@ export const playRetroSound = (type: SoundType) => {
       osc2.start(now);
       osc1.stop(now + 0.25);
       osc2.stop(now + 0.25);
+    }
+    else if (type === "message") {
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.setValueAtTime(1100, now + 0.04);
+      gainNode.gain.setValueAtTime(0.03, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
     }
   } catch (e) {
     console.warn("Failed to play sound:", e);

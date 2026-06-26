@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { memo, useState, useEffect } from "react";
 import { motion, useDragControls } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
@@ -18,7 +18,7 @@ interface DesktopWindowProps {
   onToggleSettings?: () => void;
 }
 
-export default function DesktopWindow({
+export default memo(function DesktopWindow({
   title,
   children,
   onClose,
@@ -54,15 +54,14 @@ export default function DesktopWindow({
       transition={{ type: "spring", stiffness: 350, damping: 26 }}
       className={`flex flex-col window-chrome shadow-2xl border border-dark-border overflow-hidden bg-dark-surface ${
         shouldMaximize
-          ? "fixed w-full h-[calc(100vh-88px)] top-12 bottom-10 left-0 right-0 z-40 rounded-none border-none"
+          ? "fixed inset-x-0 top-[var(--navbar-height)] bottom-10 z-[60] rounded-none border-none"
           : "absolute w-[92vw] md:w-[880px] h-[80vh] md:h-[680px] top-8 left-[4vw] md:left-[100px] z-40 rounded-xl"
       }`}
       drag={!shouldMaximize}
       dragControls={dragControls}
       dragListener={false}
       dragMomentum={false}
-      role="dialog"
-      aria-modal="true"
+      role="document"
       aria-label={title}
     >
       <div className="flex flex-col flex-1 h-full overflow-hidden">
@@ -180,3 +179,4 @@ export default function DesktopWindow({
     </motion.div>
   );
 }
+);

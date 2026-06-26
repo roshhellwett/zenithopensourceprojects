@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Search, X, ArrowUpRight } from "lucide-react";
 import { FEATURED_FALLBACK, FALLBACK_REPOS } from "@/data/repos";
 import { NAV_ITEMS } from "@/data/nav";
@@ -29,7 +29,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
   const resultsRef = useRef<HTMLDivElement>(null);
 
   // Build searchable index
-  const allItems: SearchResult[] = React.useMemo(() => {
+  const allItems: SearchResult[] = useMemo(() => {
     const items: SearchResult[] = [];
 
     // Projects
@@ -82,7 +82,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
   }, [onSwitchMode, onClose]);
 
   // Filter results
-  const results = React.useMemo(() => {
+  const results = useMemo(() => {
     if (!query.trim()) return allItems.slice(0, 8);
     const q = query.toLowerCase();
     return allItems
@@ -94,16 +94,21 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
       .slice(0, 10);
   }, [query, allItems]);
 
-  // Reset on open
+  // Reset on open + body scroll lock
   useEffect(() => {
     if (isOpen) {
       playRetroSound("beep");
+      document.body.style.overflow = "hidden";
       const timer = setTimeout(() => {
         setQuery("");
         setSelectedIndex(0);
       }, 0);
-      setTimeout(() => inputRef.current?.focus(), 50);
-      return () => clearTimeout(timer);
+      const focusTimer = setTimeout(() => inputRef.current?.focus(), 50);
+      return () => {
+        document.body.style.overflow = "";
+        clearTimeout(timer);
+        clearTimeout(focusTimer);
+      };
     }
   }, [isOpen]);
 
@@ -167,10 +172,27 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
       <div
         className="relative w-full max-w-[560px] bg-dark-surface border border-dark-border rounded-xl shadow-2xl overflow-hidden animate-fade-in-up"
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => {
+          if (e.key === "Tab") {
+            const focusable = e.currentTarget.querySelectorAll<HTMLElement>(
+              'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            if (focusable.length === 0) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+              e.preventDefault();
+              last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+              e.preventDefault();
+              first.focus();
+            }
+          }
+        }}
       >
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-dark-border">
-          <Search className="w-4.5 h-4.5 text-dark-text-muted shrink-0" />
+          <Search className="w-4 h-4 text-dark-text-muted shrink-0" />
           <input
             ref={inputRef}
             type="text"
