@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Send, X, RefreshCw, Maximize2, Minimize2 } from "lucide-react";
+import { Send, X, RefreshCw, Maximize2, Minimize2, Zap } from "lucide-react";
 import { getApiUrl } from "@/lib/api";
 import { motion } from "framer-motion";
 import { playRetroSound } from "@/lib/audio";
+import { FormattedText, LoadingDots } from "@/lib/format";
 
 interface ChatPanelProps {
   onClose?: () => void;
@@ -15,7 +16,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
     {
       id: "welcome",
       sender: "bot",
-      content: "Hi, I'm Zenith AI!\n\nI'm an AI assistant trained on documentation, help articles, and other content.\n\nAsk me anything about Zenith projects.",
+      content: "Hi! I'm the Zenith assistant. Ask me about our tools, install guides, or the founder.",
       timestamp: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
     },
   ]);
@@ -27,10 +28,10 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const exampleQuestions = [
+    "What tools do you have?",
     "How does Project Sentinel work?",
-    "What is ZeroGapVote?",
-    "What tech stack does Zenith use?",
     "Tell me about the founder",
+    "What tech stack does Zenith use?",
   ];
 
   const scrollToBottom = () => {
@@ -96,7 +97,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
       {
         id: "welcome",
         sender: "bot",
-        content: "Hi, I'm Zenith AI!\n\nI'm an AI assistant trained on documentation, help articles, and other content.\n\nAsk me anything about Zenith open-source repositories.",
+        content: "Hi! I'm the Zenith assistant. Ask me about our tools, install guides, or the founder.",
         timestamp: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
       },
     ]);
@@ -126,14 +127,18 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
       aria-label="Zenith AI Chat"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-dark-border bg-dark-elevated shrink-0 select-none">
-        <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-dark-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-          </svg>
-          <span className="text-xs font-mono font-bold text-dark-text">zenith-ai.chat</span>
-          <span className="w-1.5 h-1.5 bg-accent-teal rounded-full animate-pulse" />
+      <div className="flex items-center justify-between px-3 py-2.5 border-b border-dark-border/60 bg-gradient-to-r from-amber-button/5 to-transparent shrink-0 select-none">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-button/10 text-amber-button shadow-sm">
+            <Zap size={14} />
+          </span>
+          <div>
+            <p className="text-xs font-bold text-dark-text">Zenith AI</p>
+            <p className="flex items-center gap-1.5 text-[9px] text-dark-text-muted/50">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent-teal" />
+              Online
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-0.5">
           {/* New Chat Button */}
@@ -181,8 +186,8 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
               <div className="group relative pr-10 flex gap-2">
                 <span className="w-5 h-5 rounded-full bg-amber-button/10 flex items-center justify-center shrink-0 text-[10px] select-none">🤖</span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-dark-text leading-relaxed whitespace-pre-line">
-                    {m.content}
+                  <div className="text-sm text-dark-text leading-relaxed">
+                    <FormattedText text={m.content} />
                   </div>
                   <button
                     onClick={() => handleCopy(m.id, m.content)}
@@ -212,9 +217,8 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
         {loading && (
           <div className="flex items-start gap-2.5">
             <span className="w-5 h-5 rounded-full bg-amber-button/10 flex items-center justify-center shrink-0 text-[10px] select-none">🤖</span>
-            <div className="flex-1 space-y-2 py-1">
-              <div className="h-4.5 skeleton w-3/4 rounded" />
-              <div className="h-4.5 skeleton w-1/2 rounded" />
+            <div className="rounded-2xl rounded-bl-md border border-dark-border/40 bg-dark-elevated/70 px-4 py-3 shadow-sm">
+              <LoadingDots />
             </div>
           </div>
         )}
@@ -222,23 +226,20 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
         {/* Dummy div to scroll to */}
         <div ref={messagesEndRef} />
 
-        {/* Example questions */}
-        {messages.length === 1 && (
-          <div className="space-y-2 mt-4 select-none">
-            <div className="text-[10px] uppercase tracking-wider text-dark-text-muted font-bold">
-              Suggested Prompts
-            </div>
-            <div className="grid grid-cols-1 gap-2">
-              {exampleQuestions.map((q) => (
-                <button
-                  key={q}
-                  onClick={() => handleSend(q)}
-                  className="w-full text-left px-3 py-2.5 bg-dark-elevated/40 border border-dark-border hover:border-dark-text-faint rounded-lg text-xs text-dark-text hover:bg-dark-elevated transition-colors cursor-pointer"
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
+        {/* Suggested prompts as chips */}
+        {messages.length === 1 && !loading && (
+          <div className="flex flex-wrap gap-2 mt-3 select-none">
+            {exampleQuestions.map((q) => (
+              <button
+                key={q}
+                onClick={() => handleSend(q)}
+                disabled={loading}
+                className="rounded-lg border border-dark-border/60 bg-dark-elevated/50 px-3 py-1.5 text-[11px] font-medium text-dark-text-muted transition-all hover:border-amber-button/30 hover:bg-amber-button/5 hover:text-amber-button active:scale-[0.97] disabled:opacity-40 cursor-pointer"
+                type="button"
+              >
+                {q}
+              </button>
+            ))}
           </div>
         )}
       </div>
