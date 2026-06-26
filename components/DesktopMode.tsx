@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import DesktopIcon, { renderDesktopIcon } from "./DesktopIcon";
 import DesktopWindow from "./DesktopWindow";
 import ChatPanel from "./ChatPanel";
-import IsometricBackground from "./IsometricBackground";
 import { LEFT_DESKTOP_ICONS, RIGHT_DESKTOP_ICONS } from "@/data/desktop-icons";
 import { motion } from "framer-motion";
 import { playRetroSound, getSoundEnabled, setSoundEnabled } from "@/lib/audio";
@@ -273,9 +272,6 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
     >
       {/* CRT scanline overlay */}
       {crtActive && <div className="crt-overlay" />}
-
-      {/* Isometric background layout */}
-      <IsometricBackground />
 
       {/* Toast notifications */}
       <div className="fixed bottom-14 left-4 z-[60] flex flex-col gap-2 max-w-sm">

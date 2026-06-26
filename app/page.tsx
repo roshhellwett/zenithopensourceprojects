@@ -12,7 +12,7 @@ export default function Page() {
   return (
     <div className="min-h-screen selection:bg-amber-button/30 selection:text-amber-button relative">
       {/* Background images for different screen sizes */}
-      <div className="fixed inset-0 w-full h-full pointer-events-none select-none z-0" aria-hidden="true">
+      <div className="fixed inset-0 w-full h-full pointer-events-none select-none z-0 bg-noise" aria-hidden="true">
         {/* Desktop Background */}
         <div className="hidden md:block relative w-full h-full">
           <Image
@@ -20,7 +20,9 @@ export default function Page() {
             alt=""
             fill
             priority
-            quality={90}
+            quality={80}
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12N4BgAA/AD+yPJ3oAAAAABJRU5ErkJggg=="
             className="object-cover object-center crisp-bg"
             sizes="100vw"
           />
@@ -32,7 +34,9 @@ export default function Page() {
             alt=""
             fill
             priority
-            quality={90}
+            quality={80}
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12N4BgAA/AD+yPJ3oAAAAABJRU5ErkJggg=="
             className="object-cover object-center crisp-bg"
             sizes="100vw"
           />
