@@ -47,3 +47,4 @@ yarn-error.log*
 next-env.d.ts
 implementation_plan.md
 .implementation_plan.md
+.early.coverage
