@@ -37,7 +37,7 @@ All responses include:
 If you discover a security vulnerability in this project:
 
 1. **Do NOT** open a public GitHub issue
-2. **Email** the maintainer directly at: `roshhellwett@icloud.com`
+2. **Email** the maintainer directly at: `zenithprojects@icloud.com`
 3. Include:
    - Description of the vulnerability
    - Steps to reproduce

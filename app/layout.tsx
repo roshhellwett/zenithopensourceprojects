@@ -18,41 +18,53 @@ const sourceCodePro = Source_Code_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "Zenith – We make open source tools for civic engineers",
+  title: {
+    default: "Zenith Open Source Projects – Roshan Kr Singh | Civic Tech & Developer Tools",
+    template: "%s – Zenith Open Source Projects",
+  },
   description:
-    "Explore open source civic-tech tools, AI news aggregators, transparent voting blueprints, Telegram bots, Windows utilities, and more by Roshan Kr Singh (@roshhellwett). Built with one rule: be useful, be transparent, be free.",
+    "Zenith Open Source Projects is an open-source software registry and civic-tech ecosystem founded by independent developer Roshan Kr Singh (@roshhellwett) in India. Featuring Project Sentinel, ZeroGapVote, AI tools, and system utilities.",
   keywords: [
+    "zenith open source projects",
+    "zenith open source",
+    "zenith projects",
+    "zenith registry",
+    "zenith software",
+    "roshan kr singh zenith",
     "roshhellwett",
     "roshan kr singh",
-    "zenith open source projects",
-    "open source",
-    "telegram bot",
+    "what is zenith open source projects",
+    "zenith civic tech",
+    "project sentinel news",
+    "project zerogapvote",
+    "project cortex ai",
+    "open source india",
     "civic tech india",
     "windows utilities",
-    "grub themes",
     "ai news aggregator",
-    "project sentinel",
-    "developer tools",
-    "indian open source",
     "github projects",
   ],
   authors: [
     { name: "Roshan Kr Singh", url: "https://github.com/roshhellwett" },
   ],
   creator: "Roshan Kr Singh",
-  publisher: "Roshan Kr Singh",
+  publisher: "Zenith Open Source Projects",
   robots: {
     index: true,
     follow: true,
-    "max-snippet": -1,
-    "max-image-preview": "large",
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   alternates: {
     canonical: SITE_URL,
   },
   icons: {
     icon: [{ url: "/favicon.ico" }],
-    // apple icon not bundled — uncomment and add the file to public/ to enable
   },
   manifest: "/manifest.json",
   verification: {
@@ -66,22 +78,20 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Zenith Open Source Projects – Roshan Kr Singh",
     description:
-      "A curated collection of open source tools, bots, and system experiments by Roshan Kr Singh. Telegram bots, Windows utilities, GRUB themes, AI news, and more.",
+      "The official open-source software registry and civic-tech ecosystem by Roshan Kr Singh (@roshhellwett). Featuring Project Sentinel, ZeroGapVote, and developer utilities.",
     url: SITE_URL,
     siteName: "Zenith Open Source Projects",
     locale: "en_IN",
     type: "website",
     countryName: "India",
-    // images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: "Zenith Open Source Projects" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zenith Open Source Projects",
+    title: "Zenith Open Source Projects – Roshan Kr Singh",
     description:
-      "Open source Telegram bots, Windows tools, GRUB themes, and more by @roshhellwett.",
+      "Open-source software registry and civic-tech ecosystem by Roshan Kr Singh (@roshhellwett).",
     creator: "@roshhellwett",
     creatorId: "roshhellwett",
-    // images: [`${SITE_URL}/og-image.png`],
   },
 };
 

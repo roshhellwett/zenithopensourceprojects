@@ -55,7 +55,7 @@ export default memo(function DesktopWindow({
       className={`flex flex-col window-chrome shadow-2xl border border-dark-border overflow-hidden bg-dark-surface ${
         shouldMaximize
           ? "fixed inset-x-0 top-[var(--navbar-height)] bottom-10 z-[60] rounded-none border-none"
-          : "absolute w-[92vw] md:w-[880px] h-[80vh] md:h-[680px] top-8 left-[4vw] md:left-[100px] z-40 rounded-xl"
+          : "absolute w-[95vw] max-w-[880px] h-[85vh] max-h-[700px] top-[2vh] sm:top-[4vh] left-0 right-0 mx-auto z-40 rounded-xl"
       }`}
       drag={!shouldMaximize}
       dragControls={dragControls}
@@ -135,7 +135,7 @@ export default memo(function DesktopWindow({
                   </button>
                   <div className="h-4 w-px bg-dark-border" />
                   <span className="text-[11px] px-2 py-0.5 bg-dark-border/40 rounded font-mono">
-                    Node: v18.0.0
+                    Next.js 16
                   </span>
                   <div className="h-4 w-px bg-dark-border" />
                   <span className="text-[10px] uppercase font-bold tracking-wider text-accent-teal">

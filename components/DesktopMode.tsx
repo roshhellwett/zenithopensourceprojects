@@ -527,25 +527,25 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
                   </a>
                 </div>
 
-                <div className="flex items-center gap-4 text-xs text-dark-text-muted select-none">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-dark-text-muted select-none">
                   <a
                     href="https://github.com/roshhellwett"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="posthog-link flex items-center gap-1 hover:text-amber-button"
+                    className="posthog-link flex items-center gap-1 hover:text-amber-button shrink-0"
                   >
                     <span className="text-accent-teal">◆</span> GitHub
                   </a>
-                  <span className="text-dark-border">•</span>
+                  <span className="text-dark-border hidden sm:inline">•</span>
                   <span
-                    className="posthog-link cursor-pointer hover:text-amber-button"
+                    className="posthog-link cursor-pointer hover:text-amber-button shrink-0"
                     onClick={onSwitchToWebsite}
                   >
                     ▶ Website mode
                   </span>
-                  <span className="text-dark-border">•</span>
+                  <span className="text-dark-border hidden sm:inline">•</span>
                   <span
-                    className="posthog-link cursor-pointer hover:text-amber-button"
+                    className="posthog-link cursor-pointer hover:text-amber-button shrink-0"
                     onClick={() => {
                       setActiveTab("founder");
                       addToast("Opening founder.md...");

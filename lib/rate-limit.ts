@@ -5,6 +5,14 @@ const RATE_LIMIT_MAX = 20;
 
 export function isRateLimited(ip: string): boolean {
   const now = Date.now();
+
+  // Evict expired entries to prevent memory leak on long-running processes
+  if (rateLimitMap.size > 100) {
+    for (const [key, val] of rateLimitMap) {
+      if (now > val.resetTime) rateLimitMap.delete(key);
+    }
+  }
+
   const entry = rateLimitMap.get(ip);
 
   if (!entry || now > entry.resetTime) {

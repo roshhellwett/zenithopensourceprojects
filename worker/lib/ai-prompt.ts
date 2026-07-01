@@ -28,8 +28,7 @@ Total GitHub Repos: 23
 GitHub Badges: Developer Program Member, Pro, Starstruck, Pair Extraordinaire, YOLO, Pull Shark, Quickdraw
 
 Social Profiles & Contact:
-- Personal Email: roshhellwett@icloud.com
-- Zenith Business Email: zenithprojects@icloud.com
+- Email: zenithprojects@icloud.com
 - LinkedIn: https://www.linkedin.com/in/roshhellwett
 - GitHub: https://github.com/roshhellwett
 - ORCID: https://orcid.org/0009-0008-7213-6376

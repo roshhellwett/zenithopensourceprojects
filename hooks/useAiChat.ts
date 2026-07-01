@@ -47,7 +47,11 @@ export function useAiChat({
   }, [messages, scrollToBottom]);
 
   const copyMessage = useCallback((id: string, text: string) => {
-    navigator.clipboard.writeText(text);
+    try {
+      navigator.clipboard.writeText(text);
+    } catch {
+      // Clipboard API unavailable (non-secure context / older browser)
+    }
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   }, []);

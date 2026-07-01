@@ -13,6 +13,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { playRetroSound } from "@/lib/audio";
 
+/** Detect macOS platform for keyboard shortcut rendering (client-only) */
+function getIsMac(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+}
+
 interface NavbarProps {
   onToggleMode?: () => void;
   currentMode?: "desktop" | "website";
@@ -25,6 +31,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const isMac = getIsMac();
 
   // Active section observer for smooth website navigation highlighting
   useEffect(() => {
@@ -32,27 +39,46 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
       const timer = setTimeout(() => setActiveSection(""), 0);
       return () => clearTimeout(timer);
     }
-    const sections = ["projects", "stack", "founder"];
-    const observers = sections.map((id) => {
-      const el = document.getElementById(id);
-      if (!el) return null;
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setActiveSection(id);
-            }
-          });
-        },
-        { threshold: 0.3 }
-      );
-      observer.observe(el);
-      return { observer, el };
-    });
+    
+    let observers: { observer: IntersectionObserver; el: HTMLElement }[] = [];
+    let intervalId: ReturnType<typeof setInterval>;
+
+    const initObservers = () => {
+      const sections = ["projects", "stack", "founder"];
+      const allExist = sections.every(id => document.getElementById(id) !== null);
+      
+      if (!allExist) return false;
+      
+      observers = sections.map((id) => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setActiveSection(id);
+              }
+            });
+          },
+          { threshold: 0.3 }
+        );
+        observer.observe(el);
+        return { observer, el };
+      }).filter(Boolean) as { observer: IntersectionObserver; el: HTMLElement }[];
+      
+      return true;
+    };
+
+    if (!initObservers()) {
+      intervalId = setInterval(() => {
+        if (initObservers()) clearInterval(intervalId);
+      }, 250);
+    }
 
     return () => {
+      if (intervalId) clearInterval(intervalId);
       observers.forEach((obs) => {
-        if (obs) obs.observer.unobserve(obs.el);
+        obs.observer.unobserve(obs.el);
       });
     };
   }, [currentMode]);
@@ -249,7 +275,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
             >
               <Search className="w-4 h-4" />
               <kbd className="hidden md:flex items-center gap-0.5 text-[9px] text-dark-text-faint bg-dark-bg border border-dark-border-subtle rounded px-1.5 py-0.5 font-mono">
-                ⌘K
+                {isMac ? "⌘K" : "Ctrl K"}
               </kbd>
             </button>
 

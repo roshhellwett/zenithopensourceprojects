@@ -205,7 +205,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
             disabled={chat.loading}
             rows={1}
             maxLength={2000}
-            className="flex-1 bg-dark-bg border border-dark-border rounded-lg px-3 py-2 text-sm text-dark-text placeholder-dark-text-faint focus:outline-none focus:border-amber-button transition-colors resize-none py-1.5 min-h-[36px] max-h-[100px] overflow-y-auto font-sans"
+            className="flex-1 bg-dark-bg border border-dark-border rounded-lg px-3 py-1.5 text-sm text-dark-text placeholder-dark-text-faint focus:outline-none focus:border-amber-button transition-colors resize-none min-h-[36px] max-h-[100px] overflow-y-auto font-sans"
           />
           <button
             type="submit"

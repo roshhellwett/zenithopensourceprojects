@@ -11,6 +11,7 @@ import { ZenithLogo } from "@/components/ZenithLogo";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Repo } from "@/types";
 import { playRetroSound } from "@/lib/audio";
+import Link from "next/link";
 
 const ALL_REPOS = [FEATURED_FALLBACK, ...FALLBACK_REPOS];
 
@@ -351,7 +352,7 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
             Building software used to mean relying on proprietary tools, closed-source dependencies, and opaque architectures.
           </p>
           <p className="text-base sm:text-lg text-dark-text-muted leading-relaxed max-w-[660px] mb-8">
-            Zenith is the only project registry that acts as a blueprint for you to build civic-tech, systems utilities, and dev tools — <em className="text-dark-text">transparently.</em>
+            <strong className="text-dark-text">Zenith Open Source Projects</strong> by Roshan Kr Singh is an independent software collective and open-source registry acting as a blueprint for you to build civic-tech, systems utilities, and dev tools — <em className="text-dark-text">transparently.</em>
           </p>
 
           {/* CTA Buttons - Responsive Stacked layout */}
@@ -763,12 +764,6 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
         </div>
       </motion.section>
 
-      {/* Decorative Wave Divider */}
-      <div className="w-full overflow-hidden leading-[0] fill-dark-surface/90 mt-12 select-none" aria-hidden="true">
-        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-10 transform rotate-180">
-          <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V30.28C1122.56,66,1061.08,92.83,985.66,92.83Z" fill="var(--color-dark-surface)"></path>
-        </svg>
-      </div>
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-dark-border bg-dark-surface/90 backdrop-blur-sm select-none">
@@ -781,9 +776,19 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
                 All modules active
               </span>
             </div>
-            <div className="flex items-center justify-center gap-4 text-xs text-dark-text-faint font-medium">
-              <a href="https://github.com/roshhellwett/zenithopensourceprojects/blob/main/license" target="_blank" rel="noopener noreferrer" className="hover:text-dark-text transition-colors">MIT License</a>
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-dark-text-faint font-medium">
+              <Link href="/privacy" className="hover:text-dark-text transition-colors">Privacy</Link>
+              <span>·</span>
+              <Link href="/terms" className="hover:text-dark-text transition-colors">Terms</Link>
+              <span>·</span>
+              <Link href="/cookies" className="hover:text-dark-text transition-colors">Cookies</Link>
+              <span>·</span>
+              <Link href="/open-source" className="hover:text-dark-text transition-colors">Open Source</Link>
+              <span>·</span>
+              <Link href="/security" className="hover:text-dark-text transition-colors">Security</Link>
+              <span>·</span>
               <a href="https://github.com/roshhellwett" target="_blank" rel="noopener noreferrer" className="hover:text-dark-text transition-colors">GitHub</a>
+              <span>·</span>
               <a href="https://www.linkedin.com/in/roshhellwett" target="_blank" rel="noopener noreferrer" className="hover:text-dark-text transition-colors">LinkedIn</a>
             </div>
           </div>

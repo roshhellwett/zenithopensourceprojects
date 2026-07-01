@@ -16,16 +16,24 @@ const nextConfig: NextConfig = {
       source: "/(.*)",
       headers: [
         { key: "X-DNS-Prefetch-Control", value: "on" },
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "X-Frame-Options", value: "DENY" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
       ],
     },
   ],
 
+  // Image optimization — unoptimized on GitHub Pages (static export)
+  images: GITHUB_PAGES
+    ? { unoptimized: true, qualities: [25, 50, 75, 80] }
+    : { qualities: [25, 50, 75, 80] },
+
+  // GitHub Pages static export config
   ...(GITHUB_PAGES
     ? {
         output: "export" as const,
         basePath: BASE_PATH,
         assetPrefix: `${BASE_PATH}/`,
-        images: { unoptimized: true },
       }
     : {}),
 };

@@ -40,7 +40,7 @@ export default function Page() {
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12N4BgAA/AD+yPJ3oAAAAABJRU5ErkJggg=="
             className="object-cover object-center crisp-bg"
-            sizes="100vw"
+            sizes="(min-width: 768px) 100vw, 0vw"
           />
         </div>
         {/* Mobile Background */}
@@ -54,7 +54,7 @@ export default function Page() {
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12N4BgAA/AD+yPJ3oAAAAABJRU5ErkJggg=="
             className="object-cover object-center crisp-bg"
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, 0vw"
           />
         </div>
       </div>

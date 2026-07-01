@@ -39,6 +39,11 @@ export const NAV_ITEMS: NavItem[] = [
       { label: "README", href: "https://github.com/roshhellwett/zenithopensourceprojects#readme", desc: "Project documentation", icon: "docs" },
       { label: "Source Code", href: "https://github.com/roshhellwett/zenithopensourceprojects", desc: "View on GitHub", icon: "folder-project" },
       { label: "License (MIT)", href: "https://github.com/roshhellwett/zenithopensourceprojects/blob/main/license", desc: "Open source license", icon: "changelog" },
+      { label: "Privacy Policy", href: "/privacy", desc: "No tracking or personal data", icon: "why" },
+      { label: "Terms of Service", href: "/terms", desc: "Terms of use & disclaimers", icon: "docs" },
+      { label: "Cookie Policy", href: "/cookies", desc: "Zero tracking cookies", icon: "file-mdx" },
+      { label: "Open Source & Licenses", href: "/open-source", desc: "MIT & third-party attributions", icon: "changelog" },
+      { label: "Security Policy", href: "/security", desc: "Security model & reporting", icon: "why" },
     ],
   },
   {
