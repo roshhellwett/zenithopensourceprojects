@@ -68,7 +68,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   verification: {
-    google: "CWEIddbWw_sSmzFyikcyLv3jLzWUYDb-0V5JUNUjmvw",
+    google: ["CWEIddbWw_sSmzFyikcyLv3jLzWUYDb-0V5JUNUjmvw", "1bd198fa5b4dc9f1"],
   },
   formatDetection: {
     telephone: false,
