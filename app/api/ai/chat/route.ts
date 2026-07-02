@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { ZENITH_SYSTEM_PROMPT, OFFLINE_RESPONSES } from "@/lib/ai-prompt";
 import { isRateLimited, MAX_MESSAGE_LENGTH, MAX_HISTORY_DEPTH } from "@/lib/rate-limit";
 
+const VALID_SENDERS = new Set(["user", "bot", "assistant"]);
+
 export async function POST(req: Request) {
   try {
     // Rate limiting
@@ -14,6 +16,15 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { text: "You're sending too many requests. Please wait a moment and try again." },
         { status: 429 }
+      );
+    }
+
+    // Validate Content-Type
+    const contentType = req.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      return NextResponse.json(
+        { text: "Content-Type must be application/json." },
+        { status: 400 }
       );
     }
 
@@ -38,7 +49,6 @@ export async function POST(req: Request) {
     }
 
     // Validate and sanitize each message
-    const validSenders = new Set(["user", "bot", "assistant"]);
     const truncated = messages.length > MAX_HISTORY_DEPTH ? messages.slice(-MAX_HISTORY_DEPTH) : messages;
     const sanitizedMessages = truncated
       .filter(
@@ -46,7 +56,7 @@ export async function POST(req: Request) {
           typeof m === "object" &&
           m !== null &&
           typeof (m as Record<string, unknown>).sender === "string" &&
-          validSenders.has((m as Record<string, unknown>).sender as string) &&
+          VALID_SENDERS.has((m as Record<string, unknown>).sender as string) &&
           typeof (m as Record<string, unknown>).content === "string"
       )
       .map((m) => ({
@@ -134,6 +144,9 @@ export async function POST(req: Request) {
         if (fetchError instanceof Error && fetchError.name === "AbortError") {
           return NextResponse.json({
             text: "The AI is taking too long to respond. Please try again.",
+          }, {
+            status: 408,
+            headers: { "Retry-After": "10" },
           });
         }
 

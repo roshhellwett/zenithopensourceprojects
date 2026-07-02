@@ -1,7 +1,6 @@
 "use client";
 
-import React, { memo, useState, useEffect } from "react";
-import { motion, useDragControls } from "framer-motion";
+import React, { memo, useState, useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 
 interface DesktopWindowProps {
@@ -31,8 +30,11 @@ export default memo(function DesktopWindow({
   onSearch,
   onToggleSettings,
 }: DesktopWindowProps) {
-  const dragControls = useDragControls();
   const [isMobile, setIsMobile] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const isDraggingRef = useRef(false);
+  const dragStart = useRef({ x: 0, y: 0, left: 0, top: 0 });
 
   // Check screen size to auto-maximize on mobile viewports
   useEffect(() => {
@@ -46,29 +48,50 @@ export default memo(function DesktopWindow({
 
   const shouldMaximize = isMaximized || isMobile;
 
+  const handleDragStart = (e: React.PointerEvent) => {
+    if (shouldMaximize) return;
+    setIsDragging(true);
+    isDraggingRef.current = true;
+    dragStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      left: dragOffset.x,
+      top: dragOffset.y,
+    };
+    if (e.target instanceof HTMLElement) { e.target.setPointerCapture(e.pointerId); }
+  };
+
+  const handleDragMove = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current || shouldMaximize) return;
+    setDragOffset({
+      x: dragStart.current.left + (e.clientX - dragStart.current.x),
+      y: dragStart.current.top + (e.clientY - dragStart.current.y),
+    });
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    isDraggingRef.current = false;
+  };
+
   return (
-    <motion.div
-      initial={{ scale: 0.96, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.96, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 350, damping: 26 }}
-      className={`flex flex-col window-chrome shadow-2xl border border-dark-border overflow-hidden bg-dark-surface ${
+    <div
+      className={`animate-window-fade-in flex flex-col window-chrome shadow-2xl border border-dark-border overflow-hidden bg-dark-surface ${
         shouldMaximize
           ? "fixed inset-x-0 top-[var(--navbar-height)] bottom-10 z-[60] rounded-none border-none"
           : "absolute w-[95vw] max-w-[880px] h-[85vh] max-h-[700px] top-[2vh] sm:top-[4vh] left-0 right-0 mx-auto z-40 rounded-xl"
       }`}
-      drag={!shouldMaximize}
-      dragControls={dragControls}
-      dragListener={false}
-      dragMomentum={false}
-      role="document"
+      style={!shouldMaximize ? { transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`, transition: isDragging ? 'none' : 'transform 0.1s ease-out' } : undefined}
+      role="dialog"
       aria-label={title}
     >
       <div className="flex flex-col flex-1 h-full overflow-hidden">
         {/* Title bar */}
         <div
           className="bg-dark-elevated px-3 py-2 flex items-center justify-between border-b border-dark-border cursor-move select-none shrink-0"
-          onPointerDown={(e) => !shouldMaximize && dragControls.start(e)}
+          onPointerDown={handleDragStart}
+          onPointerMove={handleDragMove}
+          onPointerUp={handleDragEnd}
           onDoubleClick={onToggleMaximize}
         >
           {/* Traffic lights with touch-friendly hit areas */}
@@ -176,7 +199,7 @@ export default memo(function DesktopWindow({
           {children}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 );

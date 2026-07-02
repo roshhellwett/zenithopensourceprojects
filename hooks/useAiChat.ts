@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { SoundType } from "@/lib/audio";
-import { ZENITH_SYSTEM_PROMPT } from "@/lib/ai-prompt";
 import { getApiUrl } from "@/lib/api";
 
 export interface ChatMessage {
@@ -21,12 +20,15 @@ export interface UseAiChatOptions {
   playRetroSound?: (type: SoundType) => void;
 }
 
+const MAX_HISTORY_DEPTH = 20;
+const DEFAULT_PREFIX = { user: "u_", bot: "b_", error: "e_" };
+
 export function useAiChat({
   botSender,
   welcomeMessage,
   fallbackMessage,
   errorMessage,
-  idPrefix = { user: "u_", bot: "b_", error: "e_" },
+  idPrefix = DEFAULT_PREFIX,
   playRetroSound,
 }: UseAiChatOptions) {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -37,6 +39,26 @@ export function useAiChat({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const idCounterRef = useRef(0);
+  const mountedRef = useRef(true);
+  const abortRef = useRef<AbortController | null>(null);
+  const messagesRef = useRef(messages);
+  const configRef = useRef({ botSender, welcomeMessage, fallbackMessage, errorMessage, idPrefix, playRetroSound });
+
+  useEffect(() => {
+    configRef.current = { botSender, welcomeMessage, fallbackMessage, errorMessage, idPrefix, playRetroSound };
+  }, [botSender, welcomeMessage, fallbackMessage, errorMessage, idPrefix, playRetroSound]);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      abortRef.current?.abort();
+    };
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -57,12 +79,13 @@ export function useAiChat({
   }, []);
 
   const sendMessage = useCallback(async (text?: string) => {
+    const cfg = configRef.current;
     const msg = (text ?? input).trim();
     if (!msg || loading) return;
 
     setInput("");
     const userMsg: ChatMessage = {
-      id: `${idPrefix.user}${++idCounterRef.current}`,
+      id: `${cfg.idPrefix.user}${++idCounterRef.current}`,
       sender: "user",
       content: msg,
       timestamp: new Date().toISOString(),
@@ -71,15 +94,16 @@ export function useAiChat({
     setLoading(true);
 
     const controller = new AbortController();
+    abortRef.current = controller;
     const timeout = setTimeout(() => controller.abort(), 30000);
 
     try {
+      const recent = messagesRef.current.slice(-MAX_HISTORY_DEPTH);
       const response = await fetch(`${getApiUrl()}/api/ai/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          systemPrompt: ZENITH_SYSTEM_PROMPT,
-          messages: [...messages.slice(-10), userMsg].map((m) => ({
+          messages: [...recent, userMsg].map((m) => ({
             sender: m.sender,
             content: m.content,
           })),
@@ -88,39 +112,43 @@ export function useAiChat({
       });
 
       clearTimeout(timeout);
+      if (!mountedRef.current) return;
       const data = await response.json();
-      const botContent = data.text || fallbackMessage;
+      if (!mountedRef.current) return;
+      const botContent = data.text || cfg.fallbackMessage;
       const botMsg: ChatMessage = {
-        id: `${idPrefix.bot}${++idCounterRef.current}`,
-        sender: botSender,
+        id: `${cfg.idPrefix.bot}${++idCounterRef.current}`,
+        sender: cfg.botSender,
         content: botContent,
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, botMsg]);
-      playRetroSound?.("message");
+      cfg.playRetroSound?.("message");
     } catch (err: unknown) {
       clearTimeout(timeout);
-      if (err instanceof Error && err.name === "AbortError") return;
+      if (!mountedRef.current || (err instanceof Error && err.name === "AbortError")) return;
       const errMsg: ChatMessage = {
-        id: `${idPrefix.error}${++idCounterRef.current}`,
-        sender: botSender,
-        content: errorMessage,
+        id: `${cfg.idPrefix.error}${++idCounterRef.current}`,
+        sender: cfg.botSender,
+        content: cfg.errorMessage,
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errMsg]);
-      playRetroSound?.("error");
+      cfg.playRetroSound?.("error");
     } finally {
-      setLoading(false);
+      abortRef.current = null;
+      if (mountedRef.current) setLoading(false);
     }
-  }, [input, loading, messages, botSender, fallbackMessage, errorMessage, idPrefix, playRetroSound]);
+  }, [input, loading]);
 
   const clearChat = useCallback(() => {
+    const cfg = configRef.current;
     idCounterRef.current = 0;
     setMessages([
-      { id: `${idPrefix.bot}0`, sender: botSender, content: welcomeMessage, timestamp: new Date().toISOString() },
+      { id: `${cfg.idPrefix.bot}0`, sender: cfg.botSender, content: cfg.welcomeMessage, timestamp: new Date().toISOString() },
     ]);
-    playRetroSound?.("success");
-  }, [botSender, welcomeMessage, idPrefix, playRetroSound]);
+    cfg.playRetroSound?.("success");
+  }, []);
 
   return {
     messages, setMessages,

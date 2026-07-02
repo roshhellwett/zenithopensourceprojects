@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { Sliders } from 'lucide-react';
 import { STACK } from "@/data/stack";

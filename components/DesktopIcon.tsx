@@ -3,7 +3,6 @@
 import React, { memo, useState, useEffect, useRef } from "react";
 
 interface DesktopIconProps {
-  id: string;
   label: string;
   iconKey: string;
   onClick: () => void;

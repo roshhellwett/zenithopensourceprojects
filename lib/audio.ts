@@ -1,17 +1,27 @@
+// ── Shared Audio Context ──
 let sharedAudioCtx: AudioContext | null = null;
+let clickNoiseBuffer: AudioBuffer | null = null;
 
 const getAudioContext = (): AudioContext | null => {
   if (typeof window === "undefined") return null;
   if (!sharedAudioCtx) {
-    const AudioContextClass =
-      window.AudioContext ||
+    const ACtx =
+      window.AudioContext ??
       (window as unknown as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (AudioContextClass) {
-      sharedAudioCtx = new AudioContextClass();
+    if (ACtx) {
+      sharedAudioCtx = new ACtx();
     }
   }
   return sharedAudioCtx;
 };
+
+export function disposeAudioContext(): void {
+  if (sharedAudioCtx) {
+    sharedAudioCtx.close().catch(() => {});
+    sharedAudioCtx = null;
+    clickNoiseBuffer = null;
+  }
+}
 
 export type SoundType =
   | "click"
@@ -26,12 +36,12 @@ export type SoundType =
   | "message";
 
 export const getSoundEnabled = (): boolean => {
-  if (typeof window === "undefined") return true;
+  if (typeof window === "undefined") return false;
   try {
     const val = localStorage.getItem("zenith_sound_enabled");
     return val !== "false";
   } catch {
-    return true;
+    return false;
   }
 };
 
@@ -76,14 +86,16 @@ export const playRetroSound = (type: SoundType) => {
       osc.stop(now + 0.05);
 
       // Noise click part (adds high-frequency mechanical feel)
-      const bufferSize = audioCtx.sampleRate * 0.01; // 10ms of noise
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
+      if (!clickNoiseBuffer) {
+        const bufferSize = audioCtx.sampleRate * 0.01;
+        clickNoiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = clickNoiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
       }
       const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
+      noise.buffer = clickNoiseBuffer;
 
       const noiseFilter = audioCtx.createBiquadFilter();
       noiseFilter.type = "highpass";
@@ -281,6 +293,6 @@ export const playRetroSound = (type: SoundType) => {
       osc.stop(now + 0.08);
     }
   } catch (e) {
-    console.warn("Failed to play sound:", e);
+    console.error("Failed to play sound:", e);
   }
 };

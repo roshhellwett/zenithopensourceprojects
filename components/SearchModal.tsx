@@ -6,6 +6,7 @@ import { FEATURED_FALLBACK, FALLBACK_REPOS } from "@/data/repos";
 import { NAV_ITEMS } from "@/data/nav";
 import { STACK } from "@/data/stack";
 import { playRetroSound } from "@/lib/audio";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/scroll-lock";
 
 interface SearchResult {
   type: "project" | "nav" | "stack" | "action";
@@ -74,7 +75,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
         title: "Switch Mode",
         description: "Toggle between Desktop OS and Website mode",
         icon: "🔄",
-        action: () => { onSwitchMode(); onClose(); },
+        action: () => { onSwitchMode?.(); onClose?.(); },
       });
     }
 
@@ -98,14 +99,14 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
   useEffect(() => {
     if (isOpen) {
       playRetroSound("beep");
-      document.body.style.overflow = "hidden";
+      lockBodyScroll();
       const timer = setTimeout(() => {
         setQuery("");
         setSelectedIndex(0);
       }, 0);
       const focusTimer = setTimeout(() => inputRef.current?.focus(), 50);
       return () => {
-        document.body.style.overflow = "";
+        unlockBodyScroll();
         clearTimeout(timer);
         clearTimeout(focusTimer);
       };
@@ -149,8 +150,8 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
 
   // Scroll selected into view
   useEffect(() => {
-    const el = resultsRef.current?.children[selectedIndex] as HTMLElement;
-    el?.scrollIntoView({ block: "nearest" });
+    const child = resultsRef.current?.children[selectedIndex];
+    if (child instanceof HTMLElement) { child.scrollIntoView({ block: "nearest" }); }
   }, [selectedIndex]);
 
   // Reset selection on query change deleted and handled in onChange event handler
@@ -203,7 +204,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
             }}
             onKeyDown={handleKeyDown}
             placeholder="Search projects, stack, navigation..."
-            className="flex-1 bg-transparent text-sm text-dark-text placeholder-dark-text-faint focus:outline-none"
+            className="flex-1 bg-transparent text-base sm:text-sm text-dark-text placeholder-dark-text-faint focus:outline-none"
             autoComplete="off"
             spellCheck={false}
           />

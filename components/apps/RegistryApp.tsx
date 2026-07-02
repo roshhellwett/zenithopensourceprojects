@@ -16,10 +16,13 @@ export default function RegistryApp({ playRetroSound }: { playRetroSound: (type:
   return (
     <div className="space-y-6">
       {/* Category tabs */}
-      <div className="flex overflow-x-auto pb-1 gap-1.5 border-b border-dark-border-subtle select-none">
+      <div className="flex overflow-x-auto pb-1 gap-1.5 border-b border-dark-border-subtle select-none" role="tablist">
         {CATEGORIES.map((cat) => (
           <button
             key={cat.id}
+            role="tab"
+            aria-selected={activeCategory === cat.id}
+            aria-controls="registry-panel"
             onClick={() => {
               setActiveCategory(cat.id);
               playRetroSound("click");
@@ -36,7 +39,7 @@ export default function RegistryApp({ playRetroSound }: { playRetroSound: (type:
       </div>
 
       {/* Filtered Repos Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div id="registry-panel" className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredRepos.slice(0, 6).map((repo) => (
           <div
             key={repo.name}

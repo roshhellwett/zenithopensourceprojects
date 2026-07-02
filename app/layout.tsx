@@ -68,7 +68,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   verification: {
-    google: ["CWEIddbWw_sSmzFyikcyLv3jLzWUYDb-0V5JUNUjmvw", "1bd198fa5b4dc9f1"],
+    google: ["CWEIddbWw_sSmzFyikcyLv3jLzWUYDb-0V5JUNUjmvw"],
   },
   formatDetection: {
     telephone: false,
@@ -84,14 +84,22 @@ export const metadata: Metadata = {
     locale: "en_IN",
     type: "website",
     countryName: "India",
+    images: [
+      {
+        url: `${SITE_URL}/logo.webp`,
+        width: 512,
+        height: 512,
+        alt: "Zenith Open Source Projects",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Zenith Open Source Projects – Roshan Kr Singh",
     description:
       "Open-source software registry and civic-tech ecosystem by Roshan Kr Singh (@roshhellwett).",
+    images: [`${SITE_URL}/logo.webp`],
     creator: "@roshhellwett",
-    creatorId: "roshhellwett",
   },
 };
 
@@ -99,6 +107,7 @@ export const viewport: Viewport = {
   themeColor: "#e1d7c2",
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -117,6 +126,7 @@ export default function RootLayout({
         </a>
 
         <StructuredData />
+        <div className="crt-overlay" aria-hidden="true" />
         <main id="main-content">
           {children}
         </main>

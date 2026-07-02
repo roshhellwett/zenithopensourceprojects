@@ -2,12 +2,12 @@
 
 /* eslint-disable react-hooks/refs -- useAiChat returns state not refs */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Send, X, RefreshCw, Maximize2, Minimize2, Zap } from "lucide-react";
-import { motion } from "framer-motion";
 import { playRetroSound } from "@/lib/audio";
 import { FormattedText, LoadingDots } from "@/lib/format";
 import { useAiChat } from "@/hooks/useAiChat";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/scroll-lock";
 
 interface ChatPanelProps {
   onClose?: () => void;
@@ -36,7 +36,7 @@ const ChatMessage = React.memo(function ChatMessage({ m, copiedId, onCopy }: {
             </div>
             <button
               onClick={() => onCopy(m.id, m.content)}
-              className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-0.5 bg-dark-elevated hover:bg-dark-border/40 border border-dark-border rounded text-[9px] text-dark-text-muted hover:text-dark-text cursor-pointer font-semibold shadow-sm select-none"
+              className="absolute right-0 top-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-2 py-0.5 bg-dark-elevated hover:bg-dark-border/40 border border-dark-border rounded text-[9px] text-dark-text-muted hover:text-dark-text cursor-pointer font-semibold shadow-sm select-none"
               title="Copy response"
             >
               {copiedId === m.id ? "✓ Copied" : "📋 Copy"}
@@ -49,7 +49,7 @@ const ChatMessage = React.memo(function ChatMessage({ m, copiedId, onCopy }: {
           <p className="whitespace-pre-wrap">{m.content}</p>
           <button
             onClick={() => onCopy(m.id, m.content)}
-            className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-0.5 bg-dark-elevated hover:bg-dark-border/40 border border-dark-border rounded text-[9px] text-dark-text-muted hover:text-dark-text cursor-pointer font-semibold shadow-sm select-none"
+            className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-2 py-0.5 bg-dark-elevated hover:bg-dark-border/40 border border-dark-border rounded text-[9px] text-dark-text-muted hover:text-dark-text cursor-pointer font-semibold shadow-sm select-none"
             title="Copy message"
           >
             {copiedId === m.id ? "✓ Copied" : "📋 Copy"}
@@ -63,13 +63,34 @@ const ChatMessage = React.memo(function ChatMessage({ m, copiedId, onCopy }: {
 export default function ChatPanel({ onClose }: ChatPanelProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  const panelRef = useRef<HTMLDivElement>(null);
+
   // Lock body scroll when fullscreen
   useEffect(() => {
     if (isFullscreen) {
-      document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = ""; };
+      lockBodyScroll();
+      return () => { unlockBodyScroll(); };
     }
   }, [isFullscreen]);
+
+  // Focus trap for dialog
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    const focusable = el.querySelectorAll<HTMLElement>(
+      'a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (first) first.focus();
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey && document.activeElement === first) { last?.focus(); e.preventDefault(); }
+      else if (!e.shiftKey && document.activeElement === last) { first?.focus(); e.preventDefault(); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const chat = useAiChat({
     botSender: "bot",
@@ -80,13 +101,9 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
   });
 
   return (
-    <motion.div
-      layout
-      initial={{ y: 25, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: 25, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 350, damping: 25 }}
-      className={`bg-dark-surface border border-dark-border flex flex-col overflow-hidden window-chrome transition-all duration-300 ${
+    <div
+      ref={panelRef}
+      className={`animate-fade-in-up bg-dark-surface border border-dark-border flex flex-col overflow-hidden window-chrome ${
         isFullscreen
           ? "fixed inset-x-0 top-[var(--navbar-height)] bottom-10 z-50 rounded-none border-none shadow-none"
           : "w-full sm:w-[360px] h-[75vh] sm:h-[520px] rounded-t-2xl sm:rounded-xl shadow-2xl max-h-[80vh] sm:max-h-[520px]"
@@ -205,7 +222,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
             disabled={chat.loading}
             rows={1}
             maxLength={2000}
-            className="flex-1 bg-dark-bg border border-dark-border rounded-lg px-3 py-1.5 text-sm text-dark-text placeholder-dark-text-faint focus:outline-none focus:border-amber-button transition-colors resize-none min-h-[36px] max-h-[100px] overflow-y-auto font-sans"
+            className="flex-1 bg-dark-bg border border-dark-border rounded-lg px-3 py-1.5 text-base sm:text-sm text-dark-text placeholder-dark-text-faint focus:outline-none focus:border-amber-button transition-colors resize-none min-h-[36px] max-h-[100px] overflow-y-auto font-sans"
           />
           <button
             type="submit"
@@ -221,6 +238,6 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
           <span>{chat.input.length} / 2000</span>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

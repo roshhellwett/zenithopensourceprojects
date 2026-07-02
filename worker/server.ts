@@ -4,7 +4,10 @@ import { ZENITH_SYSTEM_PROMPT, OFFLINE_RESPONSES } from "./lib/ai-prompt";
 import { isRateLimited, MAX_MESSAGE_LENGTH, MAX_HISTORY_DEPTH } from "./lib/rate-limit";
 
 // ── Config ──
-const PORT = parseInt(process.env.PORT || "3001", 10);
+const PORT = (() => {
+  const p = parseInt(process.env.PORT || "3001", 10);
+  return isNaN(p) ? 3001 : p;
+})();
 const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
@@ -16,7 +19,7 @@ const app = express();
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, false);
       // Validate localhost or exact matches
       const isLocalhost =
         origin.startsWith("http://localhost:") ||

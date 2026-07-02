@@ -1,4 +1,6 @@
-import { useState, useCallback, useRef } from "react";
+"use client";
+
+import { useState, useCallback, useRef, useMemo } from "react";
 
 export function useMouseSpotlight() {
   const [coords, setCoords] = useState({ x: 0, y: 0 });
@@ -17,15 +19,17 @@ export function useMouseSpotlight() {
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
+  const bind = useMemo(() => ({
+    onMouseMove: handleMouseMove,
+    onMouseEnter: handleMouseEnter,
+    onMouseLeave: handleMouseLeave,
+  }), [handleMouseMove, handleMouseEnter, handleMouseLeave]);
+
   return {
     ref: elementRef,
     x: coords.x,
     y: coords.y,
     isHovered,
-    bind: {
-      onMouseMove: handleMouseMove,
-      onMouseEnter: handleMouseEnter,
-      onMouseLeave: handleMouseLeave,
-    },
+    bind,
   };
 }

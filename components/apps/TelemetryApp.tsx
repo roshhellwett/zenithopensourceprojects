@@ -20,6 +20,11 @@ export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSo
   const [playbackAction, setPlaybackAction] = useState<string>("Sentinel compilation loop initialized...");
   const timeRef = useRef(0);
 
+  const playRetroSoundRef = useRef(playRetroSound);
+  const addToastRef = useRef(addToast);
+  useEffect(() => { playRetroSoundRef.current = playRetroSound; }, [playRetroSound]);
+  useEffect(() => { addToastRef.current = addToast; }, [addToast]);
+
   useEffect(() => {
     if (!isPlayingRecording) {
       timeRef.current = 0;
@@ -32,8 +37,8 @@ export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSo
       if (timeRef.current >= 60) {
         setIsPlayingRecording(false);
         setPlaybackTime(0);
-        addToast("Build verification pipeline completed!");
-        playRetroSound("success");
+        addToastRef.current?.("Build verification pipeline completed!");
+        playRetroSoundRef.current?.("success");
         return;
       }
 
@@ -48,7 +53,7 @@ export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSo
     }, 100);
 
     return () => clearInterval(interval);
-  }, [isPlayingRecording, addToast, playRetroSound]);
+  }, [isPlayingRecording]);
 
   const cols = 26;
   const rows = 7;

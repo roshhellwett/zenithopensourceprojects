@@ -29,10 +29,10 @@ export default function Page() {
     <div className="min-h-screen selection:bg-amber-button/30 selection:text-amber-button relative">
       {/* Background images for different screen sizes */}
       <div className="fixed inset-0 w-full h-full pointer-events-none select-none z-0 bg-noise" aria-hidden="true">
-        {/* Desktop Background */}
-        <div className="hidden md:block relative w-full h-full">
+        <picture>
+          <source media="(min-width: 768px)" srcSet="/desktop_background.webp" />
           <Image
-            src="/desktop_background.png"
+            src="/mobile_background.webp"
             alt=""
             fill
             priority
@@ -40,23 +40,9 @@ export default function Page() {
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12N4BgAA/AD+yPJ3oAAAAABJRU5ErkJggg=="
             className="object-cover object-center crisp-bg"
-            sizes="(min-width: 768px) 100vw, 0vw"
+            sizes="100vw"
           />
-        </div>
-        {/* Mobile Background */}
-        <div className="block md:hidden relative w-full h-full">
-          <Image
-            src="/mobile_background.png"
-            alt=""
-            fill
-            priority
-            quality={80}
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12N4BgAA/AD+yPJ3oAAAAABJRU5ErkJggg=="
-            className="object-cover object-center crisp-bg"
-            sizes="(max-width: 768px) 100vw, 0vw"
-          />
-        </div>
+        </picture>
       </div>
 
       {/* Content layer */}

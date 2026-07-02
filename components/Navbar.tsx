@@ -9,7 +9,6 @@ import { renderDesktopIcon } from "@/components/DesktopIcon";
 import dynamic from "next/dynamic";
 
 const SearchModal = dynamic(() => import("@/components/SearchModal"), { ssr: false });
-import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { playRetroSound } from "@/lib/audio";
 
@@ -32,6 +31,9 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const isMac = getIsMac();
+
+  const getActiveEl = (): HTMLElement | null =>
+    document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
   // Active section observer for smooth website navigation highlighting
   useEffect(() => {
@@ -89,7 +91,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setSearchOpen((prev) => {
-          if (!prev) previousFocusRef.current = document.activeElement as HTMLElement;
+          if (!prev) previousFocusRef.current = getActiveEl();
           return !prev;
         });
       }
@@ -101,7 +103,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
   // Listen for custom open-search event (from desktop window toolbar)
   useEffect(() => {
     const handleOpenSearch = () => {
-      previousFocusRef.current = document.activeElement as HTMLElement;
+      previousFocusRef.current = getActiveEl();
       setSearchOpen(true);
     };
     window.addEventListener("zenith_open_search", handleOpenSearch);
@@ -115,6 +117,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Escape") {
           setMobileOpen(false);
+          menuButtonRef.current?.focus();
         }
       };
       window.addEventListener("keydown", handleKeyDown);
@@ -132,25 +135,28 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
       'a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
     );
     if (focusableElements.length === 0) return;
-    const firstElement = focusableElements[0] as HTMLElement;
-    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+    const firstCandidate = focusableElements[0];
+    const lastCandidate = focusableElements[focusableElements.length - 1];
+    if (!(firstCandidate instanceof HTMLElement) || !(lastCandidate instanceof HTMLElement)) return;
+    const firstEl: HTMLElement = firstCandidate;
+    const lastEl: HTMLElement = lastCandidate;
 
     const handleTab = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
       if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          lastElement.focus();
+        if (document.activeElement === firstEl) {
+          lastEl.focus();
           e.preventDefault();
         }
       } else {
-        if (document.activeElement === lastElement) {
-          firstElement.focus();
+        if (document.activeElement === lastEl) {
+          firstEl.focus();
           e.preventDefault();
         }
       }
     };
 
-    firstElement.focus();
+    firstEl.focus();
     window.addEventListener("keydown", handleTab);
     return () => {
       window.removeEventListener("keydown", handleTab);
@@ -266,10 +272,10 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
             <button
               onClick={() => {
                 playRetroSound("click");
-                previousFocusRef.current = document.activeElement as HTMLElement;
-                setSearchOpen(true);
-              }}
-              className="p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-colors flex items-center gap-1"
+        previousFocusRef.current = getActiveEl();
+        setSearchOpen(true);
+      }}
+      className="p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-colors flex items-center gap-1"
               title="Search (Cmd/Ctrl + K)"
               aria-label="Search"
             >
@@ -327,6 +333,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
               }}
               className="lg:hidden p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-colors"
               aria-expanded={mobileOpen}
+              aria-controls="mobile-menu-panel"
               aria-label="Toggle mobile menu"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -341,71 +348,63 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
         </div>
 
         {/* Mobile Dropdown & Backdrop */}
-        <AnimatePresence>
-          {mobileOpen && (
-            <>
-              {/* Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 top-12 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
-                onClick={() => { setMobileOpen(false); menuButtonRef.current?.focus(); }}
-              />
+        {mobileOpen && (
+          <>
+            {/* Backdrop */}
+            <div
+              className="animate-backdrop-in fixed inset-0 top-12 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+              onClick={() => { setMobileOpen(false); menuButtonRef.current?.focus(); }}
+            />
 
-              {/* Menu Panel */}
-              <motion.div
-                ref={menuRef}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.25, ease: "easeInOut" }}
-                className="lg:hidden absolute top-12 left-0 right-0 bg-dark-elevated border-b border-dark-border px-4 py-4 space-y-3 max-h-[70vh] overflow-y-auto z-50 shadow-2xl"
-              >
-                {NAV_ITEMS.map((item) => (
-                  <div key={item.label} className="space-y-1">
-                    <div className="text-xs font-bold uppercase tracking-wider text-dark-text-muted px-2 pt-1">
-                      {item.label}
-                    </div>
-                    {item.children?.map((child) => {
-                      const isHighlighted =
-                        child.href.startsWith("#") &&
-                        activeSection === child.href.substring(1);
-                      return (
-                        <a
-                          key={child.label}
-                          href={child.href}
-                          target={child.href?.startsWith("http") ? "_blank" : undefined}
-                          rel={child.href?.startsWith("http") ? "noopener noreferrer" : undefined}
-                          onClick={(e) => handleNavClick(e, child.href)}
-                          className={`flex items-center gap-2.5 px-3 py-2 text-sm rounded-md transition-colors ${
-                            isHighlighted
-                              ? "bg-amber-button/10 text-amber-button font-semibold"
-                              : "text-dark-text hover:bg-dark-surface"
-                          }`}
-                        >
-                          <span>{child.icon ? renderDesktopIcon(child.icon, "w-4 h-4") : null}</span>
-                          <span>{child.label}</span>
-                        </a>
-                      );
-                    })}
+            {/* Menu Panel */}
+            <div
+              ref={menuRef}
+              id="mobile-menu-panel"
+              className="mobile-menu-panel animate-expand-down lg:hidden absolute top-12 left-0 right-0 bg-dark-elevated border-b border-dark-border px-4 py-4 space-y-3 max-h-[70vh] overflow-y-auto z-50 shadow-2xl"
+            >
+              {NAV_ITEMS.map((item) => (
+                <div key={item.label} className="space-y-1">
+                  <div className="text-xs font-bold uppercase tracking-wider text-dark-text-muted px-2 pt-1">
+                    {item.label}
                   </div>
-                ))}
-                <div className="pt-3 border-t border-dark-border-subtle">
-                  <a
-                          href={STORE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => playRetroSound("click")}
-                    className="flex items-center justify-center gap-1.5 bg-amber-button hover:bg-saffron-deep text-black px-4 py-2.5 rounded-md text-sm font-bold transition-all w-full shadow-md active:scale-95"
-                  >
-                    Get started – free
-                  </a>
+                  {item.children?.map((child) => {
+                    const isHighlighted =
+                      child.href.startsWith("#") &&
+                      activeSection === child.href.substring(1);
+                    return (
+                      <a
+                        key={child.label}
+                        href={child.href}
+                        target={child.href?.startsWith("http") ? "_blank" : undefined}
+                        rel={child.href?.startsWith("http") ? "noopener noreferrer" : undefined}
+                        onClick={(e) => handleNavClick(e, child.href)}
+                        className={`flex items-center gap-2.5 px-3 py-2 text-sm rounded-md transition-colors ${
+                          isHighlighted
+                            ? "bg-amber-button/10 text-amber-button font-semibold"
+                            : "text-dark-text hover:bg-dark-surface"
+                        }`}
+                      >
+                        <span>{child.icon ? renderDesktopIcon(child.icon, "w-4 h-4") : null}</span>
+                        <span>{child.label}</span>
+                      </a>
+                    );
+                  })}
                 </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+              ))}
+              <div className="pt-3 border-t border-dark-border-subtle">
+                <a
+                        href={STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => playRetroSound("click")}
+                  className="flex items-center justify-center gap-1.5 bg-amber-button hover:bg-saffron-deep text-black px-4 py-2.5 rounded-md text-sm font-bold transition-all w-full shadow-md active:scale-95"
+                >
+                  Get started – free
+                </a>
+              </div>
+            </div>
+          </>
+        )}
       </header>
 
       {/* Global Search Modal */}

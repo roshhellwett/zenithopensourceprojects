@@ -1,21 +1,22 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import dynamic from "next/dynamic";
 import DesktopIcon, { renderDesktopIcon } from "./DesktopIcon";
 import DesktopWindow from "./DesktopWindow";
-import ChatPanel from "./ChatPanel";
 import { STORE_URL } from "@/lib/site";
 import { LEFT_DESKTOP_ICONS, RIGHT_DESKTOP_ICONS } from "@/data/desktop-icons";
-import { motion } from "framer-motion";
 import { playRetroSound, getSoundEnabled, setSoundEnabled } from "@/lib/audio";
 
 import { ZenithLogo } from "@/components/ZenithLogo";
-import HomeApp from "@/components/apps/HomeApp";
-import RegistryApp from "@/components/apps/RegistryApp";
-import TelemetryApp from "@/components/apps/TelemetryApp";
-import StackApp from "@/components/apps/StackApp";
-import FounderApp from "@/components/apps/FounderApp";
-import MascotApp from "@/components/apps/MascotApp";
+
+const HomeApp = dynamic(() => import("@/components/apps/HomeApp"), { ssr: false });
+const RegistryApp = dynamic(() => import("@/components/apps/RegistryApp"), { ssr: false });
+const TelemetryApp = dynamic(() => import("@/components/apps/TelemetryApp"), { ssr: false });
+const StackApp = dynamic(() => import("@/components/apps/StackApp"), { ssr: false });
+const FounderApp = dynamic(() => import("@/components/apps/FounderApp"), { ssr: false });
+const MascotApp = dynamic(() => import("@/components/apps/MascotApp"), { ssr: false });
+const ChatPanel = dynamic(() => import("./ChatPanel"), { ssr: false });
 
 interface DesktopModeProps {
   onSwitchToWebsite: () => void;
@@ -28,30 +29,6 @@ const TAB_LABELS: Record<string, string> = {
   stack: "stack.sys",
   founder: "founder.md",
   "ask-ai": "zenith-ai.chat",
-};
-
-// Stagger entrance animations for desktop icons
-const iconContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.04,
-    },
-  },
-};
-
-const iconItemVariants = {
-  hidden: { y: 15, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: "spring" as const,
-      stiffness: 350,
-      damping: 24,
-    },
-  },
 };
 
 // Clock Widget for the Taskbar
@@ -79,11 +56,12 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [chatOpen, setChatOpen] = useState(true);
-  const [crtActive, setCrtActive] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Startup animation boot sequence
-  const [isBooting, setIsBooting] = useState(true);
+  const [isBooting, setIsBooting] = useState(() => {
+    try { return !sessionStorage.getItem("zenith_booted"); } catch { return true; }
+  });
   const [bootLog, setBootLog] = useState<string[]>([]);
 
   const [soundEnabled, setSoundEnabledState] = useState(() => getSoundEnabled());
@@ -131,10 +109,9 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
 
   // Boot loader execution
   const bootTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bootInitialRef = useRef(isBooting);
   useEffect(() => {
-    let booted = false;
-    try { booted = !!sessionStorage.getItem("zenith_booted"); } catch {}
-    if (booted) { setIsBooting(false); return; } // eslint-disable-line react-hooks/set-state-in-effect
+    if (bootInitialRef.current === false) return;
 
     const lines = [
       "ZENITH REGISTRY BOOTLOADER v1.0.4",
@@ -173,12 +150,10 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
   // Keyboard Shortcuts Hook (refs to avoid re-registering listener)
   const windowOpenRef = useRef(windowOpen);
   const isMinimizedRef = useRef(isMinimized);
-  const crtActiveRef = useRef(crtActive);
   const isBootingRef = useRef(isBooting);
 
   useEffect(() => { windowOpenRef.current = windowOpen; }, [windowOpen]);
   useEffect(() => { isMinimizedRef.current = isMinimized; }, [isMinimized]);
-  useEffect(() => { crtActiveRef.current = crtActive; }, [crtActive]);
   useEffect(() => { isBootingRef.current = isBooting; }, [isBooting]);
 
   useEffect(() => {
@@ -190,17 +165,6 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
         setIsMinimized(true);
         addToast("Window minimized. Toggle via bottom taskbar.");
         playRetroSound("toggle");
-      }
-
-      // Ctrl+Shift+T to toggle CRT filter
-      if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "T") {
-        e.preventDefault();
-        setCrtActive((prev) => {
-          const next = !prev;
-          playRetroSound("crt");
-          addToast(`CRT Filter ${next ? "enabled" : "disabled"}`);
-          return next;
-        });
       }
 
       // Ctrl + 1-4 to switch active tabs
@@ -282,14 +246,6 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
     closeContextMenu();
   }, [closeContextMenu]);
 
-  const handleContextToggleCrt = useCallback(() => {
-    const next = !crtActive;
-    setCrtActive(next);
-    playRetroSound("crt");
-    addToast(next ? "CRT Filter ON" : "CRT Filter OFF");
-    closeContextMenu();
-  }, [crtActive, addToast, closeContextMenu]);
-
   const handleContextToggleSound = useCallback(() => {
     const nextSound = !soundEnabled;
     setSoundEnabled(nextSound);
@@ -348,9 +304,6 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       className="relative h-[calc(100vh-var(--navbar-height))] overflow-hidden"
       onContextMenu={handleContextMenu}
     >
-      {/* CRT scanline overlay */}
-      {crtActive && <div className="crt-overlay" />}
-
       {/* Toast notifications */}
       <div className="fixed bottom-14 left-4 z-[60] flex flex-col gap-2 max-w-sm" role="status" aria-live="polite" aria-label="Notifications">
         {toasts.map((t) => (
@@ -360,7 +313,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
           >
             <span className="w-2 h-2 bg-amber-button rounded-full animate-pulse shrink-0" />
             <span>{t.message}</span>
-            <div className="absolute bottom-0 left-0 h-0.5 bg-amber-button toast-progress-bar" style={{ width: "100%" }} />
+            <div className="absolute bottom-0 left-0 h-0.5 bg-amber-button toast-progress-bar" />
           </div>
         ))}
       </div>
@@ -368,29 +321,27 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       {/* Right-click Context Menu */}
       {contextMenu.visible && (
         <div
+          role="menu"
           className="fixed bg-dark-elevated border border-dark-border rounded-lg shadow-2xl py-1 z-50 min-w-44 select-none animate-scale-in"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
+            role="menuitem"
             onClick={handleContextOpenHome}
             className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
           >
             📂 Open home.md
           </button>
           <button
+            role="menuitem"
             onClick={handleContextOpenAssistant}
             className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
           >
             💬 Open AI Assistant
           </button>
           <button
-            onClick={handleContextToggleCrt}
-            className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
-          >
-            📺 Toggle CRT overlay
-          </button>
-          <button
+            role="menuitem"
             onClick={handleContextToggleSound}
             className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
           >
@@ -398,6 +349,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
           </button>
           <div className="h-px bg-dark-border-subtle my-1" />
           <button
+            role="menuitem"
             onClick={handleContextGoToWebsite}
             className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
           >
@@ -407,42 +359,30 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       )}
 
       {/* Left desktop icons (staggered animated) */}
-      <motion.div
-        variants={iconContainerVariants}
-        initial="hidden"
-        animate="visible"
-        className="absolute left-3 top-4 z-20 hidden md:flex flex-col gap-1"
-      >
-        {LEFT_DESKTOP_ICONS.map((icon) => (
-          <motion.div key={icon.id} variants={iconItemVariants}>
+      <div className="absolute left-3 top-4 z-20 hidden md:flex flex-col gap-1">
+        {LEFT_DESKTOP_ICONS.map((icon, idx) => (
+          <div key={icon.id} className="animate-icon-stagger" style={{ animationDelay: `${idx * 0.04}s` }}>
             <DesktopIcon
-              id={icon.id}
               label={icon.label}
               iconKey={icon.icon}
               onClick={() => handleIconClick(icon.id, icon.action, icon.tabId, icon.link)}
             />
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
 
       {/* Right desktop icons (staggered animated) */}
-      <motion.div
-        variants={iconContainerVariants}
-        initial="hidden"
-        animate="visible"
-        className="absolute right-3 top-4 z-20 hidden md:flex flex-col gap-1 items-center"
-      >
-        {RIGHT_DESKTOP_ICONS.map((icon) => (
-          <motion.div key={icon.id} variants={iconItemVariants}>
+      <div className="absolute right-3 top-4 z-20 hidden md:flex flex-col gap-1 items-center">
+        {RIGHT_DESKTOP_ICONS.map((icon, idx) => (
+          <div key={icon.id} className="animate-icon-stagger" style={{ animationDelay: `${(LEFT_DESKTOP_ICONS.length + idx) * 0.04}s` }}>
             <DesktopIcon
-              id={icon.id}
               label={icon.label}
               iconKey={icon.icon}
               onClick={() => handleIconClick(icon.id, icon.action, icon.tabId, icon.link)}
             />
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
 
       {/* Mobile top navigation scroll bar */}
       <div className="md:hidden flex overflow-x-auto gap-3 px-3 py-2 bg-dark-surface/90 backdrop-blur-sm border-b border-dark-border scrollbar-none z-20 select-none">
@@ -537,22 +477,24 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
                     <span className="text-accent-teal">◆</span> GitHub
                   </a>
                   <span className="text-dark-border hidden sm:inline">•</span>
-                  <span
-                    className="posthog-link cursor-pointer hover:text-amber-button shrink-0"
+                  <button
+                    type="button"
+                    className="posthog-link cursor-pointer hover:text-amber-button shrink-0 bg-transparent border-none p-0 font-inherit text-inherit"
                     onClick={onSwitchToWebsite}
                   >
                     ▶ Website mode
-                  </span>
+                  </button>
                   <span className="text-dark-border hidden sm:inline">•</span>
-                  <span
-                    className="posthog-link cursor-pointer hover:text-amber-button shrink-0"
+                  <button
+                    type="button"
+                    className="posthog-link cursor-pointer hover:text-amber-button shrink-0 bg-transparent border-none p-0 font-inherit text-inherit"
                     onClick={() => {
                       setActiveTab("founder");
                       addToast("Opening founder.md...");
                     }}
                   >
                     💬 Talk to founder
-                  </span>
+                  </button>
                 </div>
               </div>
 

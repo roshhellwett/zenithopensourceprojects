@@ -10,12 +10,11 @@ const nextConfig: NextConfig = {
   // Enable compression
   compress: true,
 
-  // Security headers (applied to all routes)
+  // Security headers (applied to all routes — proxy.ts also sets CSP/HSTS)
   headers: async () => [
     {
       source: "/(.*)",
       headers: [
-        { key: "X-DNS-Prefetch-Control", value: "on" },
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "X-Frame-Options", value: "DENY" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -25,8 +24,8 @@ const nextConfig: NextConfig = {
 
   // Image optimization — unoptimized on GitHub Pages (static export)
   images: GITHUB_PAGES
-    ? { unoptimized: true, qualities: [25, 50, 75, 80] }
-    : { qualities: [25, 50, 75, 80] },
+    ? { unoptimized: true }
+    : {},
 
   // GitHub Pages static export config
   ...(GITHUB_PAGES

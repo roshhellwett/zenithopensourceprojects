@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable react-hooks/refs -- useAiChat returns state not refs */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Send } from 'lucide-react';
 import { SoundType } from '@/lib/audio';
 import { useAiChat } from '@/hooks/useAiChat';
@@ -95,7 +95,7 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: S
 
       {/* Chat bubbles container */}
       <div className="flex-1 bg-dark-bg border border-dark-border rounded p-3 overflow-y-auto space-y-3 font-sans relative">
-        {chat.messages.map((m) => {
+        {useMemo(() => chat.messages.map((m) => {
           const isBot = m.sender === "hogai";
           return (
             <div
@@ -121,7 +121,7 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: S
               </div>
             </div>
           );
-        })}
+        }), [chat.messages])}
 
         {chat.loading && (
           <div className="flex gap-2.5 max-w-[85%] mr-auto">
@@ -147,7 +147,7 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: S
             onChange={(e) => chat.setInput(e.target.value)}
             disabled={chat.loading}
             placeholder="Type your prompt..."
-            className="w-full bg-dark-bg border border-dark-border rounded p-2.5 pr-20 text-xs text-dark-text focus:outline-none focus:ring-1 focus:ring-cobalt font-mono"
+            className="w-full bg-dark-bg border border-dark-border rounded p-2.5 pr-20 text-base sm:text-xs text-dark-text focus:outline-none focus:ring-1 focus:ring-cobalt font-mono"
           />
           <button
             type="submit"

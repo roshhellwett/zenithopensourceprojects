@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import { TrafficLights } from "@/components/TrafficLights";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "404 — Page Not Found — Zenith Open Source Projects",
+};
 
 export default function NotFound() {
   return (
