@@ -106,18 +106,20 @@ export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSo
             </span>
           </div>
 
-          <div className="grid gap-[3px] sm:gap-[4px] justify-start" style={{
-            gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-            gridAutoFlow: "column",
-            gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`
-          }}>
-            {heatmapCells.map((c, i) => (
-              <div
-                key={i}
-                className={`aspect-square rounded-[2px] transition-all hover:scale-125 ${levelClass[c.level]} min-w-[4px] sm:min-w-[6px]`}
-                title={`${c.commits} commits recorded`}
-              />
-            ))}
+          <div className="overflow-x-auto pb-1">
+            <div className="grid gap-[3px] sm:gap-[4px] justify-start min-w-[280px]" style={{
+              gridTemplateColumns: `repeat(${cols}, minmax(8px, 1fr))`,
+              gridAutoFlow: "column",
+              gridTemplateRows: `repeat(${rows}, minmax(8px, 1fr))`
+            }}>
+              {heatmapCells.map((c, i) => (
+                <div
+                  key={i}
+                  className={`aspect-square rounded-[2px] transition-all hover:scale-125 ${levelClass[c.level]} w-2 h-2 sm:w-2.5 sm:h-2.5`}
+                  title={`${c.commits} commits recorded`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 

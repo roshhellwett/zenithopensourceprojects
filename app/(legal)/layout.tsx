@@ -20,7 +20,7 @@ export default function LegalLayout({
         <div className="max-w-[900px] mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm font-bold text-dark-text hover:text-amber-button transition-colors"
+            className="flex items-center gap-2 text-sm font-bold text-dark-text hover:text-amber-button transition-colors min-h-[44px] shrink-0"
           >
             ← Back to Zenith
           </Link>

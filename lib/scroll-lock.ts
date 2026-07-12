@@ -7,9 +7,14 @@ export function lockBodyScroll(): void {
   }
 }
 
-export function unlockBodyScroll(): void {
-  lockCount = Math.max(0, lockCount - 1);
+export function unlockBodyScroll(force = false): void {
+  if (force) {
+    lockCount = 0;
+  } else {
+    lockCount = Math.max(0, lockCount - 1);
+  }
   if (lockCount === 0) {
     document.body.style.overflow = "";
+    document.body.classList.remove("scroll-locked");
   }
 }

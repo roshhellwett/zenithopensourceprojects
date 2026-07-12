@@ -177,6 +177,17 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
     };
   }, [mobileOpen]);
 
+  // Click outside to close desktop dropdowns
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
   // Smooth scroll handler for anchor links
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     playRetroSound("click");
@@ -188,16 +199,21 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
         const el = document.getElementById(targetId);
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });
+        } else {
+          setTimeout(() => {
+            document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth" });
+          }, 300);
         }
       };
 
       if (currentMode === "desktop" && onToggleMode) {
         onToggleMode();
-        setTimeout(doScroll, 100);
+        setTimeout(doScroll, 200);
       } else {
         doScroll();
       }
       setMobileOpen(false);
+      setOpenDropdown(null);
     }
   };
 
@@ -206,7 +222,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
       <header className="sticky top-0 z-50 bg-dark-surface/95 border-b border-dark-border backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 h-12 flex items-center justify-between safe-area-px">
           {/* Left: Logo + Nav */}
-          <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0 flex-1 overflow-hidden">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0 flex-1">
             {/* Logo */}
             <Link href="/" onClick={() => playRetroSound("click")} className="flex items-center gap-1.5 sm:gap-2 shrink-0 group">
                 <ZenithLogo animate={false} />
@@ -221,7 +237,16 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                 const isRightmost = idx >= NAV_ITEMS.length - 2;
                 const isOpen = openDropdown === item.label;
                 return (
-                <div key={item.label} className="relative navbar-item group">
+                <div
+                  key={item.label}
+                  className="relative navbar-item group"
+                  onMouseEnter={() => {
+                    if (item.children) setOpenDropdown(item.label);
+                  }}
+                  onMouseLeave={() => {
+                    if (item.children) setOpenDropdown(null);
+                  }}
+                >
                   <button
                     type="button"
                     onClick={() => {
@@ -240,8 +265,8 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                   {/* Dropdown */}
                   {item.children && (
                     <div
-                      className={`absolute top-full mt-1 w-56 xl:w-72 bg-dark-elevated border border-dark-border rounded-lg shadow-2xl p-2 z-50 transition-all duration-200 ${
-                        isOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible translate-y-[-4px]"
+                      className={`navbar-dropdown absolute top-full mt-1 w-56 xl:w-72 bg-dark-elevated border border-dark-border rounded-lg shadow-2xl p-2 z-50 transition-all duration-200 ${
+                        isOpen ? "opacity-100 visible translate-y-0" : ""
                       } ${isRightmost ? "right-0 left-auto" : "left-0"}`}
                     >
                       {item.children.map((child) => {

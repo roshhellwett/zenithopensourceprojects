@@ -113,6 +113,10 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    return () => unlockBodyScroll(true);
+  }, []);
+
   const handleClose = useCallback(() => {
     playRetroSound("close");
     onClose();

@@ -10,6 +10,7 @@ import { STORE_URL } from "@/lib/site";
 import { ZenithLogo } from "@/components/ZenithLogo";
 import type { Repo } from "@/types";
 import { playRetroSound } from "@/lib/audio";
+import { unlockBodyScroll } from "@/lib/scroll-lock";
 import Link from "next/link";
 
 const ALL_REPOS = [FEATURED_FALLBACK, ...FALLBACK_REPOS];
@@ -233,6 +234,13 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
   const [showConsent, setShowConsent] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  // Ensure any scroll locks from previous mode or modals are cleared
+  useEffect(() => {
+    unlockBodyScroll(true);
+    document.body.style.overflow = "";
+    document.body.classList.remove("scroll-locked");
+  }, []);
 
   // Auto-cycle feature tabs
   useEffect(() => {
@@ -624,7 +632,7 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
             Complete structural list of core verified repositories inside the Zenith environment.
           </p>
 
-          <div className="border border-dark-border rounded-lg overflow-x-auto -mx-3 sm:mx-0 sm:overflow-clip">
+          <div className="border border-dark-border rounded-lg overflow-x-auto w-full">
             <table className="w-full text-xs sm:text-sm min-w-[320px]">
               <thead>
                 <tr className="bg-dark-surface border-b border-dark-border select-none">

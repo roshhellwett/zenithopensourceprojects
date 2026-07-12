@@ -47,6 +47,9 @@
 }
 
 /* Mobile Safari dvh fix — use dynamic viewport height where supported */
+.min-h-screen-dvh {
+  min-height: 100vh;
+}
 @supports (height: 100dvh) {
   html,
   body {
@@ -54,6 +57,9 @@
   }
   .h-dvh-fix {
     height: 100dvh;
+  }
+  .min-h-screen-dvh {
+    min-height: 100dvh;
   }
 }
 
@@ -67,26 +73,22 @@
 
 /* ── Base Resets ── */
 html {
-  overflow-y: scroll;
   overflow-x: hidden;
-  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
   background-color: var(--color-dark-bg);
 }
 body {
-  overflow-x: hidden;
+  min-height: 100vh;
   width: 100%;
-  max-width: 100vw;
   position: relative;
   background-color: var(--color-dark-bg);
   font-family: var(--font-sans);
   letter-spacing: -0.025em;
   color: var(--color-dark-text);
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-wrap: break-word;
   word-wrap: break-word;
-  overscroll-behavior: none;
 }
 
 /* ── Skip to content (accessibility) ── */
@@ -383,10 +385,8 @@ body {
 
 /* ── Body scroll lock (for mobile menu) ── */
 body.scroll-locked {
-  overflow: hidden;
+  overflow: hidden !important;
   touch-action: none;
-  position: fixed;
-  width: 100%;
 }
 body.scroll-locked .mobile-menu-panel {
   touch-action: auto;

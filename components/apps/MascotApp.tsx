@@ -78,7 +78,7 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: S
   });
 
   return (
-    <div className="flex flex-col min-h-[250px] sm:min-h-[350px] flex-1">
+    <div className="flex flex-col h-full min-h-[300px] sm:min-h-[400px] flex-1">
       <div className="bg-dark-surface border border-dark-border p-2 rounded text-[11px] sm:text-xs text-dark-text-muted mb-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 select-none">
         <span className="text-left">Ask about compile paths, scraper setups, or project telemetry details.</span>
         <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">

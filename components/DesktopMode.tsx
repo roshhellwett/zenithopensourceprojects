@@ -7,6 +7,7 @@ import DesktopWindow from "./DesktopWindow";
 import { STORE_URL } from "@/lib/site";
 import { LEFT_DESKTOP_ICONS, RIGHT_DESKTOP_ICONS } from "@/data/desktop-icons";
 import { playRetroSound, getSoundEnabled, setSoundEnabled } from "@/lib/audio";
+import { unlockBodyScroll } from "@/lib/scroll-lock";
 
 import { ZenithLogo } from "@/components/ZenithLogo";
 
@@ -271,10 +272,18 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
     playRetroSound("click");
   }, []);
 
+  useEffect(() => {
+    return () => {
+      unlockBodyScroll(true);
+      document.body.style.overflow = "";
+      document.body.classList.remove("scroll-locked");
+    };
+  }, []);
+
   if (isBooting) {
     return (
       <div className="fixed inset-0 bg-[#191b22] text-amber-button font-mono p-3 sm:p-6 flex flex-col justify-between z-[9999]">
-        <div className="space-y-1 text-[10px] sm:text-xs select-none max-w-xl">
+        <div className="space-y-1 text-[10px] sm:text-xs select-none max-w-xl overflow-y-auto pr-2">
           {bootLog.map((line, idx) => (
             <p
               key={idx}
@@ -291,7 +300,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
           ))}
           <p className="animate-pulse">▊</p>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-1 text-[9px] sm:text-[10px] text-dark-text-faint border-t border-dark-border/20 pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-1 text-[9px] sm:text-[10px] text-dark-text-faint border-t border-dark-border/20 pt-4 shrink-0">
           <span>ZENITH SYSTEM RUNTIME</span>
           <span>India verified © {new Date().getFullYear()}</span>
         </div>
@@ -301,7 +310,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
 
   return (
     <div
-      className="relative h-[calc(100vh-var(--navbar-height))] overflow-hidden"
+      className="relative h-[calc(100vh-var(--navbar-height))] h-[calc(100dvh-var(--navbar-height))] overflow-hidden"
       onContextMenu={handleContextMenu}
     >
       {/* Toast notifications */}
