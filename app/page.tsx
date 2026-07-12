@@ -26,7 +26,7 @@ export default function Page() {
   const [mode, setMode] = useState<"desktop" | "website">("desktop");
 
   return (
-    <div className="min-h-screen selection:bg-amber-button/30 selection:text-amber-button relative">
+    <div className="min-h-screen selection:bg-amber-button/30 selection:text-amber-button relative overflow-x-hidden">
       {/* Background images for different screen sizes */}
       <div className="fixed inset-0 w-full h-full pointer-events-none select-none z-0 bg-noise" aria-hidden="true">
         <picture>

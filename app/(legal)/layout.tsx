@@ -17,7 +17,7 @@ export default function LegalLayout({
     <div className="min-h-screen bg-dark-bg">
       {/* Top navigation bar */}
       <header className="sticky top-0 z-50 bg-dark-surface/95 border-b border-dark-border backdrop-blur-md">
-        <div className="max-w-[900px] mx-auto px-4 md:px-6 h-12 flex items-center justify-between">
+        <div className="max-w-[900px] mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
           <Link
             href="/"
             className="flex items-center gap-2 text-sm font-bold text-dark-text hover:text-amber-button transition-colors"

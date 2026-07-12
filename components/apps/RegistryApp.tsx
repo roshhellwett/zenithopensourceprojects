@@ -16,7 +16,7 @@ export default function RegistryApp({ playRetroSound }: { playRetroSound: (type:
   return (
     <div className="space-y-6">
       {/* Category tabs */}
-      <div className="flex overflow-x-auto pb-1 gap-1.5 border-b border-dark-border-subtle select-none" role="tablist">
+      <div className="flex overflow-x-auto pb-1 gap-1 border-b border-dark-border-subtle select-none scrollbar-none snap-x-mandatory -mx-1 px-1" role="tablist">
         {CATEGORIES.map((cat) => (
           <button
             key={cat.id}
@@ -27,7 +27,7 @@ export default function RegistryApp({ playRetroSound }: { playRetroSound: (type:
               setActiveCategory(cat.id);
               playRetroSound("click");
             }}
-            className={`px-3 py-1.5 rounded-t text-xs font-bold border-t border-x focus:outline-none transition-colors whitespace-nowrap cursor-pointer ${
+            className={`px-2.5 sm:px-3 py-2 sm:py-1.5 rounded-t text-[11px] sm:text-xs font-bold border-t border-x focus:outline-none transition-colors whitespace-nowrap cursor-pointer snap-start min-h-[44px] sm:min-h-[36px] shrink-0 ${
               activeCategory === cat.id
                 ? "bg-dark-surface border-dark-border text-dark-text border-b-2 border-b-amber-button -mb-[2px] z-10"
                 : "bg-dark-bg border-dark-border-subtle text-dark-text-muted hover:text-dark-text"
@@ -94,12 +94,12 @@ export default function RegistryApp({ playRetroSound }: { playRetroSound: (type:
 
       {/* See more link */}
       {filteredRepos.length > 3 && (
-        <div className="mt-6 flex justify-center">
+        <div className="mt-4 sm:mt-6 flex justify-center">
           <a
             href="https://github.com/roshhellwett?tab=repositories"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-amber-button hover:bg-saffron-deep text-black px-6 py-2.5 border border-amber-shadow rounded text-xs font-bold flex items-center gap-2 transition-transform active:translate-y-0.5"
+            className="bg-amber-button hover:bg-saffron-deep text-black px-5 sm:px-6 py-2.5 sm:py-2 border border-amber-shadow rounded text-xs font-bold flex items-center gap-2 transition-transform active:translate-y-0.5 min-h-[44px] sm:min-h-0"
           >
             Visit Zenith Registry Page <ArrowUpRight className="w-3.5 h-3.5" />
           </a>

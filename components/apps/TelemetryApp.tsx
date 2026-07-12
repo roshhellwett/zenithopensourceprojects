@@ -80,18 +80,18 @@ export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSo
   ];
 
   return (
-    <div className="grid grid-cols-12 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 md:gap-6">
       {/* Left: Commit cadence heatmap */}
-      <div className="col-span-12 md:col-span-5 space-y-4">
+      <div className="md:col-span-5 space-y-3 sm:space-y-4">
         <h3 className="font-bold text-sm text-dark-text uppercase tracking-wide font-mono flex items-center gap-1.5">
-          <Activity className="w-4 h-4 text-accent-teal" />
+          <Activity className="w-4 h-4 text-accent-teal shrink-0" />
           <span>Commit Cadence Heatmap</span>
         </h3>
 
-        <div className="bg-dark-surface border border-dark-border p-4 rounded">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-dark-surface border border-dark-border p-3 sm:p-4 rounded overflow-x-auto">
+          <div className="flex items-center justify-between mb-3 sm:mb-4 min-w-0">
             <span className="text-[10px] font-bold tracking-widest text-dark-text-faint uppercase">Last 26 weeks</span>
-            <span className="text-[9px] font-bold tracking-widest text-dark-text-faint uppercase flex items-center">
+            <span className="text-[9px] font-bold tracking-widest text-dark-text-faint uppercase flex items-center shrink-0 ml-2">
               Less <span className="inline-flex gap-1 mx-2 align-middle">
                 {[0, 1, 2, 3, 4].map((l) => (
                   <span key={l} className={`w-[8px] h-[8px] rounded-sm ${levelClass[l]}`} />
@@ -100,7 +100,7 @@ export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSo
             </span>
           </div>
 
-          <div className="grid gap-[4px] justify-center" style={{
+          <div className="grid gap-[3px] sm:gap-[4px] justify-start" style={{
             gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
             gridAutoFlow: "column",
             gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`
@@ -108,14 +108,14 @@ export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSo
             {heatmapCells.map((c, i) => (
               <div
                 key={i}
-                className={`aspect-square rounded-[2px] transition-all hover:scale-125 ${levelClass[c.level]}`}
+                className={`aspect-square rounded-[2px] transition-all hover:scale-125 ${levelClass[c.level]} min-w-[4px] sm:min-w-[6px]`}
                 title={`${c.commits} commits recorded`}
               />
             ))}
           </div>
         </div>
 
-        <div className="bg-dark-bg border border-dark-border-subtle p-3 rounded text-xs leading-normal">
+        <div className="bg-dark-bg border border-dark-border-subtle p-2.5 sm:p-3 rounded text-xs leading-normal">
           <p className="text-dark-text-muted">
             Our build telemetries verify compilation metrics, static audit outcomes, and EasyEffects script loads dynamically every 24 hours.
           </p>
@@ -123,20 +123,20 @@ export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSo
       </div>
 
       {/* Right: Live compiler console simulator */}
-      <div className="col-span-12 md:col-span-7 flex flex-col justify-between space-y-4">
-        <div className="bg-dark-surface border border-dark-border p-4 rounded flex-1 flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b pb-2 border-dark-border-subtle mb-3">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-accent-salmon animate-pulse inline-block" />
-              <span className="font-bold text-xs font-mono text-dark-text">Simulated Build Diagnostics Stream</span>
+      <div className="md:col-span-7 flex flex-col justify-between space-y-3 sm:space-y-4">
+        <div className="bg-dark-surface border border-dark-border p-3 sm:p-4 rounded flex-1 flex flex-col justify-between">
+          <div className="flex items-center justify-between border-b pb-2 border-dark-border-subtle mb-3 gap-2">
+            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-accent-salmon animate-pulse inline-block shrink-0" />
+              <span className="font-bold text-xs font-mono text-dark-text truncate">Simulated Build Diagnostics Stream</span>
             </div>
-            <div className="text-[10px] font-mono text-dark-text-muted bg-dark-elevated px-2 py-0.5 rounded">
+            <div className="text-[10px] font-mono text-dark-text-muted bg-dark-elevated px-2 py-0.5 rounded shrink-0">
               Node: New Delhi
             </div>
           </div>
 
           {/* Terminal */}
-          <div className="relative border border-dark-border h-48 bg-[#0a0b0e] text-accent-teal p-3 rounded font-mono text-[10px] overflow-y-auto leading-relaxed">
+          <div className="relative border border-dark-border h-40 sm:h-48 bg-[#0a0b0e] text-accent-teal p-2 sm:p-3 rounded font-mono text-[9px] sm:text-[10px] overflow-y-auto leading-relaxed">
             <div className="absolute inset-0 bg-grid-line opacity-[0.02] pointer-events-none" />
             
             <div className="space-y-1">
@@ -169,23 +169,23 @@ export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSo
           </div>
 
           {/* Timeline controller */}
-          <div className="mt-4 flex items-center justify-between gap-3 bg-dark-elevated p-2 rounded border border-dark-border-subtle">
+          <div className="mt-3 sm:mt-4 flex items-center justify-between gap-2 sm:gap-3 bg-dark-elevated p-2 rounded border border-dark-border-subtle">
             <button
               onClick={() => {
                 setIsPlayingRecording(!isPlayingRecording);
                 playRetroSound("click");
               }}
-              className="p-1 px-3 border border-amber-shadow rounded bg-amber-button text-black text-xs font-bold flex items-center gap-1.5 hover:bg-saffron-deep cursor-pointer"
+              className="px-2.5 sm:px-3 py-2 sm:py-1 border border-amber-shadow rounded bg-amber-button text-black text-xs font-bold flex items-center gap-1.5 hover:bg-saffron-deep cursor-pointer shrink-0 min-h-[36px]"
             >
               {isPlayingRecording ? (
-                <><Pause className="w-3.5 h-3.5" /><span>PAUSE</span></>
+                <><Pause className="w-3.5 h-3.5" /><span className="hidden sm:inline">PAUSE</span></>
               ) : (
-                <><Play className="w-3.5 h-3.5" /><span>SIMULATE PIPELINE RUN</span></>
+                <><Play className="w-3.5 h-3.5" /><span className="hidden sm:inline">SIMULATE</span></>
               )}
             </button>
 
-            <div className="flex-1">
-              <div className="bg-dark-border h-2.5 rounded border border-dark-border-subtle relative overflow-hidden">
+            <div className="flex-1 min-w-0">
+              <div className="bg-dark-border h-2 sm:h-2.5 rounded border border-dark-border-subtle relative overflow-hidden">
                 <div
                   className="bg-cobalt h-full absolute top-0 left-0 transition-all"
                   style={{ width: `${(playbackTime / 60) * 100}%` }}

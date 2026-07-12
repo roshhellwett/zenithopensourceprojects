@@ -44,7 +44,7 @@ export default memo(function DesktopIcon({ label, iconKey, onClick }: DesktopIco
         onClick();
         setSelected(false);
       }}
-      className={`desktop-icon flex flex-col items-center gap-1.5 p-2 w-[78px] cursor-pointer focus:outline-none group relative transition-all rounded-lg select-none ${
+      className={`desktop-icon flex flex-col items-center gap-1.5 p-1.5 sm:p-2 w-[68px] sm:w-[78px] cursor-pointer focus:outline-none group relative transition-all rounded-lg select-none ${
         selected
           ? "bg-amber-button/20 border border-amber-button/40 shadow-inner scale-[0.98]"
           : "border border-transparent hover:bg-dark-border/20"
@@ -56,10 +56,10 @@ export default memo(function DesktopIcon({ label, iconKey, onClick }: DesktopIco
       {/* Subtle hover glow behind icon */}
       <div className="absolute inset-0 bg-amber-button/10 opacity-0 group-hover:opacity-100 rounded-lg filter blur-md transition-opacity pointer-events-none" />
 
-      <div className="w-12 h-12 flex items-center justify-center relative z-10 drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
+      <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center relative z-10 drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
         {renderDesktopIcon(iconKey)}
       </div>
-      <span className={`text-[10px] text-center font-bold tracking-tight leading-tight select-none z-10 break-words w-full ${
+      <span className={`text-[9px] sm:text-[10px] text-center font-bold tracking-tight leading-tight select-none z-10 break-words w-full ${
         selected ? "text-dark-text" : "text-dark-text/80 group-hover:text-dark-text"
       }`}>
         {label}

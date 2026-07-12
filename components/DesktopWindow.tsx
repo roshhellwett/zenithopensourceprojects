@@ -78,8 +78,8 @@ export default memo(function DesktopWindow({
     <div
       className={`animate-window-fade-in flex flex-col window-chrome shadow-2xl border border-dark-border overflow-hidden bg-dark-surface ${
         shouldMaximize
-          ? "fixed inset-x-0 top-[var(--navbar-height)] bottom-10 z-[60] rounded-none border-none"
-          : "absolute w-[95vw] max-w-[880px] h-[85vh] max-h-[700px] top-[2vh] sm:top-[4vh] left-0 right-0 mx-auto z-40 rounded-xl"
+          ? "fixed inset-x-0 top-[var(--navbar-height)] bottom-[var(--taskbar-height)] z-[60] rounded-none border-none"
+          : "fixed sm:absolute w-screen sm:w-[95vw] max-w-[880px] h-dvh sm:h-[85vh] max-h-none sm:max-h-[700px] top-0 sm:top-[4vh] left-0 right-0 sm:mx-auto z-40 rounded-none sm:rounded-xl"
       }`}
       style={!shouldMaximize ? { transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`, transition: isDragging ? 'none' : 'transform 0.1s ease-out' } : undefined}
       role="dialog"
@@ -88,7 +88,7 @@ export default memo(function DesktopWindow({
       <div className="flex flex-col flex-1 h-full overflow-hidden">
         {/* Title bar */}
         <div
-          className="bg-dark-elevated px-3 py-2 flex items-center justify-between border-b border-dark-border cursor-move select-none shrink-0"
+          className="bg-dark-elevated px-2 sm:px-3 py-2 flex items-center justify-between border-b border-dark-border cursor-move select-none shrink-0 min-h-[44px] sm:min-h-0"
           onPointerDown={handleDragStart}
           onPointerMove={handleDragMove}
           onPointerUp={handleDragEnd}
@@ -96,58 +96,58 @@ export default memo(function DesktopWindow({
         >
           {/* Traffic lights with touch-friendly hit areas */}
           <div
-            className="flex items-center gap-0.5"
+            className="flex items-center gap-1"
             onPointerDown={(e) => e.stopPropagation()}
           >
             <button
               onClick={onClose}
-              className="w-6 h-6 flex items-center justify-center hover:bg-dark-surface/10 rounded-full transition-colors focus:outline-none cursor-pointer"
+              className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center hover:bg-dark-surface/10 rounded-full transition-colors focus:outline-none cursor-pointer active:scale-90"
               title="Close window"
               aria-label="Close window"
             >
-              <span className="w-3 h-3 rounded-full bg-[#FF5F57] hover:bg-[#FF3B30] border border-[#E04842]" />
+              <span className="w-4 h-4 sm:w-3 sm:h-3 rounded-full bg-[#FF5F57] hover:bg-[#FF3B30] border border-[#E04842]" />
             </button>
             <button
               onClick={onMinimize}
-              className="w-6 h-6 flex items-center justify-center hover:bg-dark-surface/10 rounded-full transition-colors focus:outline-none cursor-pointer"
+              className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center hover:bg-dark-surface/10 rounded-full transition-colors focus:outline-none cursor-pointer active:scale-90"
               title="Minimize window"
               aria-label="Minimize window"
             >
-              <span className="w-3 h-3 rounded-full bg-[#FEBC2E] hover:bg-[#F5A623] border border-[#DFA023]" />
+              <span className="w-4 h-4 sm:w-3 sm:h-3 rounded-full bg-[#FEBC2E] hover:bg-[#F5A623] border border-[#DFA023]" />
             </button>
             <button
               onClick={onToggleMaximize}
-              className="w-6 h-6 flex items-center justify-center hover:bg-dark-surface/10 rounded-full transition-colors focus:outline-none cursor-pointer"
+              className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center hover:bg-dark-surface/10 rounded-full transition-colors focus:outline-none cursor-pointer active:scale-90"
               title="Maximize window"
               aria-label="Maximize window"
             >
-              <span className="w-3 h-3 rounded-full bg-[#28C840] hover:bg-[#1DB954] border border-[#24A93B]" />
+              <span className="w-4 h-4 sm:w-3 sm:h-3 rounded-full bg-[#28C840] hover:bg-[#1DB954] border border-[#24A93B]" />
             </button>
           </div>
 
           {/* Center: file name with dropdown */}
-          <div className="flex items-center gap-1.5 text-sm text-dark-text/70 font-medium select-none">
-            <svg className="w-4 h-4 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div className="flex items-center gap-1.5 text-sm text-dark-text/70 font-medium select-none min-w-0 flex-1 justify-center px-2">
+            <svg className="w-4 h-4 opacity-50 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
             </svg>
-            <span className="font-mono text-xs tracking-tight">{title}</span>
-            <ChevronDown className="w-3 h-3 opacity-40" />
+            <span className="font-mono text-[11px] sm:text-xs tracking-tight truncate">{title}</span>
+            <ChevronDown className="w-3 h-3 opacity-40 shrink-0" />
           </div>
 
           {/* Right spacer to balance traffic lights */}
-          <div className="w-18" />
+          <div className="w-14 sm:w-18 shrink-0" />
         </div>
 
         {/* Toolbar */}
         {showToolbar && (
-          <div className="bg-dark-surface px-4 py-1.5 flex items-center justify-between border-b border-dark-border-subtle shrink-0 select-none">
+          <div className="bg-dark-surface px-2 sm:px-4 py-1.5 flex items-center justify-between border-b border-dark-border-subtle shrink-0 select-none overflow-x-auto scrollbar-none">
             {toolbarContent || (
               <>
-                <div className="flex items-center gap-3 text-dark-text-muted">
+                <div className="flex items-center gap-2 sm:gap-3 text-dark-text-muted min-w-0 flex-1">
                   <button
                     onClick={onRefresh}
-                    className="p-1 hover:bg-dark-border/50 rounded transition-colors flex items-center justify-center cursor-pointer"
+                    className="p-1.5 sm:p-1 hover:bg-dark-border/50 rounded transition-colors flex items-center justify-center cursor-pointer min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0"
                     title="Refresh database"
                     aria-label="Refresh database"
                   >
@@ -156,19 +156,19 @@ export default memo(function DesktopWindow({
                       <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" />
                     </svg>
                   </button>
-                  <div className="h-4 w-px bg-dark-border" />
-                  <span className="text-[11px] px-2 py-0.5 bg-dark-border/40 rounded font-mono">
+                  <div className="h-4 w-px bg-dark-border shrink-0" />
+                  <span className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-dark-border/40 rounded font-mono whitespace-nowrap">
                     Next.js 16
                   </span>
-                  <div className="h-4 w-px bg-dark-border" />
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-accent-teal">
+                  <div className="h-4 w-px bg-dark-border shrink-0" />
+                  <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-accent-teal whitespace-nowrap">
                     registry: active
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                   <button
                     onClick={onSearch}
-                    className="p-1 text-dark-text-muted hover:text-dark-text hover:bg-dark-border/50 rounded transition-colors cursor-pointer"
+                    className="p-1.5 sm:p-1 text-dark-text-muted hover:text-dark-text hover:bg-dark-border/50 rounded transition-colors cursor-pointer min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
                     title="Search registry index (Cmd+K)"
                     aria-label="Search registry"
                   >
@@ -179,7 +179,7 @@ export default memo(function DesktopWindow({
                   </button>
                   <button
                     onClick={onToggleSettings}
-                    className="p-1 text-dark-text-muted hover:text-dark-text hover:bg-dark-border/50 rounded transition-colors cursor-pointer"
+                    className="p-1.5 sm:p-1 text-dark-text-muted hover:text-dark-text hover:bg-dark-border/50 rounded transition-colors cursor-pointer min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
                     title="CRT & Sound settings"
                     aria-label="CRT and sound settings"
                   >
@@ -195,7 +195,7 @@ export default memo(function DesktopWindow({
         )}
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto bg-dark-surface min-h-0">
+        <div className="flex-1 overflow-y-auto bg-dark-surface min-h-0 overscroll-contain">
           {children}
         </div>
       </div>

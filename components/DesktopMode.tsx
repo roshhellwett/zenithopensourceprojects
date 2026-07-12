@@ -305,14 +305,14 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       onContextMenu={handleContextMenu}
     >
       {/* Toast notifications */}
-      <div className="fixed bottom-14 left-4 z-[60] flex flex-col gap-2 max-w-sm" role="status" aria-live="polite" aria-label="Notifications">
+      <div className="fixed bottom-[calc(var(--taskbar-height)+8px)] left-2 right-2 sm:left-4 sm:right-auto z-[60] flex flex-col gap-2 max-w-[calc(100vw-1rem)] sm:max-w-sm" role="status" aria-live="polite" aria-label="Notifications">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className="bg-dark-surface/90 border border-dark-border px-3 py-2.5 rounded-lg shadow-xl text-xs text-dark-text font-medium flex items-center gap-2 animate-fade-in-up backdrop-blur-sm relative overflow-hidden"
+            className="bg-dark-surface/90 border border-dark-border px-3 py-2 sm:py-2.5 rounded-lg shadow-xl text-[11px] sm:text-xs text-dark-text font-medium flex items-center gap-2 animate-fade-in-up backdrop-blur-sm relative overflow-hidden w-full sm:w-auto"
           >
-            <span className="w-2 h-2 bg-amber-button rounded-full animate-pulse shrink-0" />
-            <span>{t.message}</span>
+            <span className="w-2 h-2 bg-amber-button rounded-full animate-pulse shrink-0 hidden sm:block" />
+            <span className="leading-tight flex-1 min-w-0">{t.message}</span>
             <div className="absolute bottom-0 left-0 h-0.5 bg-amber-button toast-progress-bar" />
           </div>
         ))}
@@ -322,28 +322,28 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       {contextMenu.visible && (
         <div
           role="menu"
-          className="fixed bg-dark-elevated border border-dark-border rounded-lg shadow-2xl py-1 z-50 min-w-44 select-none animate-scale-in"
-          style={{ top: contextMenu.y, left: contextMenu.x }}
+          className="fixed bg-dark-elevated border border-dark-border rounded-lg shadow-2xl py-1 z-50 min-w-44 max-w-[calc(100vw-16px)] select-none animate-scale-in"
+          style={{ top: Math.min(contextMenu.y, Math.max(0, window.innerHeight - 340)), left: Math.min(Math.max(8, contextMenu.x), window.innerWidth - 200) }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
             role="menuitem"
             onClick={handleContextOpenHome}
-            className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
+            className="w-full text-left px-3 py-2 sm:py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2 min-h-[44px] sm:min-h-0"
           >
             📂 Open home.md
           </button>
           <button
             role="menuitem"
             onClick={handleContextOpenAssistant}
-            className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
+            className="w-full text-left px-3 py-2 sm:py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2 min-h-[44px] sm:min-h-0"
           >
             💬 Open AI Assistant
           </button>
           <button
             role="menuitem"
             onClick={handleContextToggleSound}
-            className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
+            className="w-full text-left px-3 py-2 sm:py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2 min-h-[44px] sm:min-h-0"
           >
             🔊 {soundEnabled ? "Mute retro sounds" : "Enable retro sounds"}
           </button>
@@ -351,7 +351,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
           <button
             role="menuitem"
             onClick={handleContextGoToWebsite}
-            className="w-full text-left px-3 py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2"
+            className="w-full text-left px-3 py-2 sm:py-1.5 text-xs text-dark-text hover:bg-dark-surface cursor-pointer flex items-center gap-2 min-h-[44px] sm:min-h-0"
           >
             🌐 Go to Website Mode
           </button>
@@ -385,17 +385,17 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       </div>
 
       {/* Mobile top navigation scroll bar */}
-      <div className="md:hidden flex overflow-x-auto gap-3 px-3 py-2 bg-dark-surface/90 backdrop-blur-sm border-b border-dark-border scrollbar-none z-20 select-none">
+      <div className="md:hidden flex overflow-x-auto gap-2 px-2 py-2 bg-dark-surface/90 backdrop-blur-sm border-b border-dark-border scrollbar-none z-20 select-none overscroll-contain snap-x snap-mandatory safe-area-px">
         {[...LEFT_DESKTOP_ICONS, ...RIGHT_DESKTOP_ICONS].map((icon) => (
           <button
             key={icon.id}
             onClick={() => handleIconClick(icon.id, icon.action, icon.tabId, icon.link)}
-            className="flex flex-col items-center justify-center gap-1 shrink-0 px-2 py-1 text-dark-text-muted hover:text-dark-text active:text-amber-button transition-colors cursor-pointer"
+            className="flex flex-col items-center justify-center gap-1 shrink-0 px-2.5 py-1.5 text-dark-text-muted hover:text-dark-text active:text-amber-button transition-colors cursor-pointer snap-start min-w-[56px]"
           >
-            <div className="w-6 h-6 flex items-center justify-center shrink-0">
-              {renderDesktopIcon(icon.icon, "w-6 h-6")}
+            <div className="w-7 h-7 flex items-center justify-center shrink-0">
+              {renderDesktopIcon(icon.icon, "w-7 h-7")}
             </div>
-            <span className="text-[9px] font-bold text-center tracking-tight leading-tight whitespace-nowrap">
+            <span className="text-[9px] font-bold text-center tracking-tight leading-tight whitespace-nowrap truncate max-w-[56px]">
               {icon.label.split("\n")[0]}
             </span>
           </button>
@@ -434,26 +434,26 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
             {/* Window content */}
             <div className="bg-dark-surface min-h-full">
               {/* Hero header */}
-              <div className="px-6 md:px-10 pt-8 pb-6 border-b border-dark-border-subtle">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="px-3 sm:px-6 md:px-10 pt-4 sm:pt-8 pb-3 sm:pb-6 border-b border-dark-border-subtle">
+                <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
                   <ZenithLogo />
-                  <span className="font-extrabold text-xl tracking-tight text-dark-text">Zenith</span>
+                  <span className="font-extrabold text-base sm:text-xl tracking-tight text-dark-text">Zenith</span>
                 </div>
 
-                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-tight text-dark-text mb-4">
+                <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-tight text-dark-text mb-2 sm:mb-4">
                   The open source way to build civic tech
                 </h1>
 
-                <p className="text-sm text-dark-text-muted leading-relaxed max-w-[600px] mb-6">
+                <p className="text-xs sm:text-sm text-dark-text-muted leading-relaxed max-w-[600px] mb-3 sm:mb-6">
                   Zenith is the unified registry for civic-tech platforms, systems utilities, and developer tools. Built in India, MIT-licensed, always free.
                 </p>
 
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <a
                     href={STORE_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-amber-button hover:bg-saffron-deep text-black px-4 py-2 rounded-md text-xs font-bold transition-all active:scale-95 border border-amber-shadow"
+                    className="bg-amber-button hover:bg-saffron-deep text-black px-4 py-2.5 sm:py-2 rounded-md text-xs font-bold transition-all active:scale-95 border border-amber-shadow text-center min-h-[44px] sm:min-h-0 flex items-center justify-center"
                   >
                     Get started - free
                   </a>
@@ -461,13 +461,13 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
                     href="https://github.com/roshhellwett"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="border border-dark-border hover:border-dark-text-muted text-dark-text px-4 py-2 rounded-md text-xs font-bold transition-all hover:bg-dark-surface"
+                    className="border border-dark-border hover:border-dark-text-muted text-dark-text px-4 py-2.5 sm:py-2 rounded-md text-xs font-bold transition-all hover:bg-dark-surface text-center min-h-[44px] sm:min-h-0 flex items-center justify-center"
                   >
                     View Source
                   </a>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-dark-text-muted select-none">
+                <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-4 gap-y-2 text-[11px] sm:text-xs text-dark-text-muted select-none">
                   <a
                     href="https://github.com/roshhellwett"
                     target="_blank"
@@ -479,7 +479,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
                   <span className="text-dark-border hidden sm:inline">•</span>
                   <button
                     type="button"
-                    className="posthog-link cursor-pointer hover:text-amber-button shrink-0 bg-transparent border-none p-0 font-inherit text-inherit"
+                    className="posthog-link cursor-pointer hover:text-amber-button shrink-0 bg-transparent border-none p-0 font-inherit text-inherit whitespace-nowrap"
                     onClick={onSwitchToWebsite}
                   >
                     ▶ Website mode
@@ -487,7 +487,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
                   <span className="text-dark-border hidden sm:inline">•</span>
                   <button
                     type="button"
-                    className="posthog-link cursor-pointer hover:text-amber-button shrink-0 bg-transparent border-none p-0 font-inherit text-inherit"
+                    className="posthog-link cursor-pointer hover:text-amber-button shrink-0 bg-transparent border-none p-0 font-inherit text-inherit whitespace-nowrap"
                     onClick={() => {
                       setActiveTab("founder");
                       addToast("Opening founder.md...");
@@ -499,7 +499,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
               </div>
 
               {/* Tab navigation inside window */}
-              <div className="flex overflow-x-auto border-b border-dark-border bg-dark-surface/50 select-none">
+              <div className="flex overflow-x-auto border-b border-dark-border bg-dark-surface/50 select-none scrollbar-none snap-x-mandatory" role="tablist">
                 {[
                   { id: "home", label: "Understand projects" },
                   { id: "registry", label: "Project registry" },
@@ -508,8 +508,10 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
                 ].map((tab) => (
                   <button
                     key={tab.id}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
                     onClick={() => handleTabClick(tab.id)}
-                    className={`px-5 py-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 cursor-pointer ${
+                    className={`px-2.5 sm:px-5 py-3 text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all border-b-2 cursor-pointer snap-start min-h-[44px] ${
                       activeTab === tab.id
                         ? "text-dark-text border-amber-button bg-dark-surface/60 font-bold"
                         : "text-dark-text-muted border-transparent hover:text-dark-text hover:bg-dark-surface/20"
@@ -521,7 +523,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
               </div>
 
               {/* Content apps */}
-              <div className="p-6 md:p-8 min-h-[300px]">
+              <div className="p-3 sm:p-6 md:p-8 min-h-[200px] sm:min-h-[300px]">
                 {activeTab === "home" && <HomeApp />}
                 {activeTab === "registry" && <RegistryApp playRetroSound={playRetroSound} />}
                 {activeTab === "telemetry" && <TelemetryApp playRetroSound={playRetroSound} addToast={addToast} />}
@@ -536,7 +538,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
 
       {/* Chat Panel (fixed/responsive bottom-right overlay) */}
       {chatOpen && (
-        <div className="fixed sm:absolute bottom-10 sm:bottom-14 right-0 sm:right-4 w-full sm:w-auto z-50">
+        <div className="fixed bottom-[var(--taskbar-height)] right-0 sm:right-4 left-0 sm:left-auto z-50">
           <ChatPanel onClose={() => setChatOpen(false)} />
         </div>
       )}
@@ -548,7 +550,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
             setChatOpen(true);
             playRetroSound("click");
           }}
-          className="fixed bottom-14 right-4 z-50 w-12 h-12 bg-dark-surface border border-dark-border rounded-full flex items-center justify-center shadow-xl hover:bg-dark-elevated hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          className="fixed bottom-[calc(var(--taskbar-height)+8px)] right-3 sm:right-4 z-50 w-11 h-11 sm:w-12 sm:h-12 bg-dark-surface border border-dark-border rounded-full flex items-center justify-center shadow-xl hover:bg-dark-elevated hover:scale-105 active:scale-95 transition-all cursor-pointer"
           title="Open AI Assistant"
           aria-label="Open AI Assistant"
         >
@@ -559,17 +561,17 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       )}
 
       {/* Bottom Taskbar/Dock */}
-      <div className="absolute bottom-0 left-0 right-0 h-10 bg-dark-surface/90 border-t border-dark-border backdrop-blur-md z-30 px-4 flex items-center justify-between select-none">
+      <div className="absolute bottom-0 left-0 right-0 h-[var(--taskbar-height)] bg-dark-surface/90 border-t border-dark-border backdrop-blur-md z-30 px-1 sm:px-4 flex items-center justify-between select-none overflow-x-auto scrollbar-none">
         {/* Left status info */}
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-accent-teal animate-pulse" role="status" aria-label="System online" />
-          <span className="text-[9px] font-extrabold tracking-wider uppercase text-dark-text-muted">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <span className="w-2 h-2 rounded-full bg-accent-teal animate-pulse shrink-0" role="status" aria-label="System online" />
+          <span className="text-[9px] font-extrabold tracking-wider uppercase text-dark-text-muted hidden xs:inline">
             zenith_os
           </span>
         </div>
 
         {/* Center application taskbar */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1 flex-1 justify-center overflow-x-auto scrollbar-none px-1">
           {[
             { id: "home", label: "home.md", icon: "file-text" },
             { id: "registry", label: "projects.exe", icon: "folder-project" },
@@ -582,7 +584,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
               <button
                 key={app.id}
                 onClick={() => handleTaskbarClick(app.id, isRunning)}
-                className={`h-7 px-2.5 rounded flex items-center gap-1.5 text-[10px] font-bold transition-all border cursor-pointer ${
+                className={`h-8 sm:h-7 px-1.5 sm:px-2.5 rounded flex items-center gap-1 sm:gap-1.5 text-[10px] font-bold transition-all border cursor-pointer shrink-0 ${
                   isRunning
                     ? "bg-amber-button/15 border-amber-button/40 text-dark-text shadow-sm scale-95"
                     : "bg-transparent border-transparent hover:bg-dark-border/20 text-dark-text-muted hover:text-dark-text"
@@ -598,7 +600,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
         </div>
 
         {/* Right time info */}
-        <div className="flex items-center gap-3 text-[10px] font-extrabold text-dark-text-muted font-mono">
+        <div className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] font-extrabold text-dark-text-muted font-mono shrink-0">
           <ClockWidget />
         </div>
       </div>

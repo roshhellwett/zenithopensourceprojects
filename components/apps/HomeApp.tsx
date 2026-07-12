@@ -3,19 +3,19 @@ import { FileCode, ArrowUpRight } from 'lucide-react';
 
 export default function HomeApp() {
   return (
-    <div className="space-y-6">
-      <div className="bg-dark-surface border-l-4 border-cobalt p-4 rounded-r flex flex-col gap-2 border border-dark-border">
-        <h3 className="text-sm font-bold text-dark-text flex items-center gap-1.5 uppercase font-mono">
-          <FileCode className="w-4 h-4 text-cobalt" />
-          <span>The Zenith Open Source Thesis</span>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="bg-dark-surface border-l-4 border-cobalt p-3 sm:p-4 rounded-r flex flex-col gap-2 border border-dark-border">
+        <h3 className="text-[13px] sm:text-sm font-bold text-dark-text flex items-center gap-1.5 uppercase font-mono">
+          <FileCode className="w-4 h-4 text-cobalt shrink-0" />
+          <span className="truncate">The Zenith Open Source Thesis</span>
         </h3>
         <p className="text-xs text-dark-text-muted leading-relaxed">
           Zenith is a digital registry and project showcase for civic‑tech platforms, low‑level systems interfaces, local automation pipelines, and developer utilities. Designed in India and optimized for deterministic, accessible, and public-first deployment models.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-dark-surface border border-dark-border p-4 rounded space-y-2.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+        <div className="bg-dark-surface border border-dark-border p-3 sm:p-4 rounded space-y-2 sm:space-y-2.5">
           <span className="text-[10px] font-mono text-dark-text-faint block border-b pb-1 border-dark-border-subtle uppercase">✦ CORE THESIS 01</span>
           <h4 className="font-extrabold text-sm text-dark-text">Self-Reliance (Bharat First)</h4>
           <p className="text-xs text-dark-text-muted leading-relaxed">
@@ -23,7 +23,7 @@ export default function HomeApp() {
           </p>
         </div>
 
-        <div className="bg-dark-surface border border-dark-border p-4 rounded space-y-2.5">
+        <div className="bg-dark-surface border border-dark-border p-3 sm:p-4 rounded space-y-2.5">
           <span className="text-[10px] font-mono text-dark-text-faint block border-b pb-1 border-dark-border-subtle uppercase">✦ CORE THESIS 02</span>
           <h4 className="font-extrabold text-sm text-dark-text">Transparent Architectures</h4>
           <p className="text-xs text-dark-text-muted leading-relaxed">
@@ -33,19 +33,21 @@ export default function HomeApp() {
       </div>
 
       {/* FEATURED PROJECT */}
-      <div className="bg-dark-elevated border-2 border-dark-border p-4 rounded space-y-3">
-        <div className="flex items-center justify-between border-b pb-2 border-dark-border-subtle">
-          <span className="font-mono text-xs font-bold text-dark-text">⭐️ KEY FEATURED REPOSITORY: PROJECT SENTINEL</span>
-          <span className="text-[10px] font-mono text-cobalt border border-cobalt/30 px-2 py-0.5 rounded bg-cobalt/10 font-bold">AI News Scraper</span>
+      <div className="bg-dark-elevated border-2 border-dark-border p-3 sm:p-4 rounded space-y-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-2 border-dark-border-subtle gap-1 sm:gap-0">
+          <span className="font-mono text-[11px] sm:text-xs font-bold text-dark-text">⭐️ KEY FEATURED REPOSITORY: PROJECT SENTINEL</span>
+          <span className="text-[10px] font-mono text-cobalt border border-cobalt/30 px-2 py-0.5 rounded bg-cobalt/10 font-bold whitespace-nowrap">AI News Scraper</span>
         </div>
 
         <p className="text-xs text-dark-text-muted leading-relaxed">
           Project Sentinel is an automated Indian news aggregator pipeline. It aggregates source RSS streams, isolates clickbait via lightweight NLP heuristics, classifying events dynamically in real-time. Fuses scraper routines and classification logic into a clean terminal simulator console.
         </p>
 
-        <div className="flex items-center gap-3.5 pt-2 font-mono text-xs text-dark-text-muted">
+        <div className="flex flex-wrap items-center gap-x-2.5 sm:gap-x-3.5 gap-y-1.5 pt-2 font-mono text-[11px] sm:text-xs text-dark-text-muted">
           <span>Language: <b className="text-dark-text">TypeScript</b></span>
+          <span className="hidden xs:inline">·</span>
           <span>Target: <b className="text-dark-text">Verifiable Newsroom</b></span>
+          <span className="hidden xs:inline">·</span>
           <a
             href="https://github.com/roshhellwett/projectsentinel"
             target="_blank"

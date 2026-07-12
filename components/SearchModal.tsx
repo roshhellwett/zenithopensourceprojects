@@ -160,7 +160,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-start justify-center pt-[15vh] px-4"
+      className="fixed inset-0 z-[9999] flex items-start justify-center pt-[5vh] sm:pt-[15vh] px-2 sm:px-4"
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
@@ -171,7 +171,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-[560px] bg-dark-surface border border-dark-border rounded-xl shadow-2xl overflow-hidden animate-fade-in-up"
+        className="relative w-full max-w-[560px] bg-dark-surface border border-dark-border rounded-lg sm:rounded-xl shadow-2xl overflow-hidden animate-fade-in-up mx-0 sm:mx-2"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => {
           if (e.key === "Tab") {
@@ -192,7 +192,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
         }}
       >
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-dark-border">
+        <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 sm:py-3.5 border-b border-dark-border">
           <Search className="w-4 h-4 text-dark-text-muted shrink-0" />
           <input
             ref={inputRef}
@@ -204,7 +204,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
             }}
             onKeyDown={handleKeyDown}
             placeholder="Search projects, stack, navigation..."
-            className="flex-1 bg-transparent text-base sm:text-sm text-dark-text placeholder-dark-text-faint focus:outline-none"
+            className="flex-1 bg-transparent text-base sm:text-sm text-dark-text placeholder-dark-text-faint focus:outline-none min-h-[44px] sm:min-h-0"
             autoComplete="off"
             spellCheck={false}
           />
@@ -213,7 +213,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
           </kbd>
           <button
             onClick={handleClose}
-            className="sm:hidden p-1 text-dark-text-muted hover:text-dark-text transition-colors"
+            className="sm:hidden p-2 text-dark-text-muted hover:text-dark-text transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Close search"
           >
             <X className="w-4 h-4" />
@@ -227,7 +227,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
           role="listbox"
         >
           {results.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-dark-text-muted">
+            <div className="px-4 py-6 sm:py-8 text-center text-sm text-dark-text-muted">
               <p className="font-semibold mb-1">No results found</p>
               <p className="text-xs text-dark-text-faint">
                 Try searching for &quot;Sentinel&quot;, &quot;TypeScript&quot;, or &quot;voting&quot;
@@ -248,7 +248,7 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
                     handleClose();
                   }
                 }}
-                className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-left transition-colors cursor-pointer ${
+                className={`w-full flex items-start gap-3 px-3 py-3 sm:py-2.5 rounded-lg text-left transition-colors cursor-pointer min-h-[52px] sm:min-h-0 ${
                   i === selectedIndex
                     ? "bg-amber-button/10 border border-amber-button/20"
                     : "hover:bg-dark-elevated border border-transparent"

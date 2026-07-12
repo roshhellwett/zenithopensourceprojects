@@ -190,11 +190,11 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
   return (
     <>
       <header className="sticky top-0 z-50 bg-dark-surface/95 border-b border-dark-border backdrop-blur-md">
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 h-12 flex items-center justify-between">
+        <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 h-12 flex items-center justify-between safe-area-px">
           {/* Left: Logo + Nav */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0 flex-1 overflow-hidden">
             {/* Logo */}
-            <Link href="/" onClick={() => playRetroSound("click")} className="flex items-center gap-2 shrink-0 group">
+            <Link href="/" onClick={() => playRetroSound("click")} className="flex items-center gap-1.5 sm:gap-2 shrink-0 group">
                 <ZenithLogo animate={false} />
               <span className="font-extrabold text-[15px] tracking-tight text-dark-text hidden sm:inline">
                 Zenith
@@ -202,17 +202,17 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
             </Link>
 
             {/* Desktop Nav Items */}
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1">
               {NAV_ITEMS.map((item) => (
                 <div key={item.label} className="relative navbar-item group">
-                  <button type="button" onClick={() => playRetroSound("click")} className="flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium text-dark-text-muted hover:text-dark-text transition-colors rounded-md hover:bg-dark-surface cursor-pointer">
+                  <button type="button" onClick={() => playRetroSound("click")} className="flex items-center gap-1 px-2 xl:px-3 py-1.5 text-[13px] font-medium text-dark-text-muted hover:text-dark-text transition-colors rounded-md hover:bg-dark-surface cursor-pointer min-h-[36px] whitespace-nowrap">
                     {item.label}
-                    {item.children && <ChevronDown className="w-3 h-3 opacity-50" />}
+                    {item.children && <ChevronDown className="w-3 h-3 opacity-50 shrink-0" />}
                   </button>
 
                   {/* Dropdown */}
                   {item.children && (
-                    <div className="navbar-dropdown absolute top-full left-0 mt-1 w-72 bg-dark-elevated border border-dark-border rounded-lg shadow-2xl p-2 z-50 transition-all duration-200">
+                    <div className="navbar-dropdown absolute top-full left-0 mt-1 w-56 xl:w-72 bg-dark-elevated border border-dark-border rounded-lg shadow-2xl p-2 z-50 transition-all duration-200">
                       {item.children.map((child) => {
                         const isHighlighted =
                           child.href.startsWith("#") &&
@@ -231,8 +231,8 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                             <span className="mt-0.5 shrink-0 w-6 h-6 flex items-center justify-center">
                               {child.icon ? renderDesktopIcon(child.icon, "w-6 h-6") : null}
                             </span>
-                            <div>
-                              <div className={`text-sm font-semibold transition-colors ${
+                            <div className="min-w-0">
+                              <div className={`text-sm font-semibold transition-colors truncate ${
                                 isHighlighted ? "text-amber-button" : "text-dark-text group-hover/item:text-amber-button"
                               }`}>
                                 {child.label}
@@ -243,7 +243,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                                 )}
                               </div>
                               {child.desc && (
-                                <div className="text-xs text-dark-text-muted mt-0.5">{child.desc}</div>
+                                <div className="text-xs text-dark-text-muted mt-0.5 truncate">{child.desc}</div>
                               )}
                             </div>
                           </a>
@@ -257,13 +257,13 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-0.5 sm:gap-1 md:gap-2 shrink-0">
             <a
               href={STORE_URL}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => playRetroSound("click")}
-              className="hidden sm:flex items-center gap-1.5 bg-amber-button hover:bg-saffron-deep text-black px-4 py-1.5 rounded-md text-xs font-bold transition-all active:scale-95 border border-amber-shadow"
+              className="hidden sm:flex items-center gap-1.5 bg-amber-button hover:bg-saffron-deep text-black px-2.5 md:px-4 py-1.5 rounded-md text-[11px] md:text-xs font-bold transition-all active:scale-95 border border-amber-shadow whitespace-nowrap"
             >
               Get started – free
             </a>
@@ -275,7 +275,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
         previousFocusRef.current = getActiveEl();
         setSearchOpen(true);
       }}
-      className="p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-colors flex items-center gap-1"
+      className="p-2 sm:p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-colors flex items-center gap-1 min-h-[44px] sm:min-h-[36px] min-w-[44px] sm:min-w-[36px]"
               title="Search (Cmd/Ctrl + K)"
               aria-label="Search"
             >
@@ -293,18 +293,18 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                   playRetroSound("toggle");
                   onToggleMode();
                 }}
-                className="p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-all active:scale-95 flex items-center gap-1.5 text-xs font-semibold"
+                className="p-2 sm:p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-all active:scale-95 flex items-center gap-1.5 text-xs font-semibold min-h-[44px] sm:min-h-[36px] min-w-[44px] sm:min-w-[36px]"
                 title={`Switch to ${currentMode === "desktop" ? "Website" : "Desktop OS"} mode`}
                 aria-label={`Switch to ${currentMode === "desktop" ? "Website" : "Desktop OS"} mode`}
               >
                 {currentMode === "desktop" ? (
                   <>
-                    <Globe className="w-4 h-4 text-accent-teal animate-pulse" />
+                    <Globe className="w-4 h-4 text-accent-teal animate-pulse shrink-0" />
                     <span className="hidden md:inline">Website</span>
                   </>
                 ) : (
                   <>
-                    <Laptop className="w-4 h-4 text-amber-button" />
+                    <Laptop className="w-4 h-4 text-amber-button shrink-0" />
                     <span className="hidden md:inline">Desktop OS</span>
                   </>
                 )}
@@ -316,7 +316,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => playRetroSound("click")}
-              className="p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-colors"
+              className="p-2 sm:p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-colors min-h-[44px] sm:min-h-[36px] min-w-[44px] sm:min-w-[36px] flex items-center justify-center"
               title="GitHub Profile"
               aria-label="GitHub Profile"
             >
@@ -331,7 +331,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                 playRetroSound("click");
                 setMobileOpen(!mobileOpen);
               }}
-              className="lg:hidden p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-colors"
+              className="lg:hidden p-2.5 sm:p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu-panel"
               aria-label="Toggle mobile menu"
@@ -352,7 +352,8 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
           <>
             {/* Backdrop */}
             <div
-              className="animate-backdrop-in fixed inset-0 top-12 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+              className="animate-backdrop-in fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+              style={{ top: "var(--navbar-height)" }}
               onClick={() => { setMobileOpen(false); menuButtonRef.current?.focus(); }}
             />
 
@@ -360,11 +361,11 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
             <div
               ref={menuRef}
               id="mobile-menu-panel"
-              className="mobile-menu-panel animate-expand-down lg:hidden absolute top-12 left-0 right-0 bg-dark-elevated border-b border-dark-border px-4 py-4 space-y-3 max-h-[70vh] overflow-y-auto z-50 shadow-2xl"
+              className="mobile-menu-panel animate-expand-down lg:hidden absolute top-12 left-0 right-0 bg-dark-elevated border-b border-dark-border px-3 sm:px-4 py-3 space-y-2 max-h-[80vh] overflow-y-auto z-50 shadow-2xl safe-area-px overscroll-contain"
             >
               {NAV_ITEMS.map((item) => (
-                <div key={item.label} className="space-y-1">
-                  <div className="text-xs font-bold uppercase tracking-wider text-dark-text-muted px-2 pt-1">
+                <div key={item.label} className="space-y-0.5">
+                  <div className="text-xs font-bold uppercase tracking-wider text-dark-text-muted px-3 pt-2 pb-1 select-none">
                     {item.label}
                   </div>
                   {item.children?.map((child) => {
@@ -378,26 +379,29 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                         target={child.href?.startsWith("http") ? "_blank" : undefined}
                         rel={child.href?.startsWith("http") ? "noopener noreferrer" : undefined}
                         onClick={(e) => handleNavClick(e, child.href)}
-                        className={`flex items-center gap-2.5 px-3 py-2 text-sm rounded-md transition-colors ${
+                        className={`flex items-center gap-2.5 px-3 py-3 sm:py-2 text-sm rounded-md transition-colors ${
                           isHighlighted
                             ? "bg-amber-button/10 text-amber-button font-semibold"
                             : "text-dark-text hover:bg-dark-surface"
                         }`}
                       >
-                        <span>{child.icon ? renderDesktopIcon(child.icon, "w-4 h-4") : null}</span>
-                        <span>{child.label}</span>
+                        <span className="shrink-0">{child.icon ? renderDesktopIcon(child.icon, "w-5 h-5 sm:w-4 sm:h-4") : null}</span>
+                        <span className="truncate flex-1">{child.label}</span>
+                        {child.desc && (
+                          <span className="hidden xs:inline text-[10px] text-dark-text-faint truncate max-w-[100px]">{child.desc}</span>
+                        )}
                       </a>
                     );
                   })}
                 </div>
               ))}
-              <div className="pt-3 border-t border-dark-border-subtle">
+              <div className="pt-3 pb-2 border-t border-dark-border-subtle">
                 <a
                         href={STORE_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => playRetroSound("click")}
-                  className="flex items-center justify-center gap-1.5 bg-amber-button hover:bg-saffron-deep text-black px-4 py-2.5 rounded-md text-sm font-bold transition-all w-full shadow-md active:scale-95"
+                  className="flex items-center justify-center gap-1.5 bg-amber-button hover:bg-saffron-deep text-black px-4 py-3 sm:py-2.5 rounded-md text-sm font-bold transition-all w-full shadow-md active:scale-95 min-h-[44px]"
                 >
                   Get started – free
                 </a>
