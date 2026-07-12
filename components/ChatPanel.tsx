@@ -49,7 +49,7 @@ const ChatMessage = React.memo(function ChatMessage({ m, copiedId, onCopy }: {
           <p className="whitespace-pre-wrap">{m.content}</p>
           <button
             onClick={() => onCopy(m.id, m.content)}
-            className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-2 py-0.5 bg-dark-elevated hover:bg-dark-border/40 border border-dark-border rounded text-[9px] text-dark-text-muted hover:text-dark-text cursor-pointer font-semibold shadow-sm select-none"
+            className="sm:absolute sm:right-full sm:mr-2 sm:top-1/2 sm:-translate-y-1/2 mt-1.5 sm:mt-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-2 py-0.5 bg-dark-elevated hover:bg-dark-border/40 border border-dark-border rounded text-[9px] text-dark-text-muted hover:text-dark-text cursor-pointer font-semibold shadow-sm select-none"
             title="Copy message"
           >
             {copiedId === m.id ? "✓ Copied" : "📋 Copy"}

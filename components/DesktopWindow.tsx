@@ -39,7 +39,7 @@ export default memo(function DesktopWindow({
   // Check screen size to auto-maximize on mobile viewports
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      setIsMobile(window.innerWidth <= 1024);
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -79,7 +79,7 @@ export default memo(function DesktopWindow({
       className={`animate-window-fade-in flex flex-col window-chrome shadow-2xl border border-dark-border overflow-hidden bg-dark-surface ${
         shouldMaximize
           ? "fixed inset-x-0 top-[var(--navbar-height)] bottom-[var(--taskbar-height)] z-[60] rounded-none border-none"
-          : "fixed sm:absolute w-screen sm:w-[95vw] max-w-[880px] h-dvh sm:h-[85vh] max-h-none sm:max-h-[700px] top-0 sm:top-[4vh] left-0 right-0 sm:mx-auto z-40 rounded-none sm:rounded-xl"
+          : "fixed sm:absolute w-screen sm:w-[95vw] max-w-[880px] h-dvh sm:h-[calc(85vh-var(--taskbar-height))] max-h-none sm:max-h-[600px] top-0 sm:top-[2vh] left-0 right-0 sm:mx-auto z-40 rounded-none sm:rounded-xl"
       }`}
       style={!shouldMaximize ? { transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`, transition: isDragging ? 'none' : 'transform 0.1s ease-out' } : undefined}
       role="dialog"

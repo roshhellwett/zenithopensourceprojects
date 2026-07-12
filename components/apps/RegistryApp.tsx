@@ -58,7 +58,7 @@ export default function RegistryApp({ playRetroSound }: { playRetroSound: (type:
               </div>
               
               <h4 className="font-extrabold text-sm text-dark-text">{repo.displayName || repo.name.toUpperCase()}</h4>
-              <p className="text-xs text-dark-text-muted leading-relaxed min-h-[54px]">{repo.desc}</p>
+              <p className="text-xs text-dark-text-muted leading-relaxed line-clamp-3">{repo.desc}</p>
             </div>
 
             <div className="flex items-center justify-between border-t border-dark-border-subtle pt-3.5 mt-4 font-mono text-[11px] text-dark-text-muted">

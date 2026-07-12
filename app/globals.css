@@ -46,6 +46,25 @@
   --taskbar-height: 44px;
 }
 
+/* Mobile Safari dvh fix — use dynamic viewport height where supported */
+@supports (height: 100dvh) {
+  html,
+  body {
+    min-height: 100dvh;
+  }
+  .h-dvh-fix {
+    height: 100dvh;
+  }
+}
+
+/* Landscape mode — devices with very short heights */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --navbar-height: 40px;
+    --taskbar-height: 36px;
+  }
+}
+
 /* ── Base Resets ── */
 html {
   overflow-y: scroll;

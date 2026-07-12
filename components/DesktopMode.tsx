@@ -273,8 +273,8 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
 
   if (isBooting) {
     return (
-      <div className="fixed inset-0 bg-[#191b22] text-amber-button font-mono p-6 flex flex-col justify-between z-[9999]">
-        <div className="space-y-1 text-xs select-none max-w-xl">
+      <div className="fixed inset-0 bg-[#191b22] text-amber-button font-mono p-3 sm:p-6 flex flex-col justify-between z-[9999]">
+        <div className="space-y-1 text-[10px] sm:text-xs select-none max-w-xl">
           {bootLog.map((line, idx) => (
             <p
               key={idx}
@@ -291,7 +291,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
           ))}
           <p className="animate-pulse">▊</p>
         </div>
-        <div className="flex items-center justify-between text-[10px] text-dark-text-faint border-t border-dark-border/20 pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-1 text-[9px] sm:text-[10px] text-dark-text-faint border-t border-dark-border/20 pt-4">
           <span>ZENITH SYSTEM RUNTIME</span>
           <span>India verified © {new Date().getFullYear()}</span>
         </div>
@@ -523,7 +523,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
               </div>
 
               {/* Content apps */}
-              <div className="p-3 sm:p-6 md:p-8 min-h-[200px] sm:min-h-[300px]">
+              <div className="p-3 sm:p-6 md:p-8 min-h-[200px] sm:min-h-[300px] flex flex-col">
                 {activeTab === "home" && <HomeApp />}
                 {activeTab === "registry" && <RegistryApp playRetroSound={playRetroSound} />}
                 {activeTab === "telemetry" && <TelemetryApp playRetroSound={playRetroSound} addToast={addToast} />}

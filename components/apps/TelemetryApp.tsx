@@ -55,7 +55,13 @@ export default function TelemetryApp({ playRetroSound, addToast }: { playRetroSo
     return () => clearInterval(interval);
   }, [isPlayingRecording]);
 
-  const cols = 26;
+  const [cols, setCols] = useState(typeof window !== "undefined" && window.innerWidth < 640 ? 13 : 26);
+
+  useEffect(() => {
+    const onResize = () => setCols(window.innerWidth < 640 ? 13 : 26);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
   const rows = 7;
   const seed = (i: number) => ((i * 9301 + 49297) % 233280) / 233280;
   

@@ -29,7 +29,19 @@ export default function LegalLayout({
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-2.5 py-1.5 text-[11px] font-semibold text-dark-text-muted hover:text-dark-text hover:bg-dark-elevated rounded-md transition-colors"
+                className="px-2.5 py-1.5 text-[11px] font-semibold text-dark-text-muted hover:text-dark-text hover:bg-dark-elevated rounded-md transition-colors min-h-[44px] sm:min-h-0 flex items-center"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          {/* Mobile nav — horizontal scroll row */}
+          <nav className="sm:hidden flex overflow-x-auto gap-1 scrollbar-none snap-x-mandatory -mx-2 px-2">
+            {LEGAL_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="shrink-0 px-3 py-2 text-[11px] font-semibold text-dark-text-muted hover:text-dark-text hover:bg-dark-elevated rounded-md transition-colors snap-start min-h-[44px] flex items-center whitespace-nowrap"
               >
                 {link.label}
               </Link>

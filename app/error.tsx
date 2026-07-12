@@ -29,7 +29,7 @@ export default function Error({
           </div>
 
           {/* Terminal content */}
-          <div className="p-6 text-left font-mono text-sm space-y-3">
+          <div className="p-4 sm:p-6 text-left font-mono text-xs sm:text-sm space-y-3">
             <p className="text-accent-salmon font-bold">
               {">"} SYSTEM CRASH DETECTED
             </p>
@@ -75,13 +75,13 @@ export default function Error({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
             onClick={reset}
-            className="bg-amber-button hover:bg-saffron-deep text-black px-6 py-2.5 rounded-md text-sm font-bold transition-all active:scale-95 border border-amber-shadow w-full sm:w-auto cursor-pointer"
+            className="bg-amber-button hover:bg-saffron-deep text-black px-6 py-2.5 rounded-md text-sm font-bold transition-all active:scale-95 border border-amber-shadow w-full sm:w-auto cursor-pointer min-h-[44px] sm:min-h-0 flex items-center justify-center"
           >
             ↻ Retry
           </button>
           <Link
             href="/"
-            className="border border-dark-border hover:border-dark-text-muted text-dark-text px-6 py-2.5 rounded-md text-sm font-bold transition-all hover:bg-dark-surface w-full sm:w-auto text-center"
+            className="border border-dark-border hover:border-dark-text-muted text-dark-text px-6 py-2.5 rounded-md text-sm font-bold transition-all hover:bg-dark-surface w-full sm:w-auto text-center min-h-[44px] sm:min-h-0 flex items-center justify-center"
           >
             ← Back to Home
           </Link>
@@ -89,7 +89,7 @@ export default function Error({
             href="https://github.com/roshhellwett/zenithopensourceprojects/issues"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-dark-text-muted hover:text-dark-text text-sm font-bold transition-colors"
+            className="text-dark-text-muted hover:text-dark-text text-sm font-bold transition-colors min-h-[44px] flex items-center justify-center"
           >
             Report Bug →
           </a>

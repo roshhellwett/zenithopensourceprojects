@@ -21,7 +21,7 @@ export default function NotFound() {
           </div>
 
           {/* Terminal content */}
-          <div className="p-6 text-left font-mono text-sm space-y-3">
+          <div className="p-4 sm:p-6 text-left font-mono text-xs sm:text-sm space-y-3">
             <p className="text-amber-button font-bold">
               {">"} zenith --locate file
             </p>
@@ -63,7 +63,7 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/"
-            className="bg-amber-button hover:bg-saffron-deep text-black px-6 py-2.5 rounded-md text-sm font-bold transition-all active:scale-95 border border-amber-shadow w-full sm:w-auto"
+            className="bg-amber-button hover:bg-saffron-deep text-black px-6 py-2.5 rounded-md text-sm font-bold transition-all active:scale-95 border border-amber-shadow w-full sm:w-auto min-h-[44px] sm:min-h-0 flex items-center justify-center"
           >
             ← Back to Home
           </Link>
@@ -71,7 +71,7 @@ export default function NotFound() {
             href="https://github.com/roshhellwett?tab=repositories"
             target="_blank"
             rel="noopener noreferrer"
-            className="border border-dark-border hover:border-dark-text-muted text-dark-text px-6 py-2.5 rounded-md text-sm font-bold transition-all hover:bg-dark-surface w-full sm:w-auto"
+            className="border border-dark-border hover:border-dark-text-muted text-dark-text px-6 py-2.5 rounded-md text-sm font-bold transition-all hover:bg-dark-surface w-full sm:w-auto min-h-[44px] sm:min-h-0 flex items-center justify-center"
           >
             Browse Projects
           </a>

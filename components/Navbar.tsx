@@ -202,8 +202,10 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
             </Link>
 
             {/* Desktop Nav Items */}
-            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1">
-              {NAV_ITEMS.map((item) => (
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5">
+              {NAV_ITEMS.map((item, idx) => {
+                const isRightmost = idx >= NAV_ITEMS.length - 2;
+                return (
                 <div key={item.label} className="relative navbar-item group">
                   <button type="button" onClick={() => playRetroSound("click")} className="flex items-center gap-1 px-2 xl:px-3 py-1.5 text-[13px] font-medium text-dark-text-muted hover:text-dark-text transition-colors rounded-md hover:bg-dark-surface cursor-pointer min-h-[36px] whitespace-nowrap">
                     {item.label}
@@ -212,7 +214,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
 
                   {/* Dropdown */}
                   {item.children && (
-                    <div className="navbar-dropdown absolute top-full left-0 mt-1 w-56 xl:w-72 bg-dark-elevated border border-dark-border rounded-lg shadow-2xl p-2 z-50 transition-all duration-200">
+                    <div className={`navbar-dropdown absolute top-full mt-1 w-56 xl:w-72 bg-dark-elevated border border-dark-border rounded-lg shadow-2xl p-2 z-50 transition-all duration-200 ${isRightmost ? "right-0 left-auto" : "left-0"}`}>
                       {item.children.map((child) => {
                         const isHighlighted =
                           child.href.startsWith("#") &&
@@ -252,7 +254,8 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                     </div>
                   )}
                 </div>
-              ))}
+              );
+              })}
             </nav>
           </div>
 

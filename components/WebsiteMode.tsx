@@ -624,7 +624,7 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
             Complete structural list of core verified repositories inside the Zenith environment.
           </p>
 
-          <div className="border border-dark-border rounded-lg overflow-x-auto -mx-3 sm:mx-0">
+          <div className="border border-dark-border rounded-lg overflow-x-auto -mx-3 sm:mx-0 sm:overflow-clip">
             <table className="w-full text-xs sm:text-sm min-w-[320px]">
               <thead>
                 <tr className="bg-dark-surface border-b border-dark-border select-none">
