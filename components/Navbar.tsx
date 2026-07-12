@@ -27,6 +27,8 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -128,6 +130,18 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
     }
   }, [mobileOpen]);
 
+  // Close dropdown on click outside
+  useEffect(() => {
+    if (!openDropdown) return;
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [openDropdown]);
+
   // Focus trap for mobile menu
   useEffect(() => {
     if (!mobileOpen || !menuRef.current) return;
@@ -202,19 +216,34 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
             </Link>
 
             {/* Desktop Nav Items */}
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5">
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5" ref={dropdownRef}>
               {NAV_ITEMS.map((item, idx) => {
                 const isRightmost = idx >= NAV_ITEMS.length - 2;
+                const isOpen = openDropdown === item.label;
                 return (
                 <div key={item.label} className="relative navbar-item group">
-                  <button type="button" onClick={() => playRetroSound("click")} className="flex items-center gap-1 px-2 xl:px-3 py-1.5 text-[13px] font-medium text-dark-text-muted hover:text-dark-text transition-colors rounded-md hover:bg-dark-surface cursor-pointer min-h-[36px] whitespace-nowrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playRetroSound("click");
+                      if (item.children) {
+                        setOpenDropdown(isOpen ? null : item.label);
+                      }
+                    }}
+                    className="flex items-center gap-1 px-2 xl:px-3 py-1.5 text-[13px] font-medium text-dark-text-muted hover:text-dark-text transition-colors rounded-md hover:bg-dark-surface cursor-pointer min-h-[36px] whitespace-nowrap"
+                    aria-expanded={isOpen}
+                  >
                     {item.label}
-                    {item.children && <ChevronDown className="w-3 h-3 opacity-50 shrink-0" />}
+                    {item.children && <ChevronDown className={`w-3 h-3 opacity-50 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />}
                   </button>
 
                   {/* Dropdown */}
                   {item.children && (
-                    <div className={`navbar-dropdown absolute top-full mt-1 w-56 xl:w-72 bg-dark-elevated border border-dark-border rounded-lg shadow-2xl p-2 z-50 transition-all duration-200 ${isRightmost ? "right-0 left-auto" : "left-0"}`}>
+                    <div
+                      className={`absolute top-full mt-1 w-56 xl:w-72 bg-dark-elevated border border-dark-border rounded-lg shadow-2xl p-2 z-50 transition-all duration-200 ${
+                        isOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible translate-y-[-4px]"
+                      } ${isRightmost ? "right-0 left-auto" : "left-0"}`}
+                    >
                       {item.children.map((child) => {
                         const isHighlighted =
                           child.href.startsWith("#") &&
