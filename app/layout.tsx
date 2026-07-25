@@ -18,9 +18,11 @@ const sourceCodePro = Source_Code_Pro({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Zenith Open Source Projects – Roshan Kr Singh | Civic Tech & Developer Tools",
-    template: "%s – Zenith Open Source Projects",
+    default:
+      "Zenith Open Source Projects – Roshan Kr Singh | Civic Tech & Developer Tools",
+    template: "%s",
   },
   description:
     "Zenith Open Source Projects is an open-source software registry and civic-tech ecosystem founded by independent developer Roshan Kr Singh (@roshhellwett) in India. Featuring Project Sentinel, ZeroGapVote, AI tools, and system utilities.",

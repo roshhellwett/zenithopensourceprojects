@@ -166,14 +166,14 @@ const breadcrumbSchema = {
     {
       "@type": "ListItem",
       position: 2,
-      name: "Desktop OS Workspace",
-      item: `${SITE_URL}?mode=desktop`,
+      name: "Zenith OS — Desktop Workspace",
+      item: `${SITE_URL}/os`,
     },
     {
       "@type": "ListItem",
       position: 3,
-      name: "Website Portfolio",
-      item: `${SITE_URL}?mode=website`,
+      name: "Zenith Website Portfolio",
+      item: `${SITE_URL}/site`,
     },
   ],
 };
