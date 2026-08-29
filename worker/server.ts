@@ -109,6 +109,18 @@ app.post("/api/ai/chat", async (req, res) => {
       });
     }
 
+    const CANDIDATE_MODELS = Array.from(
+      new Set(
+        [
+          process.env.GROQ_MODEL,
+          "openai/gpt-oss-120b",
+          "qwen/qwen3.6-27b",
+          "openai/gpt-oss-20b",
+          "qwen/qwen3.5-27b",
+        ].filter((m): m is string => Boolean(m && m.trim()))
+      )
+    );
+
     const chatMessages = [
       { role: "system" as const, content: ZENITH_SYSTEM_PROMPT },
       ...sanitizedMessages.map((m) => ({
@@ -117,55 +129,65 @@ app.post("/api/ai/chat", async (req, res) => {
       })),
     ];
 
-    // Call Groq with AbortController timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10_000);
+    let lastError: unknown;
 
-    try {
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: chatMessages,
-          temperature: 0.7,
-          max_tokens: 1024,
-        }),
-        signal: controller.signal,
-      });
+    // Try candidate models in order (automatic failover on deprecation/rate-limit/server error)
+    for (const model of CANDIDATE_MODELS) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10_000);
 
-      clearTimeout(timeoutId);
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${GROQ_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model,
+            messages: chatMessages,
+            temperature: 0.7,
+            max_tokens: 1024,
+          }),
+          signal: controller.signal,
+        });
 
-      if (!response.ok) {
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
+          const botText =
+            data.choices?.[0]?.message?.content ||
+            "I couldn't process that request. Could you rephrase?";
+          return res.json({ text: botText });
+        }
+
         const errText = await response.text();
-        console.error("Groq API error:", response.status, errText);
-        return res.status(500).json({
-          text: "The AI service encountered an error. Please try again in a moment.",
-        });
-      }
+        console.warn(`Groq model '${model}' error (${response.status}):`, errText);
+        lastError = new Error(`Groq ${response.status} (${model}): ${errText}`);
 
-      const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
-      const botText =
-        data.choices?.[0]?.message?.content ||
-        "I couldn't process that request. Could you rephrase?";
+        // If 400 (e.g. model decommissioned) or 404 or 429 (rate limit) or 5xx, try next model
+        continue;
+      } catch (fetchError: unknown) {
+        clearTimeout(timeoutId);
+        lastError = fetchError;
 
-      return res.json({ text: botText });
-    } catch (fetchError: unknown) {
-      clearTimeout(timeoutId);
-      if (fetchError instanceof Error && fetchError.name === "AbortError") {
-        return res.status(408).json({
-          text: "The AI is taking too long to respond. Please try again.",
-        });
+        if (fetchError instanceof Error && fetchError.name === "AbortError") {
+          return res.status(408).json({
+            text: "The AI is taking too long to respond. Please try again.",
+          });
+        }
+
+        // Network error — try next fallback model
+        continue;
       }
-      throw fetchError;
     }
+
+    throw lastError || new Error("All Groq candidate models failed.");
   } catch (error: unknown) {
     console.error("Worker error:", error);
     return res.status(500).json({
-      text: "A network error occurred. Please check your connection and try again.",
+      text: "The AI service encountered an error. Please try again in a moment.",
     });
   }
 });

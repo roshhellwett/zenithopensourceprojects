@@ -238,7 +238,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
           </button>
         </form>
         <div className="flex justify-between items-center text-[9px] text-dark-text-faint mt-1.5 sm:mt-2 px-1 select-none font-semibold">
-          <span>Powered by Llama 3.3 & Groq</span>
+          <span>Powered by GPT-OSS & Groq</span>
           <span className="truncate ml-2">{chat.input.length} / 2000</span>
         </div>
       </div>

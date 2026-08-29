@@ -1,6 +1,6 @@
 # ⛦ Zenith AI Worker
 
-Backend AI service for Zenith Open Source Projects — handles all Groq/Llama 3.3 chat requests.
+Backend AI service for Zenith Open Source Projects — handles Groq AI (GPT-OSS / Qwen) chat requests.
 
 ## Setup
 

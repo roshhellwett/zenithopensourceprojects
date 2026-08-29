@@ -89,7 +89,7 @@ export default function MascotApp({ playRetroSound }: { playRetroSound: (type: S
           >
             Clear Chat
           </button>
-          <span className="font-mono text-[9px] bg-dark-elevated px-1.5 py-0.5 rounded text-accent-teal whitespace-nowrap">Groq · Llama 3.3</span>
+          <span className="font-mono text-[9px] bg-dark-elevated px-1.5 py-0.5 rounded text-accent-teal whitespace-nowrap">Groq · GPT-OSS 120B</span>
         </div>
       </div>
 

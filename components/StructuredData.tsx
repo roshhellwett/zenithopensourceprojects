@@ -211,7 +211,7 @@ const faqSchema = {
       name: "What is Project Sentinel by Zenith Open Source?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Project Sentinel is an AI-powered, 24/7 automated Indian news aggregator developed under Zenith Open Source Projects. It fetches RSS feeds, deduplicates URLs, cross-references claims across trust sources, and verifies content using Groq Llama-3.3 AI models before publishing.",
+        text: "Project Sentinel is an AI-powered, 24/7 automated Indian news aggregator developed under Zenith Open Source Projects. It fetches RSS feeds, deduplicates URLs, cross-references claims across trust sources, and verifies content using Groq AI models before publishing.",
       },
     },
     {

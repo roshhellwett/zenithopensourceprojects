@@ -124,8 +124,8 @@ export default function PrivacyPage() {
             <div className="bg-dark-bg border border-dark-border-subtle rounded-lg p-4 text-sm text-dark-text-muted space-y-2 leading-relaxed">
               <p>
                 The Zenith AI assistant uses the{" "}
-                <strong className="text-dark-text">Groq API</strong> (Llama 3.3
-                model) to generate responses. Here&apos;s how it works:
+                <strong className="text-dark-text">Groq API</strong> (GPT-OSS / Qwen
+                models) to generate responses. Here&apos;s how it works:
               </p>
               <ul className="space-y-1">
                 <li className="flex items-start gap-2">

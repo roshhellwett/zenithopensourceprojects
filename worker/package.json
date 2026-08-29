@@ -1,7 +1,7 @@
 {
   "name": "zenith-ai-worker",
   "version": "1.0.0",
-  "description": "Zenith AI backend worker — handles Groq/Llama chat requests for the Zenith frontend.",
+  "description": "Zenith AI backend worker — handles Groq AI (GPT-OSS / Qwen) chat requests for the Zenith frontend.",
   "author": "Roshan Kr Singh <roshhellwett>",
   "license": "MIT",
   "main": "dist/server.js",

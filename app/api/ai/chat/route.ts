@@ -79,6 +79,18 @@ export async function POST(req: Request) {
       });
     }
 
+    const CANDIDATE_MODELS = Array.from(
+      new Set(
+        [
+          process.env.GROQ_MODEL,
+          "openai/gpt-oss-120b",
+          "qwen/qwen3.6-27b",
+          "openai/gpt-oss-20b",
+          "qwen/qwen3.5-27b",
+        ].filter((m): m is string => Boolean(m && m.trim()))
+      )
+    );
+
     // Build conversation history for Groq (OpenAI-compatible format)
     const chatMessages = [
       { role: "system" as const, content: ZENITH_SYSTEM_PROMPT },
@@ -88,11 +100,10 @@ export async function POST(req: Request) {
       })),
     ];
 
-    // Retry loop with backoff
-    const MAX_RETRIES = 2;
     let lastError: unknown;
 
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    // Try candidate models in order (automatic failover on deprecation/rate-limit/server error)
+    for (const model of CANDIDATE_MODELS) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10_000);
 
@@ -106,7 +117,7 @@ export async function POST(req: Request) {
               Authorization: `Bearer ${key}`,
             },
             body: JSON.stringify({
-              model: "llama-3.3-70b-versatile",
+              model,
               messages: chatMessages,
               temperature: 0.7,
               max_tokens: 1024,
@@ -125,18 +136,12 @@ export async function POST(req: Request) {
           return NextResponse.json({ text: botText });
         }
 
-        // Non-200 — log and retry unless it's a 4xx (client error)
         const errText = await response.text();
-        console.error("Groq API error:", response.status, errText);
+        console.warn(`Groq model '${model}' error (${response.status}):`, errText);
+        lastError = new Error(`Groq ${response.status} (${model}): ${errText}`);
 
-        if (response.status < 500) {
-          return NextResponse.json({
-            text: "The AI service encountered an error. Please try again in a moment.",
-          });
-        }
-
-        // 5xx — fall through to retry
-        lastError = new Error(`Groq ${response.status}: ${errText}`);
+        // If 400 (e.g. model decommissioned) or 404 or 429 (rate limit) or 5xx, continue to next model in cascade
+        continue;
       } catch (fetchError: unknown) {
         clearTimeout(timeoutId);
         lastError = fetchError;
@@ -150,19 +155,16 @@ export async function POST(req: Request) {
           });
         }
 
-        // Network error — retry after backoff
-        if (attempt < MAX_RETRIES) {
-          await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
-          continue;
-        }
+        // Network error — try next fallback model
+        continue;
       }
     }
 
-    throw lastError;
+    throw lastError || new Error("All Groq candidate models failed.");
   } catch (error: unknown) {
     console.error("API route error:", error);
     return NextResponse.json({
-      text: "A network error occurred. Please check your connection and try again.",
+      text: "The AI service encountered an error. Please try again in a moment.",
     });
   }
 }

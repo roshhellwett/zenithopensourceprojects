@@ -110,7 +110,7 @@ export default function TermsPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent-salmon mt-0.5">⚠</span>
-                  The AI is powered by third-party models (Groq / Llama 3.3)
+                  The AI is powered by third-party models (Groq / GPT-OSS / Qwen)
                   and we do not control the model&apos;s output.
                 </li>
                 <li className="flex items-start gap-2">
