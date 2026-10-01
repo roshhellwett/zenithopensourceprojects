@@ -51,7 +51,6 @@ export default function FounderAvatar({
               alt="Roshan Kr Singh — Verified Founder & Architect"
               width={pixelDimensions * 2}
               height={pixelDimensions * 2}
-              quality={90}
               priority
               draggable={false}
               onLoad={() => setImageLoaded(true)}

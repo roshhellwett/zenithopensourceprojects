@@ -28,15 +28,15 @@ const ChatMessage = React.memo(function ChatMessage({ m, copiedId, onCopy }: {
   return (
     <div className={`${m.sender === "user" ? "text-right" : ""}`}>
       {m.sender === "bot" && (
-        <div className="group relative pr-10 flex gap-2">
-          <span className="w-5 h-5 rounded-full bg-amber-button/10 flex items-center justify-center shrink-0 text-[10px] select-none">🤖</span>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm text-dark-text leading-relaxed">
+        <div className="group relative pr-10 flex gap-2.5 items-start">
+          <span className="w-6 h-6 rounded-full bg-amber-button/15 border border-amber-button/30 flex items-center justify-center shrink-0 text-xs select-none shadow-sm mt-0.5">🤖</span>
+          <div className="flex-1 min-w-0 bg-dark-elevated border border-dark-border/80 rounded-2xl rounded-tl-sm p-3.5 shadow-sm text-left">
+            <div className="text-xs sm:text-sm text-dark-text leading-relaxed">
               <FormattedText text={m.content} />
             </div>
             <button
               onClick={() => onCopy(m.id, m.content)}
-              className="absolute right-0 top-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-2 py-0.5 bg-dark-elevated hover:bg-dark-border/40 border border-dark-border rounded text-[9px] text-dark-text-muted hover:text-dark-text cursor-pointer font-semibold shadow-sm select-none"
+              className="absolute right-0 top-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-2 py-0.5 bg-dark-surface hover:bg-dark-border/40 border border-dark-border rounded text-[9px] text-dark-text-muted hover:text-dark-text cursor-pointer font-semibold shadow-sm select-none"
               title="Copy response"
             >
               {copiedId === m.id ? "✓ Copied" : "📋 Copy"}
@@ -45,11 +45,11 @@ const ChatMessage = React.memo(function ChatMessage({ m, copiedId, onCopy }: {
         </div>
       )}
       {m.sender === "user" && (
-        <div className="inline-block bg-cobalt/15 border border-cobalt/25 rounded-lg px-3 py-2 text-sm text-dark-text max-w-[85%] text-left relative group">
+        <div className="inline-block bg-amber-button/15 border border-amber-button/35 rounded-2xl rounded-tr-sm px-3.5 py-2.5 text-xs sm:text-sm text-dark-text font-medium max-w-[85%] text-left relative group shadow-sm">
           <p className="whitespace-pre-wrap">{m.content}</p>
           <button
             onClick={() => onCopy(m.id, m.content)}
-            className="block sm:inline-block sm:absolute sm:right-full sm:mr-2 sm:top-1/2 sm:-translate-y-1/2 mt-1.5 sm:mt-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-2 py-0.5 bg-dark-elevated hover:bg-dark-border/40 border border-dark-border rounded text-[9px] text-dark-text-muted hover:text-dark-text cursor-pointer font-semibold shadow-sm select-none"
+            className="block sm:inline-block sm:absolute sm:right-full sm:mr-2 sm:top-1/2 sm:-translate-y-1/2 mt-1.5 sm:mt-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-2 py-0.5 bg-dark-surface hover:bg-dark-border/40 border border-dark-border rounded text-[9px] text-dark-text-muted hover:text-dark-text cursor-pointer font-semibold shadow-sm select-none"
             title="Copy message"
           >
             {copiedId === m.id ? "✓ Copied" : "📋 Copy"}
@@ -107,7 +107,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
   return (
     <div
       ref={panelRef}
-      className={`animate-fade-in-up bg-[#181a20]/95 backdrop-blur-2xl border border-amber-button/30 flex flex-col overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.65),0_0_30px_rgba(241,168,44,0.12)] ${
+      className={`animate-fade-in-up bg-dark-surface/98 backdrop-blur-xl border border-dark-border flex flex-col overflow-hidden window-chrome shadow-[0_25px_60px_-15px_rgba(35,37,29,0.25)] ${
         isFullscreen
           ? "fixed inset-x-0 top-[var(--navbar-height)] bottom-[var(--taskbar-height)] z-50 rounded-none border-none shadow-none"
           : "w-full sm:w-[380px] md:w-[410px] h-[72vh] sm:h-[540px] rounded-t-2xl sm:rounded-2xl max-h-[82vh] sm:max-h-[540px]"
@@ -117,15 +117,15 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
       aria-label="Zenith AI Chat"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 sm:py-2 border-b border-dark-border/80 bg-gradient-to-r from-amber-button/10 via-dark-surface/50 to-transparent shrink-0 select-none min-h-[48px] sm:min-h-0">
+      <div className="flex items-center justify-between px-3.5 py-2.5 sm:py-2 border-b border-dark-border/80 bg-dark-elevated/90 shrink-0 select-none min-h-[48px] sm:min-h-0">
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-amber-button/20 to-accent-teal/20 text-amber-button shadow-inner shrink-0 border border-amber-button/30">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-button/15 text-amber-shadow border border-amber-button/30 shadow-sm shrink-0">
             <Zap size={14} className="text-amber-button" />
           </span>
           <div className="min-w-0">
             <p className="text-xs font-bold text-dark-text tracking-wide flex items-center gap-2">
               <span>Zenith Neural Copilot</span>
-              <span className="text-[8px] font-mono font-semibold text-accent-teal bg-accent-teal/15 border border-accent-teal/30 px-1.5 py-0.2 rounded-full">
+              <span className="text-[8px] font-mono font-bold text-accent-teal bg-accent-teal/10 border border-accent-teal/30 px-1.5 py-0.2 rounded-full">
                 GROQ LPU
               </span>
             </p>
@@ -142,7 +142,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
               playRetroSound("click");
               chat.clearChat();
             }}
-            className="p-1.5 hover:bg-dark-border/60 rounded-md transition-colors text-dark-text-muted hover:text-dark-text cursor-pointer min-h-[32px] min-w-[32px] flex items-center justify-center"
+            className="p-1.5 hover:bg-dark-border/40 rounded-md transition-colors text-dark-text-muted hover:text-dark-text cursor-pointer min-h-[32px] min-w-[32px] flex items-center justify-center"
             title="Start new chat (clear history)"
             aria-label="Start new chat"
           >
@@ -154,7 +154,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
               playRetroSound("toggle");
               setIsFullscreen(!isFullscreen);
             }}
-            className="p-1.5 hover:bg-dark-border/60 rounded-md transition-colors text-dark-text-muted hover:text-dark-text cursor-pointer min-h-[32px] min-w-[32px] flex items-center justify-center"
+            className="p-1.5 hover:bg-dark-border/40 rounded-md transition-colors text-dark-text-muted hover:text-dark-text cursor-pointer min-h-[32px] min-w-[32px] flex items-center justify-center"
             title={isFullscreen ? "Exit fullscreen" : "Fullscreen chat"}
             aria-label="Fullscreen toggle"
           >
@@ -166,7 +166,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
                 playRetroSound("close");
                 onClose();
               }}
-              className="p-1.5 hover:bg-red-500/20 hover:text-red-400 rounded-md transition-colors text-dark-text-muted cursor-pointer min-h-[32px] min-w-[32px] flex items-center justify-center"
+              className="p-1.5 hover:bg-red-500/10 hover:text-red-600 rounded-md transition-colors text-dark-text-muted cursor-pointer min-h-[32px] min-w-[32px] flex items-center justify-center"
               title="Close chat"
               aria-label="Close chat"
             >
@@ -176,16 +176,16 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3 sm:space-y-4 select-text overscroll-contain">
+      {/* Messages List */}
+      <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3 sm:space-y-4 select-text overscroll-contain bg-dark-surface/50">
         {chat.messages.map((m) => (
           <ChatMessage key={m.id} m={m} copiedId={chat.copiedId} onCopy={chat.copyMessage} />
         ))}
 
         {chat.loading && (
-          <div className="flex items-start gap-2.5 animate-pulse">
-            <span className="w-6 h-6 rounded-full bg-amber-button/15 border border-amber-button/30 flex items-center justify-center shrink-0 text-[11px] select-none">🤖</span>
-            <div className="rounded-2xl rounded-bl-sm border border-amber-button/20 bg-dark-elevated/80 px-3.5 sm:px-4 py-2.5 sm:py-3 shadow-md">
+          <div className="flex items-start gap-2.5">
+            <span className="w-6 h-6 rounded-full bg-amber-button/15 border border-amber-button/30 flex items-center justify-center shrink-0 text-xs select-none">🤖</span>
+            <div className="rounded-2xl rounded-tl-sm border border-dark-border/80 bg-dark-elevated px-4 py-3 shadow-sm">
               <LoadingDots />
             </div>
           </div>
@@ -194,10 +194,10 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
         {/* Dummy div to scroll to */}
         <div ref={chat.messagesEndRef} />
 
-        {/* Suggested prompts as holographic chips */}
+        {/* Suggested prompts as clean retro chips */}
         {chat.messages.length === 1 && !chat.loading && (
           <div className="pt-2">
-            <p className="text-[10px] font-semibold text-dark-text-faint uppercase tracking-wider mb-2">Prompt Starters</p>
+            <p className="text-[10px] font-bold text-dark-text-faint uppercase tracking-wider mb-2">Prompt Starters</p>
             <div className="flex flex-wrap gap-1.5 sm:gap-2 select-none">
               {exampleQuestions.map((q) => (
                 <button
@@ -207,7 +207,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
                     chat.sendMessage(q);
                   }}
                   disabled={chat.loading}
-                  className="rounded-lg border border-dark-border/80 bg-dark-elevated/60 hover:border-amber-button/50 hover:bg-amber-button/10 hover:text-amber-button px-2.5 sm:px-3 py-1.5 text-[11px] font-medium text-dark-text-muted transition-all active:scale-[0.97] disabled:opacity-40 cursor-pointer shadow-sm text-left"
+                  className="rounded-lg border border-dark-border bg-dark-elevated hover:bg-white hover:border-amber-button/60 hover:text-dark-text text-dark-text-muted px-2.5 sm:px-3 py-1.5 text-[11px] font-semibold transition-all active:scale-[0.97] disabled:opacity-40 cursor-pointer shadow-sm text-left"
                   type="button"
                 >
                   💡 {q}
@@ -219,7 +219,7 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
       </div>
 
       {/* Input Form */}
-      <div className="p-3 border-t border-dark-border/80 shrink-0 bg-dark-surface/40 backdrop-blur-md">
+      <div className="p-3 border-t border-dark-border/80 shrink-0 bg-dark-elevated/70 backdrop-blur-md">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -242,18 +242,18 @@ export default function ChatPanel({ onClose }: ChatPanelProps) {
             disabled={chat.loading}
             rows={1}
             maxLength={2000}
-            className="flex-1 bg-dark-bg/80 border border-dark-border focus:border-amber-button/80 rounded-xl px-3.5 py-2 text-sm text-dark-text placeholder-dark-text-faint focus:outline-none transition-all resize-none min-h-[40px] max-h-[120px] overflow-y-auto font-sans focus:ring-1 focus:ring-amber-button/50 shadow-inner"
+            className="flex-1 bg-white border border-dark-border focus:border-amber-button rounded-xl px-3.5 py-2 text-sm text-dark-text placeholder-dark-text-faint focus:outline-none transition-all resize-none min-h-[40px] max-h-[120px] overflow-y-auto font-sans focus:ring-2 focus:ring-amber-button/30 shadow-inner"
           />
           <button
             type="submit"
             disabled={!chat.input.trim() || chat.loading}
-            className="p-2.5 bg-amber-button hover:bg-saffron-deep disabled:opacity-30 rounded-xl text-black transition-all active:scale-95 cursor-pointer disabled:cursor-not-allowed shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center shadow-[0_2px_10px_rgba(241,168,44,0.3)]"
+            className="p-2.5 bg-amber-button hover:bg-saffron-deep disabled:opacity-30 rounded-xl text-black font-bold transition-all active:scale-95 cursor-pointer disabled:cursor-not-allowed shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center shadow-md"
             aria-label="Send message"
           >
             <Send className="w-4 h-4" />
           </button>
         </form>
-        <div className="flex justify-between items-center text-[9px] text-dark-text-faint mt-2 px-1 select-none font-semibold">
+        <div className="flex justify-between items-center text-[9px] text-dark-text-muted mt-2 px-1 select-none font-semibold">
           <span className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-accent-teal" />
             <span>Zenith Intelligence Core</span>
