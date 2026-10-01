@@ -7,6 +7,7 @@ import { NAV_ITEMS } from "@/data/nav";
 import { STACK } from "@/data/stack";
 import { playRetroSound } from "@/lib/audio";
 import { lockBodyScroll, unlockBodyScroll } from "@/lib/scroll-lock";
+import { isMobileDevice } from "@/lib/mode";
 
 interface SearchResult {
   type: "project" | "nav" | "stack" | "action";
@@ -68,8 +69,8 @@ export default function SearchModal({ isOpen, onClose, onSwitchMode }: SearchMod
       });
     });
 
-    // Quick actions
-    if (onSwitchMode) {
+    // Quick actions (Desktop only - mobile is locked to Website mode)
+    if (onSwitchMode && !isMobileDevice()) {
       items.push({
         type: "action",
         title: "Switch Mode",

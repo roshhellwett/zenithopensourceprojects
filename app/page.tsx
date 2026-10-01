@@ -2,24 +2,28 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { readMode, pathForMode } from "@/lib/mode";
+import { readMode, pathForMode, isMobileDevice } from "@/lib/mode";
 import { ZenithLogo } from "@/components/ZenithLogo";
 
 /**
  * `/` is a lightweight splash + redirect. It restores the visitor's
- * last-visited world (OS or Website) so the two modes feel truly
- * independent — no shared state, no cross-mode leakage, one canonical
- * URL per world.
+ * last-visited world (OS or Website).
+ * If the user is on mobile, they are always redirected immediately to `/site`.
  */
 export default function Page() {
   const router = useRouter();
 
   useEffect(() => {
-    const target = pathForMode(readMode());
-    // Prefetch both so the destination hydrates instantly.
-    router.prefetch("/os");
+    const isMobile = isMobileDevice();
+    const target = isMobile ? "/site" : pathForMode(readMode());
+
+    // Prefetch destination
+    if (!isMobile) {
+      router.prefetch("/os");
+    }
     router.prefetch("/site");
-    const t = setTimeout(() => router.replace(target), 180);
+
+    const t = setTimeout(() => router.replace(target), isMobile ? 50 : 180);
     return () => clearTimeout(t);
   }, [router]);
 

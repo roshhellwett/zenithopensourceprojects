@@ -11,6 +11,7 @@ import dynamic from "next/dynamic";
 const SearchModal = dynamic(() => import("@/components/SearchModal"), { ssr: false });
 import Link from "next/link";
 import { playRetroSound } from "@/lib/audio";
+import { isMobileDevice } from "@/lib/mode";
 
 /** Detect macOS platform for keyboard shortcut rendering (client-only) */
 function getIsMac(): boolean {
@@ -352,15 +353,18 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
               </kbd>
             </button>
 
-            {/* Mode Switcher */}
+            {/* Mode Switcher (Desktop Only) */}
             {onToggleMode && (
               <button
                 type="button"
                 onClick={() => {
+                  if (isMobileDevice()) {
+                    return;
+                  }
                   playRetroSound("toggle");
                   onToggleMode();
                 }}
-                className="group relative flex min-h-[44px] min-w-[44px] items-center gap-1.5 rounded-lg border border-dark-border-subtle bg-dark-bg/70 px-2 py-2 text-xs font-semibold text-dark-text-muted shadow-sm transition-all duration-200 hover:border-accent-teal/50 hover:bg-dark-surface hover:text-dark-text hover:shadow-md active:scale-95 sm:min-h-[36px] sm:min-w-[36px] sm:px-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-teal/70 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-surface"
+                className="hidden md:flex group relative min-h-[36px] min-w-[36px] items-center gap-1.5 rounded-lg border border-dark-border-subtle bg-dark-bg/70 px-2.5 py-1.5 text-xs font-semibold text-dark-text-muted shadow-sm transition-all duration-200 hover:border-accent-teal/50 hover:bg-dark-surface hover:text-dark-text hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-teal/70 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-surface"
                 title={`Switch to ${currentMode === "desktop" ? "Website" : "Desktop OS"} mode`}
                 aria-label={`Current mode: ${currentMode === "desktop" ? "Desktop OS" : "Website"}. Switch to ${currentMode === "desktop" ? "Website" : "Desktop OS"} mode`}
                 aria-pressed={currentMode === "desktop"}

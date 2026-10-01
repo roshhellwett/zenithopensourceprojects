@@ -699,11 +699,9 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
         </div>
       )}
 
-      {/* Chat Panel (fixed/responsive bottom-right overlay with glassmorphism) */}
+      {/* Chat Panel (self-positioned responsive overlay with expand support) */}
       {chatOpen && (
-        <div className="fixed bottom-[var(--taskbar-height)] right-0 sm:right-4 left-0 sm:left-auto z-50 animate-pop-in">
-          <ChatPanel onClose={() => setChatOpen(false)} />
-        </div>
+        <ChatPanel onClose={() => setChatOpen(false)} />
       )}
 
       {/* Floating Copilot pill when closed (inviting, unobtrusive, glorious) */}

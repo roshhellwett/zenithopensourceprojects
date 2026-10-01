@@ -4,17 +4,22 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import WebsiteMode from "@/components/WebsiteMode";
-import { writeMode } from "@/lib/mode";
+import { writeMode, isMobileDevice } from "@/lib/mode";
 
 export default function SiteClient() {
   const router = useRouter();
 
   useEffect(() => {
     writeMode("site");
-    router.prefetch("/os");
+    if (!isMobileDevice()) {
+      router.prefetch("/os");
+    }
   }, [router]);
 
   const goToOs = () => {
+    if (isMobileDevice()) {
+      return;
+    }
     writeMode("os");
     router.push("/os");
   };

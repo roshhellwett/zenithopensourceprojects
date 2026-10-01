@@ -1,6 +1,17 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-export function proxy() {
+const MOBILE_REGEX = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i;
+
+export function proxy(request: NextRequest) {
+  const userAgent = request.headers.get("user-agent") || "";
+  const pathname = request.nextUrl.pathname;
+
+  // Prevent mobile users from accessing OS mode - throw them to /site
+  if ((pathname === "/" || pathname.startsWith("/os")) && MOBILE_REGEX.test(userAgent)) {
+    const siteUrl = new URL("/site", request.url);
+    return NextResponse.redirect(siteUrl);
+  }
+
   const response = NextResponse.next();
 
   response.headers.set("X-Content-Type-Options", "nosniff");

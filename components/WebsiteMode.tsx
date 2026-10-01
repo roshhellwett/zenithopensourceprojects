@@ -13,6 +13,7 @@ import { playRetroSound } from "@/lib/audio";
 import { unlockBodyScroll } from "@/lib/scroll-lock";
 import Link from "next/link";
 import FounderAvatar from "@/components/FounderAvatar";
+import { isMobileDevice } from "@/lib/mode";
 
 const ALL_REPOS = [FEATURED_FALLBACK, ...FALLBACK_REPOS];
 
@@ -326,6 +327,7 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.altKey && e.key.toLowerCase() === "o") {
+        if (isMobileDevice()) return;
         e.preventDefault();
         onSwitchToDesktop();
       }
@@ -533,14 +535,15 @@ export default function WebsiteMode({ onSwitchToDesktop }: WebsiteModeProps) {
                 <ArrowUpRight className="w-4 h-4" />
               </a>
 
-              {/* Prominent Mode Switcher Button */}
+              {/* Prominent Mode Switcher Button (Desktop Only) */}
               <button
                 type="button"
                 onClick={() => {
+                  if (isMobileDevice()) return;
                   playRetroSound("toggle");
                   onSwitchToDesktop();
                 }}
-                className="group flex items-center justify-center gap-2 bg-dark-elevated hover:bg-dark-surface border border-dark-border hover:border-accent-teal/50 text-dark-text px-6 py-3 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-sm cursor-pointer"
+                className="hidden md:flex group items-center justify-center gap-2 bg-dark-elevated hover:bg-dark-surface border border-dark-border hover:border-accent-teal/50 text-dark-text px-6 py-3 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-sm cursor-pointer"
                 title="Launch Retro Desktop OS Mode (Alt+O)"
               >
                 <Play className="w-3.5 h-3.5 text-accent-teal group-hover:scale-110 transition-transform" />
