@@ -33,7 +33,10 @@ export type SoundType =
   | "maximize"
   | "close"
   | "error"
-  | "message";
+  | "message"
+  | "chime"
+  | "splash"
+  | "pop";
 
 export const getSoundEnabled = (): boolean => {
   if (typeof window === "undefined") return false;
@@ -291,6 +294,50 @@ export const playRetroSound = (type: SoundType) => {
       gainNode.connect(audioCtx.destination);
       osc.start(now);
       osc.stop(now + 0.08);
+    }
+    else if (type === "chime") {
+      // Ethereal crystal bell chime (Zenith stone monolith & celestial moments)
+      const freqs = [784, 1046.5, 1318.5, 1568]; // G5, C6, E6, G6
+      freqs.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+        gainNode.gain.setValueAtTime(0.035, now + idx * 0.04);
+        gainNode.gain.exponentialRampToValueAtTime(0.0005, now + idx * 0.04 + 0.5);
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.start(now + idx * 0.04);
+        osc.stop(now + idx * 0.04 + 0.5);
+      });
+    }
+    else if (type === "splash") {
+      // Water droplet & koi pond splash
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(900, now);
+      osc.frequency.exponentialRampToValueAtTime(320, now + 0.12);
+      gainNode.gain.setValueAtTime(0.04, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.14);
+    }
+    else if (type === "pop") {
+      // Soft tactile bubble pop
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(840, now + 0.035);
+      gainNode.gain.setValueAtTime(0.03, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.04);
     }
   } catch (e) {
     console.error("Failed to play sound:", e);

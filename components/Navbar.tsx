@@ -48,7 +48,7 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
     let intervalId: ReturnType<typeof setInterval>;
 
     const initObservers = () => {
-      const sections = ["projects", "stack", "founder"];
+      const sections = ["tabs", "projects", "stack", "founder"];
       const allExist = sections.every(id => document.getElementById(id) !== null);
       
       if (!allExist) return false;
@@ -129,6 +129,16 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
       };
     }
   }, [mobileOpen]);
+
+  // Escape also dismisses an open desktop menu without stealing focus.
+  useEffect(() => {
+    if (!openDropdown) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenDropdown(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [openDropdown]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -219,12 +229,12 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-dark-surface/95 border-b border-dark-border backdrop-blur-md">
+      <header className="sticky top-0 z-50 bg-dark-surface/90 border-b border-dark-border/80 backdrop-blur-xl shadow-[0_4px_18px_rgba(35,37,29,0.06)]">
         <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 h-12 flex items-center justify-between safe-area-px">
           {/* Left: Logo + Nav */}
           <div className="flex items-center gap-2 sm:gap-3 md:gap-6 min-w-0 flex-1">
             {/* Logo */}
-            <Link href="/" onClick={() => playRetroSound("click")} className="flex items-center gap-1.5 sm:gap-2 shrink-0 group">
+              <Link href="/" onClick={() => playRetroSound("click")} className="flex items-center gap-1.5 sm:gap-2 shrink-0 group" aria-label="Zenith home">
                 <ZenithLogo animate={false} />
               <span className="font-extrabold text-[15px] tracking-tight text-dark-text hidden sm:inline">
                 Zenith
@@ -350,21 +360,24 @@ export default function Navbar({ onToggleMode, currentMode }: NavbarProps) {
                   playRetroSound("toggle");
                   onToggleMode();
                 }}
-                className="p-2 sm:p-2 text-dark-text-muted hover:text-dark-text hover:bg-dark-surface rounded-md transition-all active:scale-95 flex items-center gap-1.5 text-xs font-semibold min-h-[44px] sm:min-h-[36px] min-w-[44px] sm:min-w-[36px]"
+                className="group relative flex min-h-[44px] min-w-[44px] items-center gap-1.5 rounded-lg border border-dark-border-subtle bg-dark-bg/70 px-2 py-2 text-xs font-semibold text-dark-text-muted shadow-sm transition-all duration-200 hover:border-accent-teal/50 hover:bg-dark-surface hover:text-dark-text hover:shadow-md active:scale-95 sm:min-h-[36px] sm:min-w-[36px] sm:px-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-teal/70 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-surface"
                 title={`Switch to ${currentMode === "desktop" ? "Website" : "Desktop OS"} mode`}
-                aria-label={`Switch to ${currentMode === "desktop" ? "Website" : "Desktop OS"} mode`}
+                aria-label={`Current mode: ${currentMode === "desktop" ? "Desktop OS" : "Website"}. Switch to ${currentMode === "desktop" ? "Website" : "Desktop OS"} mode`}
+                aria-pressed={currentMode === "desktop"}
               >
+                <span className="absolute inset-y-1 left-1 w-0.5 rounded-full bg-accent-teal opacity-70 transition-opacity group-hover:opacity-100" aria-hidden="true" />
                 {currentMode === "desktop" ? (
                   <>
-                    <Globe className="w-4 h-4 text-accent-teal animate-pulse shrink-0" />
-                    <span className="hidden md:inline">Website</span>
+                    <Laptop className="w-4 h-4 text-amber-button shrink-0 transition-transform duration-200 group-hover:-rotate-6" />
+                    <span className="hidden sm:inline">Desktop OS</span>
                   </>
                 ) : (
                   <>
-                    <Laptop className="w-4 h-4 text-amber-button shrink-0" />
-                    <span className="hidden md:inline">Desktop OS</span>
+                    <Globe className="w-4 h-4 text-accent-teal shrink-0 transition-transform duration-200 group-hover:rotate-6" />
+                    <span className="hidden sm:inline">Website</span>
                   </>
                 )}
+                <span className="sr-only">mode active</span>
               </button>
             )}
 

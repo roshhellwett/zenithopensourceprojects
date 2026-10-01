@@ -56,8 +56,9 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
-  const [chatOpen, setChatOpen] = useState(true);
+  const [chatOpen, setChatOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [activeEasterEgg, setActiveEasterEgg] = useState<string | null>(null);
 
   // Startup animation boot sequence
   const [isBooting, setIsBooting] = useState(() => {
@@ -106,6 +107,22 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
     };
   }, []);
 
+  const skipBoot = useCallback(() => {
+    setIsBooting(false);
+    try { sessionStorage.setItem("zenith_booted", "true"); } catch {}
+    unlockBodyScroll(true);
+    addToast("Zenith Workspace active.");
+  }, [addToast]);
+
+  useEffect(() => {
+    if (!isBooting) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") skipBoot();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isBooting, skipBoot]);
+
   // playRetroSound is imported from @/lib/audio
 
   // Boot loader execution
@@ -125,6 +142,17 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
       "UI: Loading Desktop OS graphical workspace...",
       "SUCCESS: Boot sequence complete. Entering shell.",
     ];
+
+    // Respect reduced-motion preferences by handing off immediately while
+    // still exposing the complete boot transcript to assistive technology.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const handoff = setTimeout(() => {
+        setBootLog(lines);
+        setIsBooting(false);
+        try { sessionStorage.setItem("zenith_booted", "true"); } catch { /* storage can be unavailable */ }
+      }, 0);
+      return () => clearTimeout(handoff);
+    }
 
     const lineRef = { current: 0 };
     const interval = setInterval(() => {
@@ -282,8 +310,25 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
 
   if (isBooting) {
     return (
-      <div className="fixed inset-0 bg-[#191b22] text-amber-button font-mono p-3 sm:p-6 flex flex-col justify-between z-[9999]">
-        <div className="space-y-1 text-[10px] sm:text-xs select-none max-w-xl overflow-y-auto pr-2">
+      <div className="zenith-boot fixed inset-0 bg-[#191b22] text-amber-button font-mono p-3 sm:p-6 flex flex-col justify-between z-[9999]" role="status" aria-live="polite" aria-label="Zenith system booting">
+        <div className="zenith-boot-grid" aria-hidden="true" />
+        <div className="relative flex items-center justify-between gap-4 mb-8 max-w-3xl w-full mx-auto">
+          <div className="flex items-center gap-3">
+            <ZenithLogo className="w-10 h-10 sm:w-12 sm:h-12" />
+            <div><p className="text-sm sm:text-base font-bold tracking-[0.22em] text-dark-text">ZENITH</p><p className="text-[9px] text-dark-text-faint tracking-[0.18em]">CIVIC SYSTEMS OBSERVATORY</p></div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              id="skip-boot-btn"
+              onClick={skipBoot}
+              className="text-[10px] font-mono text-amber-button hover:text-white bg-amber-button/10 hover:bg-amber-button/30 border border-amber-button/40 px-2.5 py-1 rounded transition-all cursor-pointer"
+            >
+              Skip [ESC]
+            </button>
+            <span className="hidden sm:block text-[9px] tracking-[0.18em] text-accent-teal">LINK / SECURE</span>
+          </div>
+        </div>
+        <div className="relative space-y-1 text-[10px] sm:text-xs select-none max-w-3xl w-full mx-auto flex-1 overflow-y-auto pr-2">
           {bootLog.map((line, idx) => (
             <p
               key={idx}
@@ -298,9 +343,11 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
               {line}
             </p>
           ))}
-          <p className="animate-pulse">▊</p>
+          <p className="animate-pulse text-accent-teal">▊</p>
+          <div className="mt-5 h-1 bg-dark-border/20 max-w-sm overflow-hidden"><div className="zenith-boot-progress h-full bg-amber-button" /></div>
+          <p className="mt-2 text-[9px] tracking-widest text-dark-text-faint">ESTABLISHING OBSERVATORY HANDOFF · {Math.min(100, Math.round((bootLog.length / 9) * 100))}%</p>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-1 text-[9px] sm:text-[10px] text-dark-text-faint border-t border-dark-border/20 pt-4 shrink-0">
+        <div className="relative flex flex-wrap items-center justify-between gap-1 text-[9px] sm:text-[10px] text-dark-text-faint border-t border-dark-border/20 pt-4 shrink-0 max-w-3xl w-full mx-auto">
           <span>ZENITH SYSTEM RUNTIME</span>
           <span>India verified © {new Date().getFullYear()}</span>
         </div>
@@ -310,9 +357,17 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
 
   return (
     <div
-      className="relative h-[calc(100vh-var(--navbar-height))] h-[calc(100dvh-var(--navbar-height))] overflow-hidden"
+      className="desktop-os relative h-[calc(100vh-var(--navbar-height))] h-[calc(100dvh-var(--navbar-height))] overflow-hidden"
       onContextMenu={handleContextMenu}
     >
+      {/* Layered observatory atmosphere: decorative only, never intercepts input. */}
+      <div className="desktop-atmosphere" aria-hidden="true">
+        <div className="desktop-atmosphere-grid" />
+        <div className="desktop-orbit desktop-orbit-one" />
+        <div className="desktop-orbit desktop-orbit-two" />
+        <span className="desktop-signal desktop-signal-one" />
+        <span className="desktop-signal desktop-signal-two" />
+      </div>
       {/* Toast notifications */}
       <div className="fixed bottom-[calc(var(--taskbar-height)+8px)] left-2 right-2 sm:left-4 sm:right-auto z-[60] flex flex-col gap-2 max-w-[calc(100vw-1rem)] sm:max-w-sm" role="status" aria-live="polite" aria-label="Notifications">
         {toasts.map((t) => (
@@ -380,17 +435,116 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
         ))}
       </div>
 
-      {/* Right desktop icons (staggered animated) */}
-      <div className="absolute right-3 top-4 z-20 hidden md:flex flex-col gap-1 items-center">
-        {RIGHT_DESKTOP_ICONS.map((icon, idx) => (
-          <div key={icon.id} className="animate-icon-stagger" style={{ animationDelay: `${(LEFT_DESKTOP_ICONS.length + idx) * 0.04}s` }}>
-            <DesktopIcon
-              label={icon.label}
-              iconKey={icon.icon}
-              onClick={() => handleIconClick(icon.id, icon.action, icon.tabId, icon.link)}
-            />
-          </div>
+      {/* Right floating toolbar docklet (preserves full diorama visibility!) */}
+      <div className="absolute right-4 top-3 z-20 hidden xl:flex items-center gap-1 bg-dark-surface/85 backdrop-blur-md border border-dark-border/80 rounded-xl px-2 py-1 shadow-lg">
+        {RIGHT_DESKTOP_ICONS.map((icon) => (
+          <button
+            key={icon.id}
+            onClick={() => handleIconClick(icon.id, icon.action, icon.tabId, icon.link)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-dark-text-muted hover:text-dark-text hover:bg-dark-elevated transition-all cursor-pointer group text-[11px] font-bold"
+            title={icon.label.replace("\n", " ")}
+          >
+            <span className="w-4 h-4 flex items-center justify-center shrink-0 drop-shadow-sm group-hover:scale-110 transition-transform">
+              {renderDesktopIcon(icon.icon, "w-4 h-4")}
+            </span>
+            <span>{icon.label.split("\n")[0]}</span>
+          </button>
         ))}
+      </div>
+
+      {/* ── Interactive Diorama Easter Eggs (Responsive & Tactile) ── */}
+      <div className="absolute inset-0 pointer-events-none hidden md:block overflow-hidden z-10" aria-hidden="true">
+        {/* Hotspot 1: Koi Pond (Bottom-Right) */}
+        <div
+          className="absolute right-[5%] bottom-[10%] w-[22%] h-[26%] pointer-events-auto diorama-hotspot group/pond flex items-center justify-center cursor-pointer"
+          onClick={() => {
+            playRetroSound("splash");
+            addToast("Zenith Koi Pond: Pure deterministic streams, zero memory leaks! 🐟");
+            setActiveEasterEgg("pond");
+            setTimeout(() => setActiveEasterEgg(null), 4000);
+          }}
+          title="Click to interact with the Koi Pond"
+        >
+          {/* Subtle concentric water ripples */}
+          <div className="w-12 h-12 rounded-full border-2 border-accent-teal/60 animate-pond-ripple pointer-events-none" />
+          <div className="w-24 h-24 rounded-full border border-accent-teal/30 animate-pond-ripple [animation-delay:1.2s] pointer-events-none absolute" />
+          
+          {activeEasterEgg === "pond" ? (
+            <div className="bg-dark-surface/95 border-2 border-accent-teal text-dark-text text-xs font-bold px-3 py-2 rounded-xl shadow-2xl animate-pop-in pointer-events-none absolute -top-12 z-30 whitespace-nowrap">
+              🐟 &ldquo;Zero memory leaks in this stream!&rdquo;
+            </div>
+          ) : (
+            <div className="opacity-0 group-hover/pond:opacity-100 transition-opacity bg-dark-surface/95 border border-accent-teal text-dark-text text-[10px] font-bold px-2 py-1 rounded shadow-lg absolute -top-8 pointer-events-none whitespace-nowrap">
+              💧 Click to ripple pond
+            </div>
+          )}
+        </div>
+
+        {/* Hotspot 2: Watering Gardener (Center-Right Planter) */}
+        <div
+          className="absolute right-[16%] bottom-[31%] w-[14%] h-[16%] pointer-events-auto diorama-hotspot group/gardener flex items-center justify-center cursor-pointer"
+          onClick={() => {
+            playRetroSound("pop");
+            addToast("Zen Gardener: Cultivating open-source civic tech seeds since 2024! 🌿");
+            setActiveEasterEgg("gardener");
+            setTimeout(() => setActiveEasterEgg(null), 4000);
+          }}
+          title="Click to greet the Zen Gardener"
+        >
+          {activeEasterEgg === "gardener" ? (
+            <div className="bg-dark-surface/95 border-2 border-accent-teal text-dark-text text-xs font-bold px-3 py-2 rounded-xl shadow-2xl animate-pop-in pointer-events-none absolute -top-12 z-30 whitespace-nowrap">
+              🌱 &ldquo;Nurturing open source civic tech!&rdquo;
+            </div>
+          ) : (
+            <div className="opacity-0 group-hover/gardener:opacity-100 transition-opacity bg-dark-surface/95 border border-accent-teal text-dark-text text-[10px] font-bold px-2 py-1 rounded shadow-lg absolute -top-8 pointer-events-none whitespace-nowrap">
+              🌱 Greet Gardener
+            </div>
+          )}
+        </div>
+
+        {/* Hotspot 3: Shears Gardener (Bottom-Left of Diorama) */}
+        <div
+          className="absolute right-[35%] bottom-[19%] w-[13%] h-[16%] pointer-events-auto diorama-hotspot group/shears flex items-center justify-center cursor-pointer"
+          onClick={() => {
+            playRetroSound("click");
+            addToast("Hedge Trimmer: Pruning away proprietary bloat & vendor lock-in! ✂️");
+            setActiveEasterEgg("shears");
+            setTimeout(() => setActiveEasterEgg(null), 4000);
+          }}
+          title="Click to talk to the Hedge Trimmer"
+        >
+          {activeEasterEgg === "shears" ? (
+            <div className="bg-dark-surface/95 border-2 border-amber-button text-dark-text text-xs font-bold px-3 py-2 rounded-xl shadow-2xl animate-pop-in pointer-events-none absolute -top-12 z-30 whitespace-nowrap">
+              ✂️ &ldquo;Pruning closed-source lock-in!&rdquo;
+            </div>
+          ) : (
+            <div className="opacity-0 group-hover/shears:opacity-100 transition-opacity bg-dark-surface/95 border border-amber-button text-dark-text text-[10px] font-bold px-2 py-1 rounded shadow-lg absolute -top-8 pointer-events-none whitespace-nowrap">
+              ✂️ Talk to Trimmer
+            </div>
+          )}
+        </div>
+
+        {/* Hotspot 4: ZENITH Monolith Stone (Top-Right) */}
+        <div
+          className="absolute right-[12%] top-[20%] w-[25%] h-[24%] pointer-events-auto diorama-hotspot group/monolith flex items-center justify-center cursor-pointer"
+          onClick={() => {
+            playRetroSound("chime");
+            addToast("ZENITH Monolith: Verified public foundation for civic systems! 🏛️");
+            setActiveEasterEgg("monolith");
+            setTimeout(() => setActiveEasterEgg(null), 4000);
+          }}
+          title="Click to resonate the Zenith Monolith"
+        >
+          {activeEasterEgg === "monolith" ? (
+            <div className="bg-dark-surface/95 border-2 border-amber-button text-dark-text text-xs font-bold px-3 py-2 rounded-xl shadow-2xl animate-pop-in pointer-events-none absolute -top-12 z-30 whitespace-nowrap">
+              🏛️ &ldquo;Rock-solid civic tech foundation!&rdquo;
+            </div>
+          ) : (
+            <div className="opacity-0 group-hover/monolith:opacity-100 transition-opacity bg-dark-surface/95 border border-amber-button text-dark-text text-[10px] font-bold px-2.5 py-1 rounded shadow-lg absolute -top-8 pointer-events-none whitespace-nowrap">
+              ✨ Resonate Monolith
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Mobile top navigation scroll bar */}
@@ -545,37 +699,45 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
         </div>
       )}
 
-      {/* Chat Panel (fixed/responsive bottom-right overlay) */}
+      {/* Chat Panel (fixed/responsive bottom-right overlay with glassmorphism) */}
       {chatOpen && (
-        <div className="fixed bottom-[var(--taskbar-height)] right-0 sm:right-4 left-0 sm:left-auto z-50">
+        <div className="fixed bottom-[var(--taskbar-height)] right-0 sm:right-4 left-0 sm:left-auto z-50 animate-pop-in">
           <ChatPanel onClose={() => setChatOpen(false)} />
         </div>
       )}
 
-      {/* Chat toggle button when closed */}
+      {/* Floating Copilot pill when closed (inviting, unobtrusive, glorious) */}
       {!chatOpen && (
         <button
+          id="zenith-copilot-trigger"
           onClick={() => {
             setChatOpen(true);
             playRetroSound("click");
           }}
-          className="fixed bottom-[calc(var(--taskbar-height)+8px)] right-3 sm:right-4 z-50 w-11 h-11 sm:w-12 sm:h-12 bg-dark-surface border border-dark-border rounded-full flex items-center justify-center shadow-xl hover:bg-dark-elevated hover:scale-105 active:scale-95 transition-all cursor-pointer"
-          title="Open AI Assistant"
-          aria-label="Open AI Assistant"
+          className="fixed bottom-[calc(var(--taskbar-height)+10px)] right-3 sm:right-6 z-40 flex items-center gap-2 px-3.5 py-2 bg-dark-surface/90 hover:bg-dark-elevated border border-amber-button/50 rounded-full shadow-[0_8px_24px_rgba(241,168,44,0.18)] hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md group"
+          title="Open Zenith AI Copilot"
+          aria-label="Open Zenith AI Copilot"
         >
-          <svg className="w-5 h-5 text-dark-text animate-bounce" style={{ animationDuration: "3s" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
+          <span className="w-2 h-2 rounded-full bg-accent-teal animate-pulse shrink-0" />
+          <span className="text-xs font-bold text-dark-text tracking-tight flex items-center gap-1.5">
+            <span>✨ Zenith AI Copilot</span>
+          </span>
+          <kbd className="hidden sm:inline-block font-mono text-[9px] text-dark-text-faint bg-dark-bg px-1.5 py-0.5 rounded border border-dark-border-subtle">
+            Ask
+          </kbd>
         </button>
       )}
 
-      {/* Bottom Taskbar/Dock */}
-      <div className="absolute bottom-0 left-0 right-0 h-[var(--taskbar-height)] bg-dark-surface/90 border-t border-dark-border backdrop-blur-md z-30 px-1 sm:px-4 flex items-center justify-between select-none overflow-x-auto scrollbar-none">
+      {/* Bottom Taskbar/Dock (Frosted Glass Acrylic with Sound Equalizer) */}
+      <div className="desktop-taskbar glass-dock absolute bottom-0 left-0 right-0 h-[var(--taskbar-height)] border-t border-dark-border/80 z-30 px-1 sm:px-4 flex items-center justify-between select-none overflow-x-auto scrollbar-none">
         {/* Left status info */}
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <span className="w-2 h-2 rounded-full bg-accent-teal animate-pulse shrink-0" role="status" aria-label="System online" />
           <span className="text-[9px] font-extrabold tracking-wider uppercase text-dark-text-muted hidden xs:inline">
             zenith_os
+          </span>
+          <span className="hidden lg:inline text-[8px] font-mono text-dark-text-faint bg-dark-surface/80 px-1.5 py-0.5 rounded border border-dark-border-subtle">
+            v1.0.4 • BHARAT
           </span>
         </div>
 
@@ -592,6 +754,7 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
             return (
               <button
                 key={app.id}
+                id={`taskbar-${app.id}`}
                 onClick={() => handleTaskbarClick(app.id, isRunning)}
                 className={`h-8 sm:h-7 px-1.5 sm:px-2.5 rounded flex items-center gap-1 sm:gap-1.5 text-[10px] font-bold transition-all border cursor-pointer shrink-0 ${
                   isRunning
@@ -603,14 +766,71 @@ export default function DesktopMode({ onSwitchToWebsite }: DesktopModeProps) {
                   {renderDesktopIcon(app.icon, "w-3.5 h-3.5")}
                 </span>
                 <span className="hidden sm:inline">{app.label}</span>
+                {isRunning && <span className="w-1 h-1 rounded-full bg-amber-button ml-0.5" />}
               </button>
             );
           })}
         </div>
 
-        {/* Right time info */}
-        <div className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] font-extrabold text-dark-text-muted font-mono shrink-0">
-          <ClockWidget />
+        {/* Right time & system tray info */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 text-[9px] sm:text-[10px] font-extrabold text-dark-text-muted font-mono shrink-0">
+          {/* Sound Toggle Button with animated equalizer waves */}
+          <button
+            onClick={() => {
+              const nextSound = !soundEnabled;
+              setSoundEnabled(nextSound);
+              setSoundEnabledState(nextSound);
+              if (nextSound) playRetroSound("success");
+              addToast(`Retro Audio: ${nextSound ? "ON" : "OFF"}`);
+            }}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors cursor-pointer border ${
+              soundEnabled
+                ? "bg-amber-button/10 border-amber-button/30 text-amber-button"
+                : "bg-transparent border-transparent hover:bg-dark-border/20 text-dark-text-faint"
+            }`}
+            title={soundEnabled ? "Mute retro sound effects" : "Enable retro sound effects"}
+          >
+            {soundEnabled ? (
+              <div className="flex items-end gap-0.5 h-3.5">
+                <span className="w-0.5 bg-amber-button rounded-full wave-bar-1" />
+                <span className="w-0.5 bg-amber-button rounded-full wave-bar-2" />
+                <span className="w-0.5 bg-amber-button rounded-full wave-bar-3" />
+                <span className="w-0.5 bg-amber-button rounded-full wave-bar-4" />
+              </div>
+            ) : (
+              <span className="text-[10px]">🔇</span>
+            )}
+            <span className="hidden md:inline text-[9px] uppercase tracking-wider">{soundEnabled ? "SFX" : "MUTED"}</span>
+          </button>
+
+          {/* Quick Search */}
+          <button
+            onClick={() => {
+              playRetroSound("click");
+              window.dispatchEvent(new CustomEvent("zenith_open_search"));
+            }}
+            className="hidden sm:flex items-center gap-1 px-1.5 py-1 rounded bg-transparent hover:bg-dark-border/20 text-dark-text-muted hover:text-dark-text cursor-pointer transition-colors"
+            title="Search projects (Ctrl+K)"
+          >
+            <span>🔍</span>
+            <span className="text-[9px]">Ctrl+K</span>
+          </button>
+
+          {/* Clock */}
+          <div className="px-2 py-1 rounded bg-dark-bg/60 border border-dark-border-subtle">
+            <ClockWidget />
+          </div>
+
+          {/* Show / Hide Desktop Peek Button */}
+          <button
+            onClick={() => {
+              playRetroSound("minimize");
+              setIsMinimized(!isMinimized);
+            }}
+            className="w-2.5 sm:w-3 h-6 border-l border-dark-border hover:bg-amber-button/20 transition-colors cursor-pointer"
+            title="Toggle show desktop"
+            aria-label="Show Desktop"
+          />
         </div>
       </div>
     </div>

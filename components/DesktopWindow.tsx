@@ -76,63 +76,76 @@ export default memo(function DesktopWindow({
 
   return (
     <div
-      className={`animate-window-fade-in flex flex-col window-chrome shadow-2xl border border-dark-border overflow-hidden bg-dark-surface ${
+      className={`animate-window-fade-in flex flex-col window-chrome shadow-[0_25px_60px_-15px_rgba(35,37,29,0.2)] border border-dark-border/80 overflow-hidden bg-dark-surface/95 backdrop-blur-xl ${
         shouldMaximize
           ? "fixed inset-x-0 top-[var(--navbar-height)] bottom-[var(--taskbar-height)] z-[60] rounded-none border-none"
-          : "fixed sm:absolute w-screen sm:w-[95vw] max-w-[880px] h-dvh sm:h-[calc(85vh-var(--taskbar-height))] max-h-none sm:max-h-[min(650px,calc(100dvh-var(--navbar-height)-var(--taskbar-height)-20px))] top-0 sm:top-[2vh] left-0 right-0 sm:mx-auto z-40 rounded-none sm:rounded-xl"
+          : "fixed sm:absolute w-screen sm:w-[92vw] lg:w-[820px] max-w-[850px] h-dvh sm:h-[calc(85vh-var(--taskbar-height))] max-h-none sm:max-h-[min(650px,calc(100dvh-var(--navbar-height)-var(--taskbar-height)-20px))] top-0 sm:top-[2vh] left-0 sm:left-6 lg:left-14 xl:left-20 z-40 rounded-none sm:rounded-xl"
       }`}
       style={!shouldMaximize ? { transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`, transition: isDragging ? 'none' : 'transform 0.1s ease-out' } : undefined}
       role="dialog"
       aria-label={title}
+      aria-modal={shouldMaximize}
     >
       <div className="flex flex-col flex-1 h-full overflow-hidden">
         {/* Title bar */}
         <div
-          className="bg-dark-elevated px-2 sm:px-3 py-2 flex items-center justify-between border-b border-dark-border cursor-move select-none shrink-0 min-h-[44px] sm:min-h-0"
+          className="window-titlebar bg-dark-elevated/95 backdrop-blur-md px-2 sm:px-3 py-2 flex items-center justify-between border-b border-dark-border/80 cursor-move select-none shrink-0 min-h-[44px] sm:min-h-0"
           onPointerDown={handleDragStart}
           onPointerMove={handleDragMove}
           onPointerUp={handleDragEnd}
           onDoubleClick={onToggleMaximize}
         >
-          {/* Traffic lights with touch-friendly hit areas */}
+          {/* Traffic lights with touch-friendly hit areas and macOS-style symbols on hover */}
           <div
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 group/lights"
             onPointerDown={(e) => e.stopPropagation()}
           >
             <button
+              type="button"
               onClick={onClose}
-              className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center hover:bg-dark-surface/10 rounded-full transition-colors focus:outline-none cursor-pointer active:scale-90"
+              className="window-control window-control-close w-7 h-7 sm:w-6 sm:h-6 flex items-center justify-center hover:bg-dark-surface/20 rounded-full transition-all focus:outline-none cursor-pointer active:scale-90"
               title="Close window"
               aria-label="Close window"
             >
-              <span className="w-4 h-4 sm:w-3 sm:h-3 rounded-full bg-[#FF5F57] hover:bg-[#FF3B30] border border-[#E04842]" />
+              <span className="w-3.5 h-3.5 sm:w-3 sm:h-3 rounded-full bg-[#FF5F57] hover:bg-[#FF3B30] border border-[#E04842] flex items-center justify-center text-[8px] text-[#700000] font-bold">
+                <span className="opacity-0 group-hover/lights:opacity-100 transition-opacity">✕</span>
+              </span>
             </button>
             <button
+              type="button"
               onClick={onMinimize}
-              className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center hover:bg-dark-surface/10 rounded-full transition-colors focus:outline-none cursor-pointer active:scale-90"
+              className="window-control window-control-minimize w-7 h-7 sm:w-6 sm:h-6 flex items-center justify-center hover:bg-dark-surface/20 rounded-full transition-all focus:outline-none cursor-pointer active:scale-90"
               title="Minimize window"
               aria-label="Minimize window"
             >
-              <span className="w-4 h-4 sm:w-3 sm:h-3 rounded-full bg-[#FEBC2E] hover:bg-[#F5A623] border border-[#DFA023]" />
+              <span className="w-3.5 h-3.5 sm:w-3 sm:h-3 rounded-full bg-[#FEBC2E] hover:bg-[#F5A623] border border-[#DFA023] flex items-center justify-center text-[8px] text-[#704000] font-bold">
+                <span className="opacity-0 group-hover/lights:opacity-100 transition-opacity">−</span>
+              </span>
             </button>
             <button
+              type="button"
               onClick={onToggleMaximize}
-              className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center hover:bg-dark-surface/10 rounded-full transition-colors focus:outline-none cursor-pointer active:scale-90"
+              className="window-control window-control-maximize w-7 h-7 sm:w-6 sm:h-6 flex items-center justify-center hover:bg-dark-surface/20 rounded-full transition-all focus:outline-none cursor-pointer active:scale-90"
               title="Maximize window"
               aria-label="Maximize window"
             >
-              <span className="w-4 h-4 sm:w-3 sm:h-3 rounded-full bg-[#28C840] hover:bg-[#1DB954] border border-[#24A93B]" />
+              <span className="w-3.5 h-3.5 sm:w-3 sm:h-3 rounded-full bg-[#28C840] hover:bg-[#1DB954] border border-[#24A93B] flex items-center justify-center text-[7px] text-[#004a10] font-bold">
+                <span className="opacity-0 group-hover/lights:opacity-100 transition-opacity">⤢</span>
+              </span>
             </button>
           </div>
 
           {/* Center: file name with dropdown */}
-          <div className="flex items-center gap-1.5 text-sm text-dark-text/70 font-medium select-none min-w-0 flex-1 justify-center px-2">
+          <div className="flex items-center gap-1.5 text-sm text-dark-text/70 font-medium select-none min-w-0 flex-1 justify-center px-2" title={`${title} · Zenith workspace`}>
             <svg className="w-4 h-4 opacity-50 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
             </svg>
             <span className="font-mono text-[11px] sm:text-xs tracking-tight truncate">{title}</span>
             <ChevronDown className="w-3 h-3 opacity-40 shrink-0" />
+            <span className="hidden sm:inline-flex items-center gap-1 ml-1 text-[9px] uppercase tracking-widest text-accent-teal" aria-label="Window active">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-teal shadow-[0_0_8px_rgba(42,143,101,.8)]" /> live
+            </span>
           </div>
 
           {/* Right spacer to balance traffic lights */}
@@ -145,7 +158,8 @@ export default memo(function DesktopWindow({
             {toolbarContent || (
               <>
                 <div className="flex items-center gap-2 sm:gap-3 text-dark-text-muted min-w-0 flex-1">
-                  <button
+                   <button
+                     type="button"
                     onClick={onRefresh}
                     className="p-1.5 sm:p-1 hover:bg-dark-border/50 rounded transition-colors flex items-center justify-center cursor-pointer min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0"
                     title="Refresh database"
@@ -166,7 +180,8 @@ export default memo(function DesktopWindow({
                   </span>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                  <button
+                   <button
+                     type="button"
                     onClick={onSearch}
                     className="p-1.5 sm:p-1 text-dark-text-muted hover:text-dark-text hover:bg-dark-border/50 rounded transition-colors cursor-pointer min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
                     title="Search registry index (Cmd+K)"
